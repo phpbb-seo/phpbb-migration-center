@@ -1,0 +1,1105 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+<meta charset="UTF-8">
+<title>Step 4: Migration Selection & Options</title>
+<style>
+body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background: #f0f2f5; margin: 0; padding: 20px; color: #24292f; }
+/**
+ * phpBB Migration Center Extension - Scoped Stylesheet
+ * Scoped strictly under .migrationcenter-wrapper
+ */
+
+.migrationcenter-wrapper {
+	font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+	color: #24292f;
+	line-height: 1.5;
+	margin-top: 15px;
+	box-sizing: border-box;
+}
+
+.migrationcenter-wrapper * {
+	box-sizing: border-box;
+}
+
+/* Container Constraint */
+.migrationcenter-wrapper .mc-container {
+	max-width: 1220px;
+	margin: 0 auto;
+}
+
+/* Status Badges */
+.migrationcenter-wrapper .status-badge {
+	display: inline-block;
+	padding: 3px 8px;
+	border-radius: 4px;
+	font-size: 11px;
+	font-weight: bold;
+	text-transform: uppercase;
+}
+
+.migrationcenter-wrapper .status-pending { background-color: #6c757d; color: #fff; }
+.migrationcenter-wrapper .status-running { background-color: #007bff; color: #fff; }
+.migrationcenter-wrapper .status-paused  { background-color: #ffc107; color: #000; }
+.migrationcenter-wrapper .status-completed { background-color: #28a745; color: #fff; }
+.migrationcenter-wrapper .status-failed   { background-color: #dc3545; color: #fff; }
+.migrationcenter-wrapper .status-success { background-color: #2da44e; color: #fff; }
+.migrationcenter-wrapper .status-warning { background-color: #bf8700; color: #fff; }
+.migrationcenter-wrapper .status-failure { background-color: #cf222e; color: #fff; }
+
+.migrationcenter-wrapper .text-center {
+	text-align: center;
+}
+
+/* ==========================================================================
+   Visual Stepper Header
+   ========================================================================== */
+.migrationcenter-wrapper .mc-stepper {
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	background: #ffffff;
+	border: 1px solid #d0d7de;
+	border-radius: 8px;
+	padding: 14px 20px;
+	margin-bottom: 24px;
+	box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+}
+
+.migrationcenter-wrapper .mc-step {
+	display: flex;
+	align-items: center;
+	gap: 8px;
+	font-size: 13px;
+	font-weight: 500;
+	color: #656d76;
+	text-decoration: none;
+	position: relative;
+	flex: 1;
+	justify-content: center;
+}
+
+.migrationcenter-wrapper .mc-step-circle {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	width: 26px;
+	height: 26px;
+	border-radius: 50%;
+	background: #f0f2f5;
+	color: #656d76;
+	font-size: 12px;
+	font-weight: 700;
+	border: 1px solid #d0d7de;
+	flex-shrink: 0;
+}
+
+.migrationcenter-wrapper .mc-step.completed {
+	color: #1a7f37;
+}
+
+.migrationcenter-wrapper .mc-step.completed .mc-step-circle {
+	background: #dafbe1;
+	color: #1a7f37;
+	border-color: #4ac26b;
+}
+
+.migrationcenter-wrapper .mc-step.active {
+	color: #0969da;
+	font-weight: 700;
+}
+
+.migrationcenter-wrapper .mc-step.active .mc-step-circle {
+	background: #0969da;
+	color: #ffffff;
+	border-color: #0969da;
+	box-shadow: 0 0 0 3px rgba(9, 105, 218, 0.2);
+}
+
+.migrationcenter-wrapper .mc-step.future {
+	color: #8c959f;
+	opacity: 0.75;
+}
+
+.migrationcenter-wrapper .mc-step-divider {
+	flex: 0 0 24px;
+	height: 2px;
+	background: #e1e4e8;
+	margin: 0 4px;
+}
+
+/* Page Header */
+.migrationcenter-wrapper .mc-page-header {
+	margin-bottom: 24px;
+}
+
+.migrationcenter-wrapper .mc-page-title {
+	font-size: 20px;
+	font-weight: 700;
+	color: #1f2328;
+	margin: 0 0 6px 0;
+}
+
+.migrationcenter-wrapper .mc-page-subtitle {
+	font-size: 14px;
+	color: #656d76;
+	margin: 0;
+}
+
+/* ==========================================================================
+   2-Column Layout Grid
+   ========================================================================== */
+.migrationcenter-wrapper .mc-layout {
+	display: flex;
+	gap: 24px;
+	align-items: flex-start;
+}
+
+.migrationcenter-wrapper .mc-main-col {
+	flex: 1 1 65%;
+	min-width: 0;
+}
+
+.migrationcenter-wrapper .mc-sidebar-col {
+	flex: 0 0 350px;
+	position: sticky;
+	top: 20px;
+}
+
+@media (max-width: 980px) {
+	.migrationcenter-wrapper .mc-layout {
+		flex-direction: column;
+	}
+	.migrationcenter-wrapper .mc-sidebar-col {
+		flex: 1 1 100%;
+		width: 100%;
+		position: static;
+	}
+}
+
+/* ==========================================================================
+   Cards & Content Groups
+   ========================================================================== */
+.migrationcenter-wrapper .mc-card {
+	background: #ffffff;
+	border: 1px solid #d0d7de;
+	border-radius: 8px;
+	margin-bottom: 20px;
+	box-shadow: 0 1px 3px rgba(0,0,0,0.03);
+	overflow: hidden;
+}
+
+.migrationcenter-wrapper .mc-card-header {
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	padding: 12px 18px;
+	background: #f6f8fa;
+	border-bottom: 1px solid #d0d7de;
+}
+
+.migrationcenter-wrapper .mc-card-title {
+	font-size: 14px;
+	font-weight: 700;
+	color: #1f2328;
+	margin: 0;
+	display: flex;
+	align-items: center;
+	gap: 8px;
+}
+
+.migrationcenter-wrapper .mc-card-body {
+	padding: 16px 18px;
+}
+
+/* Quick Select Toolbar */
+.migrationcenter-wrapper .mc-quick-toolbar {
+	display: flex;
+	gap: 10px;
+	align-items: center;
+	margin-bottom: 16px;
+	flex-wrap: wrap;
+}
+
+.migrationcenter-wrapper .mc-btn-sm {
+	padding: 4px 10px;
+	font-size: 12px;
+	font-weight: 600;
+	border-radius: 4px;
+	border: 1px solid #d0d7de;
+	background: #f6f8fa;
+	color: #24292f;
+	cursor: pointer;
+	text-decoration: none;
+	display: inline-block;
+	transition: background 0.15s ease;
+}
+
+.migrationcenter-wrapper .mc-btn-sm:hover {
+	background: #f0f2f5;
+	border-color: #afb8c1;
+}
+
+/* Item Rows */
+.migrationcenter-wrapper .mc-item-list {
+	display: flex;
+	flex-direction: column;
+	gap: 8px;
+}
+
+.migrationcenter-wrapper .mc-item-row {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	padding: 10px 14px;
+	border: 1px solid #e1e4e8;
+	border-radius: 6px;
+	background: #ffffff;
+	transition: all 0.15s ease;
+}
+
+.migrationcenter-wrapper .mc-item-row:hover {
+	background: #f6f8fa;
+	border-color: #d0d7de;
+}
+
+.migrationcenter-wrapper .mc-item-row.disabled {
+	background: #fcfcfc;
+	border-color: #eaecef;
+	opacity: 0.7;
+}
+
+.migrationcenter-wrapper .mc-item-control {
+	display: flex;
+	align-items: center;
+	gap: 12px;
+	flex: 1;
+}
+
+.migrationcenter-wrapper .mc-item-checkbox {
+	width: 16px;
+	height: 16px;
+	margin: 0;
+	cursor: pointer;
+}
+
+.migrationcenter-wrapper .mc-item-details {
+	display: flex;
+	flex-direction: column;
+}
+
+.migrationcenter-wrapper .mc-item-label {
+	font-size: 13px;
+	font-weight: 600;
+	color: #1f2328;
+	cursor: pointer;
+}
+
+.migrationcenter-wrapper .mc-item-desc {
+	font-size: 12px;
+	color: #656d76;
+	margin-top: 2px;
+}
+
+.migrationcenter-wrapper .mc-item-meta {
+	display: flex;
+	align-items: center;
+	gap: 8px;
+	flex-shrink: 0;
+}
+
+/* ==========================================================================
+   Badges
+   ========================================================================== */
+.migrationcenter-wrapper .mc-badge {
+	display: inline-flex;
+	align-items: center;
+	padding: 2px 8px;
+	border-radius: 12px;
+	font-size: 11px;
+	font-weight: 600;
+	line-height: 1.4;
+	white-space: nowrap;
+}
+
+.migrationcenter-wrapper .mc-badge-count {
+	background: #ddf4ff;
+	color: #0969da;
+	border: 1px solid #54aeff;
+	font-weight: 700;
+}
+
+.migrationcenter-wrapper .mc-badge-recommended {
+	background: #dafbe1;
+	color: #1a7f37;
+	border: 1px solid #4ac26b;
+}
+
+.migrationcenter-wrapper .mc-badge-optional {
+	background: #fff8c5;
+	color: #9a6700;
+	border: 1px solid #d4a72c;
+}
+
+.migrationcenter-wrapper .mc-badge-empty {
+	background: #f6f8fa;
+	color: #656d76;
+	border: 1px solid #d0d7de;
+}
+
+/* ==========================================================================
+   Mode Switcher (Recommended vs Advanced)
+   ========================================================================== */
+.migrationcenter-wrapper .mc-mode-card {
+	background: #f6f8fa;
+	border: 1px solid #d0d7de;
+	border-radius: 8px;
+	padding: 16px;
+	margin-bottom: 20px;
+}
+
+.migrationcenter-wrapper .mc-mode-tabs {
+	display: flex;
+	gap: 12px;
+	margin-bottom: 10px;
+}
+
+.migrationcenter-wrapper .mc-mode-option {
+	display: flex;
+	align-items: center;
+	gap: 8px;
+	padding: 8px 16px;
+	background: #ffffff;
+	border: 1px solid #d0d7de;
+	border-radius: 6px;
+	cursor: pointer;
+	font-weight: 600;
+	font-size: 13px;
+	transition: all 0.15s ease;
+}
+
+.migrationcenter-wrapper .mc-mode-option:hover {
+	border-color: #0969da;
+}
+
+.migrationcenter-wrapper .mc-mode-option.selected {
+	background: #0969da;
+	color: #ffffff;
+	border-color: #0969da;
+}
+
+.migrationcenter-wrapper .mc-mode-option.selected input[type="radio"] {
+	accent-color: #ffffff;
+}
+
+.migrationcenter-wrapper .mc-mode-desc {
+	font-size: 12px;
+	color: #656d76;
+	margin: 0;
+}
+
+/* ==========================================================================
+   Accordions for Advanced Settings
+   ========================================================================== */
+.migrationcenter-wrapper .mc-accordion-group {
+	display: flex;
+	flex-direction: column;
+	gap: 12px;
+	margin-top: 14px;
+}
+
+.migrationcenter-wrapper .mc-accordion {
+	border: 1px solid #d0d7de;
+	border-radius: 6px;
+	background: #ffffff;
+	overflow: hidden;
+}
+
+.migrationcenter-wrapper .mc-accordion-header {
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	padding: 12px 16px;
+	background: #f6f8fa;
+	cursor: pointer;
+	font-size: 13px;
+	font-weight: 600;
+	color: #24292f;
+	user-select: none;
+	border-bottom: 1px solid transparent;
+}
+
+.migrationcenter-wrapper .mc-accordion.open .mc-accordion-header {
+	border-bottom-color: #d0d7de;
+	background: #f0f2f5;
+}
+
+.migrationcenter-wrapper .mc-accordion-content {
+	display: none;
+	padding: 16px;
+	background: #ffffff;
+}
+
+.migrationcenter-wrapper .mc-accordion.open .mc-accordion-content {
+	display: block;
+}
+
+.migrationcenter-wrapper .mc-chevron {
+	font-size: 12px;
+	color: #656d76;
+	transition: transform 0.2s ease;
+}
+
+.migrationcenter-wrapper .mc-accordion.open .mc-chevron {
+	transform: rotate(180deg);
+}
+
+/* Clean Form Controls in Accordion */
+.migrationcenter-wrapper .mc-form-row {
+	display: flex;
+	flex-direction: column;
+	margin-bottom: 16px;
+	padding-bottom: 14px;
+	border-bottom: 1px solid #f1f3f5;
+}
+
+.migrationcenter-wrapper .mc-form-row:last-child {
+	margin-bottom: 0;
+	padding-bottom: 0;
+	border-bottom: none;
+}
+
+.migrationcenter-wrapper .mc-form-label {
+	font-size: 13px;
+	font-weight: 600;
+	color: #1f2328;
+	margin-bottom: 4px;
+}
+
+.migrationcenter-wrapper .mc-form-desc {
+	font-size: 12px;
+	color: #656d76;
+	margin-bottom: 8px;
+}
+
+.migrationcenter-wrapper .mc-form-control {
+	display: flex;
+	align-items: center;
+	gap: 10px;
+}
+
+.migrationcenter-wrapper select.mc-select {
+	padding: 6px 12px;
+	border: 1px solid #d0d7de;
+	border-radius: 6px;
+	font-size: 13px;
+	background: #ffffff;
+	color: #24292f;
+	max-width: 420px;
+	width: 100%;
+}
+
+/* ==========================================================================
+   Safety Card & Dry Run Card
+   ========================================================================== */
+.migrationcenter-wrapper .mc-safety-card {
+	background: #f6f8fa;
+	border: 1px solid #d0d7de;
+	border-left: 4px solid #0969da;
+	border-radius: 6px;
+	padding: 16px;
+	margin-bottom: 20px;
+}
+
+.migrationcenter-wrapper .mc-safety-title {
+	font-size: 13px;
+	font-weight: 700;
+	color: #0969da;
+	margin: 0 0 10px 0;
+	display: flex;
+	align-items: center;
+	gap: 6px;
+}
+
+.migrationcenter-wrapper .mc-safety-list {
+	list-style: none;
+	padding: 0;
+	margin: 0;
+	display: flex;
+	flex-direction: column;
+	gap: 6px;
+}
+
+.migrationcenter-wrapper .mc-safety-item {
+	font-size: 12px;
+	color: #24292f;
+	display: flex;
+	align-items: flex-start;
+	gap: 6px;
+}
+
+.migrationcenter-wrapper .mc-safety-icon {
+	color: #1a7f37;
+	font-weight: 700;
+}
+
+/* Dry Run Card */
+.migrationcenter-wrapper .mc-dryrun-card {
+	background: #fffde7;
+	border: 1px solid #fff59d;
+	border-radius: 6px;
+	padding: 14px 16px;
+	margin-bottom: 20px;
+}
+
+.migrationcenter-wrapper .mc-dryrun-title {
+	font-size: 13px;
+	font-weight: 700;
+	color: #795548;
+	margin: 0 0 4px 0;
+}
+
+.migrationcenter-wrapper .mc-dryrun-desc {
+	font-size: 12px;
+	color: #5d4037;
+	margin: 0 0 10px 0;
+}
+
+/* ==========================================================================
+   Summary Sidebar
+   ========================================================================== */
+.migrationcenter-wrapper .mc-summary-card {
+	background: #ffffff;
+	border: 1px solid #d0d7de;
+	border-radius: 8px;
+	box-shadow: 0 1px 3px rgba(0,0,0,0.03);
+	overflow: hidden;
+}
+
+.migrationcenter-wrapper .mc-summary-header {
+	padding: 12px 16px;
+	background: #f6f8fa;
+	border-bottom: 1px solid #d0d7de;
+	font-size: 13px;
+	font-weight: 700;
+	color: #1f2328;
+}
+
+.migrationcenter-wrapper .mc-summary-body {
+	padding: 14px 16px;
+}
+
+.migrationcenter-wrapper .mc-summary-row {
+	display: flex;
+	justify-content: space-between;
+	font-size: 12px;
+	padding: 4px 0;
+	color: #24292f;
+}
+
+.migrationcenter-wrapper .mc-summary-total {
+	display: flex;
+	justify-content: space-between;
+	font-size: 13px;
+	font-weight: 700;
+	padding-top: 10px;
+	margin-top: 8px;
+	border-top: 1px solid #eaecef;
+	color: #0969da;
+}
+
+.migrationcenter-wrapper .mc-excluded-box {
+	margin-top: 14px;
+	padding-top: 12px;
+	border-top: 1px dashed #d0d7de;
+}
+
+.migrationcenter-wrapper .mc-excluded-title {
+	font-size: 11px;
+	font-weight: 700;
+	text-transform: uppercase;
+	color: #656d76;
+	margin: 0 0 6px 0;
+}
+
+.migrationcenter-wrapper .mc-excluded-item {
+	font-size: 11px;
+	color: #656d76;
+	margin-bottom: 4px;
+}
+
+/* ==========================================================================
+   Bottom Action Bar
+   ========================================================================== */
+.migrationcenter-wrapper .mc-action-bar {
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	padding: 16px 20px;
+	background: #f6f8fa;
+	border: 1px solid #d0d7de;
+	border-radius: 8px;
+	margin-top: 24px;
+	box-shadow: 0 1px 3px rgba(0,0,0,0.03);
+}
+
+.migrationcenter-wrapper .mc-action-reassurance {
+	font-size: 12px;
+	color: #656d76;
+	margin: 0;
+}
+
+.migrationcenter-wrapper .mc-action-buttons {
+	display: flex;
+	gap: 12px;
+	align-items: center;
+}
+
+.migrationcenter-wrapper .mc-btn-primary {
+	padding: 8px 20px;
+	font-size: 13px;
+	font-weight: 700;
+	color: #ffffff;
+	background: #0969da;
+	border: 1px solid #0969da;
+	border-radius: 6px;
+	cursor: pointer;
+	text-decoration: none;
+	display: inline-flex;
+	align-items: center;
+	gap: 6px;
+	box-shadow: 0 1px 2px rgba(0,0,0,0.1);
+	transition: background 0.15s ease;
+}
+
+.migrationcenter-wrapper .mc-btn-primary:hover {
+	background: #0858b9;
+	border-color: #0858b9;
+}
+
+.migrationcenter-wrapper .mc-btn-secondary {
+	padding: 8px 16px;
+	font-size: 13px;
+	font-weight: 600;
+	color: #24292f;
+	background: #f6f8fa;
+	border: 1px solid #d0d7de;
+	border-radius: 6px;
+	cursor: pointer;
+	text-decoration: none;
+	display: inline-flex;
+	align-items: center;
+	transition: background 0.15s ease;
+}
+
+.migrationcenter-wrapper .mc-btn-secondary:hover {
+	background: #f0f2f5;
+	border-color: #afb8c1;
+}
+
+/* ==========================================================================
+   RTL Overrides
+   ========================================================================== */
+.migrationcenter-wrapper.rtl {
+	direction: rtl;
+	text-align: right;
+}
+
+.migrationcenter-wrapper.rtl .mc-safety-card {
+	border-left: 1px solid #d0d7de;
+	border-right: 4px solid #0969da;
+}
+
+.migrationcenter-wrapper.rtl .mc-action-buttons {
+	flex-direction: row-reverse;
+}
+
+
+</style>
+</head>
+<body>
+<div class="migrationcenter-wrapper ">
+<div class="mc-container">
+	<!-- Stepper -->
+	<div class="mc-stepper">
+		<div class="mc-step completed"><span class="mc-step-circle">&#10003;</span><span>Welcome</span></div>
+		<div class="mc-step-divider"></div>
+		<div class="mc-step completed"><span class="mc-step-circle">&#10003;</span><span>Source</span></div>
+		<div class="mc-step-divider"></div>
+		<div class="mc-step completed"><span class="mc-step-circle">&#10003;</span><span>Preflight</span></div>
+		<div class="mc-step-divider"></div>
+		<div class="mc-step active"><span class="mc-step-circle">4</span><span>Content & Options</span></div>
+		<div class="mc-step-divider"></div>
+		<div class="mc-step future"><span class="mc-step-circle">5</span><span>Review</span></div>
+		<div class="mc-step-divider"></div>
+		<div class="mc-step future"><span class="mc-step-circle">6</span><span>Migration</span></div>
+	</div>
+
+	<div class="mc-page-header">
+		<h2 class="mc-page-title">Select Content & Configuration</h2>
+		<p class="mc-page-subtitle">Choose the content you want to migrate and review conversion settings.</p>
+	</div>
+
+	<!-- Mode Switcher -->
+	<div class="mc-mode-card">
+		<div class="mc-mode-tabs">
+			<label class="mc-mode-option selected" id="tab-mode-recommended" onclick="setWizardMode('recommended');">
+				<input type="radio" name="wizard_mode" value="recommended" checked="checked" />
+				<span>Recommended Mode</span>
+			</label>
+			<label class="mc-mode-option" id="tab-mode-advanced" onclick="setWizardMode('advanced');">
+				<input type="radio" name="wizard_mode" value="advanced" />
+				<span>Advanced Configuration</span>
+			</label>
+		</div>
+		<p class="mc-mode-desc" id="mode-desc-text">Recommended settings are suitable for most migrations and preserve existing phpBB content.</p>
+	</div>
+
+	<div class="mc-layout">
+		<!-- Main Column -->
+		<div class="mc-main-col">
+			<div class="mc-quick-toolbar">
+				<button type="button" class="mc-btn-sm" onclick="selectRecommendedSteps();">Select Recommended</button>
+				<button type="button" class="mc-btn-sm" onclick="selectAllSteps();">Select All Available</button>
+				<button type="button" class="mc-btn-sm" onclick="clearOptionalSteps();">Clear Optional</button>
+			</div>
+
+			<!-- Card A: Members -->
+			<div class="mc-card">
+				<div class="mc-card-header">
+					<h3 class="mc-card-title">Members & Identity</h3>
+					<span class="mc-badge mc-badge-recommended">Recommended</span>
+				</div>
+				<div class="mc-card-body">
+					<div class="mc-item-list">
+						<div class="mc-item-row">
+							<div class="mc-item-control">
+								<input type="checkbox" id="step_users" name="steps[]" value="users" checked="checked" class="mc-item-checkbox mc-step-chk" data-count="100" onchange="updateLiveSummary();" />
+								<div class="mc-item-details">
+									<label for="step_users" class="mc-item-label">Users</label>
+									<span class="mc-item-desc">User accounts, groups, role memberships, global permissions, and avatars.</span>
+								</div>
+							</div>
+							<div class="mc-item-meta"><span class="mc-badge mc-badge-count">100 records</span></div>
+						</div>
+						<div class="mc-item-row">
+							<div class="mc-item-control">
+								<input type="checkbox" id="step_groups" name="steps[]" value="groups" checked="checked" class="mc-item-checkbox mc-step-chk" data-count="6" onchange="updateLiveSummary();" />
+								<div class="mc-item-details">
+									<label for="step_groups" class="mc-item-label">User Groups</label>
+									<span class="mc-item-desc">Group Memberships Reconciliation</span>
+								</div>
+							</div>
+							<div class="mc-item-meta"><span class="mc-badge mc-badge-count">6 records</span></div>
+						</div>
+						<div class="mc-item-row">
+							<div class="mc-item-control">
+								<input type="checkbox" id="step_memberships" name="steps[]" value="group_memberships" checked="checked" class="mc-item-checkbox mc-step-chk" data-count="102" onchange="updateLiveSummary();" />
+								<div class="mc-item-details">
+									<label for="step_memberships" class="mc-item-label">Group Memberships Reconciliation</label>
+									<span class="mc-item-desc">Global Permissions Translation</span>
+								</div>
+							</div>
+							<div class="mc-item-meta"><span class="mc-badge mc-badge-count">102 records</span></div>
+						</div>
+						<div class="mc-item-row">
+							<div class="mc-item-control">
+								<input type="checkbox" id="step_perms" name="steps[]" value="global_permissions" checked="checked" class="mc-item-checkbox mc-step-chk" data-count="318" onchange="updateLiveSummary();" />
+								<div class="mc-item-details">
+									<label for="step_perms" class="mc-item-label">Global Permissions Translation</label>
+									<span class="mc-item-desc">Global Permissions Translation</span>
+								</div>
+							</div>
+							<div class="mc-item-meta"><span class="mc-badge mc-badge-count">318 records</span></div>
+						</div>
+						<div class="mc-item-row">
+							<div class="mc-item-control">
+								<input type="checkbox" id="step_avatars" name="steps[]" value="avatars" checked="checked" class="mc-item-checkbox mc-step-chk" data-count="2" onchange="updateLiveSummary();" />
+								<div class="mc-item-details">
+									<label for="step_avatars" class="mc-item-label">User Avatars & Gravatars</label>
+									<span class="mc-item-desc">Avatar Transformation Policy</span>
+								</div>
+							</div>
+							<div class="mc-item-meta"><span class="mc-badge mc-badge-count">2 records</span></div>
+						</div>
+					</div>
+				</div>
+			</div>
+
+			<!-- Card B: Forums & Content -->
+			<div class="mc-card">
+				<div class="mc-card-header">
+					<h3 class="mc-card-title">Forum Structure & Content</h3>
+					<span class="mc-badge mc-badge-recommended">Recommended</span>
+				</div>
+				<div class="mc-card-body">
+					<div class="mc-item-list">
+						<div class="mc-item-row">
+							<div class="mc-item-control">
+								<input type="checkbox" id="step_forums" name="steps[]" value="forums" checked="checked" class="mc-item-checkbox mc-step-chk" data-count="38" onchange="updateLiveSummary();" />
+								<div class="mc-item-details">
+									<label for="step_forums" class="mc-item-label">Categories & Forums Hierarchy</label>
+									<span class="mc-item-desc">38 nodes (14 categories, 22 forums, 2 link forums)</span>
+								</div>
+							</div>
+							<div class="mc-item-meta"><span class="mc-badge mc-badge-count">38 records</span></div>
+						</div>
+						<div class="mc-item-row">
+							<div class="mc-item-control">
+								<input type="checkbox" id="step_topics" name="steps[]" value="topics" checked="checked" class="mc-item-checkbox mc-step-chk" data-count="538" onchange="updateLiveSummary();" />
+								<div class="mc-item-details">
+									<label for="step_topics" class="mc-item-label">Topics</label>
+									<span class="mc-item-desc">Thread Prefix Policy</span>
+								</div>
+							</div>
+							<div class="mc-item-meta"><span class="mc-badge mc-badge-count">538 records</span></div>
+						</div>
+						<div class="mc-item-row">
+							<div class="mc-item-control">
+								<input type="checkbox" id="step_posts" name="steps[]" value="posts" checked="checked" class="mc-item-checkbox mc-step-chk" data-count="7822" onchange="updateLiveSummary();" />
+								<div class="mc-item-details">
+									<label for="step_posts" class="mc-item-label">Posts & Message Conversion</label>
+									<span class="mc-item-desc">Malformed BBCode Policy</span>
+								</div>
+							</div>
+							<div class="mc-item-meta"><span class="mc-badge mc-badge-count">7,822 records</span></div>
+						</div>
+						<div class="mc-item-row">
+							<div class="mc-item-control">
+								<input type="checkbox" id="step_attachments" name="steps[]" value="attachments" checked="checked" class="mc-item-checkbox mc-step-chk" data-count="5" onchange="updateLiveSummary();" />
+								<div class="mc-item-details">
+									<label for="step_attachments" class="mc-item-label">Attachments</label>
+									<span class="mc-item-desc">Attachment Security Policy</span>
+								</div>
+							</div>
+							<div class="mc-item-meta"><span class="mc-badge mc-badge-count">5 records</span></div>
+						</div>
+						<div class="mc-item-row disabled">
+							<div class="mc-item-control">
+								<input type="checkbox" id="step_node_perms" name="steps[]" value="node_permissions" class="mc-item-checkbox mc-step-chk" data-count="0" onchange="updateLiveSummary();" />
+								<div class="mc-item-details">
+									<label for="step_node_perms" class="mc-item-label">Node Permissions Application</label>
+									<span class="mc-item-desc">Deferred until forums exist in Phase 4B</span>
+								</div>
+							</div>
+							<div class="mc-item-meta"><span class="mc-badge mc-badge-empty">No records found</span></div>
+						</div>
+					</div>
+				</div>
+			</div>
+
+			<!-- Card C: Private Content -->
+			<div class="mc-card">
+				<div class="mc-card-header">
+					<h3 class="mc-card-title">Private Messaging</h3>
+					<span class="mc-badge mc-badge-empty">No records found</span>
+				</div>
+				<div class="mc-card-body">
+					<div class="mc-item-list">
+						<div class="mc-item-row disabled">
+							<div class="mc-item-control">
+								<input type="checkbox" id="step_conv" name="steps[]" value="conversations" class="mc-item-checkbox mc-step-chk" data-count="0" onchange="updateLiveSummary();" />
+								<div class="mc-item-details"><label for="step_conv" class="mc-item-label">Conversations & Participant State</label></div>
+							</div>
+							<div class="mc-item-meta"><span class="mc-badge mc-badge-empty">No records found</span></div>
+						</div>
+						<div class="mc-item-row disabled">
+							<div class="mc-item-control">
+								<input type="checkbox" id="step_conv_msg" name="steps[]" value="conversation_messages" class="mc-item-checkbox mc-step-chk" data-count="0" onchange="updateLiveSummary();" />
+								<div class="mc-item-details"><label for="step_conv_msg" class="mc-item-label">Private Messages (Privmsgs)</label></div>
+							</div>
+							<div class="mc-item-meta"><span class="mc-badge mc-badge-empty">No records found</span></div>
+						</div>
+					</div>
+				</div>
+			</div>
+
+			<!-- Card D: Additional -->
+			<div class="mc-card">
+				<div class="mc-card-header">
+					<h3 class="mc-card-title">Polls & Moderation Data</h3>
+					<span class="mc-badge mc-badge-empty">No records found</span>
+				</div>
+				<div class="mc-card-body">
+					<div class="mc-item-list">
+						<div class="mc-item-row disabled">
+							<div class="mc-item-control">
+								<input type="checkbox" id="step_polls" name="steps[]" value="polls" class="mc-item-checkbox mc-step-chk" data-count="0" onchange="updateLiveSummary();" />
+								<div class="mc-item-details"><label for="step_polls" class="mc-item-label">Thread Polls, Options & Votes</label></div>
+							</div>
+							<div class="mc-item-meta"><span class="mc-badge mc-badge-empty">No records found</span></div>
+						</div>
+						<div class="mc-item-row disabled">
+							<div class="mc-item-control">
+								<input type="checkbox" id="step_bans" name="steps[]" value="bans" class="mc-item-checkbox mc-step-chk" data-count="0" onchange="updateLiveSummary();" />
+								<div class="mc-item-details"><label for="step_bans" class="mc-item-label">User, Email & IP Bans</label></div>
+							</div>
+							<div class="mc-item-meta"><span class="mc-badge mc-badge-empty">No records found</span></div>
+						</div>
+					</div>
+				</div>
+			</div>
+
+			<!-- Advanced Section Accordions -->
+			<div id="advanced-settings-section" style="display: none; margin-top: 24px;">
+				<div class="mc-accordion-group">
+					<div class="mc-accordion open">
+						<div class="mc-accordion-header" onclick="toggleAccordion(this);">
+							<span>Users & Duplicate Handling</span>
+							<span class="mc-chevron">&#9660;</span>
+						</div>
+						<div class="mc-accordion-content">
+							<div class="mc-form-row">
+								<label class="mc-form-label">Duplicate Username Policy</label>
+								<span class="mc-form-desc">Defines what to do if a migrating username matches an existing phpBB member.</span>
+								<div class="mc-form-control">
+									<select class="mc-select">
+										<option selected="selected">Rename with suffix (e.g. username_2) (Recommended)</option>
+										<option>Skip duplicate record</option>
+									</select>
+								</div>
+							</div>
+						</div>
+					</div>
+
+					<div class="mc-accordion">
+						<div class="mc-accordion-header" onclick="toggleAccordion(this);">
+							<span>Forums, Hierarchy & Permissions</span>
+							<span class="mc-chevron">&#9660;</span>
+						</div>
+						<div class="mc-accordion-content">
+							<div class="mc-form-row">
+								<label class="mc-form-label">Permissions Overview</label>
+								<div class="mc-safety-card" style="border-left-color: #0277bd;">
+									<ul style="margin: 0; padding-left: 18px; font-size: 12px;">
+										<li><strong>318</strong> source rules analyzed</li>
+										<li><strong style="color: #2e7d32;">31</strong> exact capability mappings</li>
+										<li><strong style="color: #f57f17;">11</strong> reduced-fidelity mappings</li>
+										<li><strong>276</strong> unsupported rules safely defaulted to no access</li>
+									</ul>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+
+			<!-- Dry Run Safety Card -->
+			<div class="mc-dryrun-card">
+				<h4 class="mc-dryrun-title">Test Migration First</h4>
+				<p class="mc-dryrun-desc">Run validation and simulate the selected stages without writing migration content to phpBB.</p>
+				<label style="font-weight: 600; font-size: 13px; cursor: pointer; display: flex; align-items: center; gap: 8px;">
+					<input type="checkbox" id="dry_run" name="dry_run" value="1" />
+					<span>Enable Dry Run simulation mode</span>
+				</label>
+			</div>
+		</div>
+
+		<!-- Sidebar Column -->
+		<div class="mc-sidebar-col">
+			<!-- Safety Card -->
+			<div class="mc-safety-card">
+				<h4 class="mc-safety-title"><span>&#128737;</span> Protected by Default</h4>
+				<ul class="mc-safety-list">
+					<li class="mc-safety-item"><span class="mc-safety-icon">&#10003;</span> <span>Existing phpBB administrators and founders are never modified</span></li>
+					<li class="mc-safety-item"><span class="mc-safety-icon">&#10003;</span> <span>Founder permissions are never granted automatically</span></li>
+					<li class="mc-safety-item"><span class="mc-safety-icon">&#10003;</span> <span>Existing canonical groups are reused safely</span></li>
+					<li class="mc-safety-item"><span class="mc-safety-icon">&#10003;</span> <span>The migration pauses after every stage for your review and approval</span></li>
+					<li class="mc-safety-item"><span class="mc-safety-icon">&#10003;</span> <span>You can safely cancel and roll back before continuing</span></li>
+				</ul>
+			</div>
+
+			<!-- Summary Card -->
+			<div class="mc-summary-card">
+				<div class="mc-summary-header"><span>Migration Summary</span></div>
+				<div class="mc-summary-body">
+					<div class="mc-summary-row"><span>Source:</span> <strong>XenForo 2.3.12</strong></div>
+					<div class="mc-summary-row"><span>Users:</span> <strong>100</strong></div>
+					<div class="mc-summary-row"><span>Categories & Forums Hierarchy:</span> <strong>38</strong></div>
+					<div class="mc-summary-row"><span>Topics:</span> <strong>538</strong></div>
+					<div class="mc-summary-row"><span>Posts & Message Conversion:</span> <strong>7,822</strong></div>
+					<div class="mc-summary-row"><span>Attachments:</span> <strong>5</strong></div>
+					<div class="mc-summary-row"><span>User Avatars & Gravatars:</span> <strong>2</strong></div>
+					<div class="mc-summary-total"><span>Total detected records:</span> <span id="summary-total-records">8,931</span></div>
+					<div class="mc-excluded-box">
+						<h5 class="mc-excluded-title">Intentionally Not Included</h5>
+						<div class="mc-excluded-item">&bull; Subscriptions & Watch Lists</div>
+						<div class="mc-excluded-item">&bull; Profile Banners</div>
+						<div class="mc-excluded-item">&bull; Unsupported Add-on Data</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<!-- Bottom Action Bar -->
+	<div class="mc-action-bar">
+		<button type="button" class="mc-btn-secondary">Back</button>
+		<div style="display: flex; align-items: center; gap: 16px;">
+			<span class="mc-action-reassurance">No data will be written during this step. You will review all choices on the next screen before starting.</span>
+			<button type="button" class="mc-btn-primary">Review Migration &raquo;</button>
+		</div>
+	</div>
+</div>
+</div>
+
+<script>
+function setWizardMode(mode) {
+	var recTab = document.getElementById("tab-mode-recommended");
+	var advTab = document.getElementById("tab-mode-advanced");
+	var advSection = document.getElementById("advanced-settings-section");
+	var descText = document.getElementById("mode-desc-text");
+	if (mode === "advanced") {
+		advTab.classList.add("selected");
+		recTab.classList.remove("selected");
+		advTab.querySelector("input").checked = true;
+		advSection.style.display = "block";
+		descText.textContent = "Reveals detailed policy controls for fine-tuning conversion and performance.";
+	} else {
+		recTab.classList.add("selected");
+		advTab.classList.remove("selected");
+		recTab.querySelector("input").checked = true;
+		advSection.style.display = "none";
+		descText.textContent = "Recommended settings are suitable for most migrations and preserve existing phpBB content.";
+	}
+}
+function toggleAccordion(headerEl) {
+	var accordion = headerEl.parentElement;
+	accordion.classList.toggle("open");
+}
+function selectRecommendedSteps() {
+	var recommended = ["groups", "users", "group_memberships", "global_permissions", "forums", "topics", "posts", "attachments", "avatars"];
+	document.querySelectorAll(".mc-step-chk").forEach(function(chk) {
+		chk.checked = (recommended.indexOf(chk.value) !== -1);
+	});
+	updateLiveSummary();
+}
+function selectAllSteps() {
+	document.querySelectorAll(".mc-step-chk").forEach(function(chk) {
+		chk.checked = true;
+	});
+	updateLiveSummary();
+}
+function clearOptionalSteps() {
+	var core = ["groups", "users", "forums", "topics", "posts"];
+	document.querySelectorAll(".mc-step-chk").forEach(function(chk) {
+		chk.checked = (core.indexOf(chk.value) !== -1);
+	});
+	updateLiveSummary();
+}
+function updateLiveSummary() {
+	var total = 0;
+	document.querySelectorAll(".mc-step-chk").forEach(function(chk) {
+		if (chk.checked) {
+			var cnt = parseInt(chk.getAttribute("data-count"), 10) || 0;
+			total += cnt;
+		}
+	});
+	var totalEl = document.getElementById("summary-total-records");
+	if (totalEl) {
+		totalEl.textContent = total.toLocaleString();
+	}
+}
+</script>
+</body>
+</html>

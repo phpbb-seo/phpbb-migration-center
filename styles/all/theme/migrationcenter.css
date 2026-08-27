@@ -1,0 +1,899 @@
+/**
+ * phpBB Migration Center - Modern Enterprise Design System
+ * Strictly scoped under .mc-app
+ *
+ * @copyright (c) 2026 phpBB SEO Team
+ * @license GNU General Public License, version 2 (GPL-2.0)
+ */
+
+.mc-app {
+	/* Design System CSS Custom Properties */
+	--mc-bg: #f8fafc;
+	--mc-surface: #ffffff;
+	--mc-surface-subtle: #f8fafc;
+	--mc-surface-raised: #f1f5f9;
+	
+	--mc-border: #d0d7de;
+	--mc-border-subtle: #e2e8f0;
+	--mc-border-hover: #94a3b8;
+	--mc-border-focus: #1976d2;
+
+	--mc-text: #0f172a;
+	--mc-text-muted: #64748b;
+	--mc-text-subtle: #94a3b8;
+
+	--mc-primary: #1976d2;
+	--mc-primary-hover: #1565c0;
+	--mc-primary-subtle: #e3f2fd;
+	--mc-primary-border: #90caf9;
+	
+	--mc-success: #2e7d32;
+	--mc-success-hover: #1b5e20;
+	--mc-success-subtle: #e8f5e9;
+	--mc-success-border: #a5d6a7;
+
+	--mc-warning: #d97706;
+	--mc-warning-hover: #b45309;
+	--mc-warning-subtle: #fffbeb;
+	--mc-warning-border: #fde68a;
+
+	--mc-danger: #dc2626;
+	--mc-danger-hover: #b91c1c;
+	--mc-danger-subtle: #fef2f2;
+	--mc-danger-border: #fecaca;
+
+	--mc-info: #0284c7;
+	--mc-info-subtle: #f0f9ff;
+	--mc-info-border: #bae6fd;
+
+	--mc-radius-sm: 6px;
+	--mc-radius-md: 10px;
+	--mc-radius-lg: 14px;
+	--mc-radius-full: 9999px;
+
+	--mc-shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+	--mc-shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.07), 0 2px 4px -2px rgba(0, 0, 0, 0.05);
+	--mc-shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.08), 0 4px 6px -4px rgba(0, 0, 0, 0.03);
+
+	--mc-focus-ring: 0 0 0 3px rgba(25, 118, 210, 0.25);
+	--mc-transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+
+	font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+	color: var(--mc-text);
+	line-height: 1.5;
+	margin-top: 10px;
+	box-sizing: border-box;
+}
+
+.mc-app * {
+	box-sizing: border-box;
+}
+
+/* ==========================================================================
+   Page Container Constraint
+   ========================================================================== */
+.mc-app .mc-container {
+	max-width: 1220px;
+	margin: 0 auto;
+}
+
+/* ==========================================================================
+   Modern Page Header
+   ========================================================================== */
+.mc-app .mc-page-header {
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	flex-wrap: wrap;
+	gap: 16px;
+	padding: 16px 20px;
+	background: var(--mc-surface);
+	border: 1px solid var(--mc-border);
+	border-radius: var(--mc-radius-md);
+	box-shadow: var(--mc-shadow-sm);
+	margin-bottom: 20px;
+}
+
+.mc-app .mc-header-main {
+	display: flex;
+	flex-direction: column;
+	gap: 4px;
+}
+
+.mc-app .mc-header-title-row {
+	display: flex;
+	align-items: center;
+	gap: 12px;
+	flex-wrap: wrap;
+}
+
+.mc-app .mc-header-title {
+	font-size: 20px;
+	font-weight: 700;
+	color: var(--mc-text);
+	margin: 0;
+	line-height: 1.2;
+}
+
+.mc-app .mc-header-subtitle {
+	font-size: 13px;
+	color: var(--mc-text-muted);
+	margin: 0;
+}
+
+.mc-app .mc-header-meta {
+	display: flex;
+	align-items: center;
+	gap: 14px;
+	flex-wrap: wrap;
+	font-size: 12px;
+	color: var(--mc-text-muted);
+}
+
+.mc-app .mc-meta-item {
+	display: inline-flex;
+	align-items: center;
+	gap: 6px;
+}
+
+.mc-app .mc-run-id-pill {
+	display: inline-flex;
+	align-items: center;
+	gap: 6px;
+	background: var(--mc-surface-raised);
+	border: 1px solid var(--mc-border-subtle);
+	padding: 3px 8px;
+	border-radius: var(--mc-radius-sm);
+	font-family: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace;
+	font-size: 12px;
+	color: var(--mc-primary);
+	direction: ltr;
+}
+
+.mc-app .mc-btn-copy {
+	background: none;
+	border: none;
+	cursor: pointer;
+	padding: 2px 4px;
+	border-radius: 4px;
+	font-size: 11px;
+	color: var(--mc-text-muted);
+	transition: var(--mc-transition);
+}
+
+.mc-app .mc-btn-copy:hover {
+	background: var(--mc-border-subtle);
+	color: var(--mc-text);
+}
+
+/* ==========================================================================
+   Status Badges
+   ========================================================================== */
+.mc-app .status-badge {
+	display: inline-flex;
+	align-items: center;
+	gap: 5px;
+	padding: 4px 10px;
+	border-radius: var(--mc-radius-full);
+	font-size: 11px;
+	font-weight: 700;
+	text-transform: uppercase;
+	letter-spacing: 0.5px;
+	line-height: 1;
+	border: 1px solid transparent;
+}
+
+.mc-app .status-ready,
+.mc-app .status-awaiting_worker { background-color: var(--mc-info-subtle); color: var(--mc-info); border-color: var(--mc-info-border); }
+.mc-app .status-running { background-color: var(--mc-primary-subtle); color: var(--mc-primary); border-color: var(--mc-primary-border); }
+.mc-app .status-awaiting_approval,
+.mc-app .status-stage_completed { background-color: var(--mc-success-subtle); color: var(--mc-success); border-color: var(--mc-success-border); }
+.mc-app .status-stage_completed_with_warnings,
+.mc-app .status-interrupted,
+.mc-app .status-warning { background-color: var(--mc-warning-subtle); color: var(--mc-warning); border-color: var(--mc-warning-border); }
+.mc-app .status-completed,
+.mc-app .status-finalized,
+.mc-app .status-success { background-color: var(--mc-success-subtle); color: var(--mc-success); border-color: var(--mc-success-border); }
+.mc-app .status-paused,
+.mc-app .status-pending,
+.mc-app .status-unstarted { background-color: var(--mc-surface-raised); color: var(--mc-text-muted); border-color: var(--mc-border-subtle); }
+.mc-app .status-failed,
+.mc-app .status-stage_failed,
+.mc-app .status-failure { background-color: var(--mc-danger-subtle); color: var(--mc-danger); border-color: var(--mc-danger-border); }
+.mc-app .status-cancelled,
+.mc-app .status-abandoned,
+.mc-app .status-rolled_back { background-color: var(--mc-surface-raised); color: var(--mc-text-muted); border-color: var(--mc-border); }
+
+/* ==========================================================================
+   KPI Summary Stat Cards (Dashboard Overview)
+   ========================================================================== */
+.mc-app .mc-kpi-grid {
+	display: grid;
+	grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+	gap: 16px;
+	margin-bottom: 20px;
+}
+
+.mc-app .mc-kpi-card {
+	background: var(--mc-surface);
+	border: 1px solid var(--mc-border);
+	border-radius: var(--mc-radius-md);
+	padding: 16px 18px;
+	box-shadow: var(--mc-shadow-sm);
+	display: flex;
+	flex-direction: column;
+	justify-content: space-between;
+}
+
+.mc-app .mc-kpi-label {
+	font-size: 12px;
+	font-weight: 600;
+	color: var(--mc-text-muted);
+	text-transform: uppercase;
+	letter-spacing: 0.5px;
+	margin-bottom: 6px;
+}
+
+.mc-app .mc-kpi-value {
+	font-size: 20px;
+	font-weight: 700;
+	color: var(--mc-text);
+	line-height: 1.2;
+}
+
+.mc-app .mc-kpi-subtext {
+	font-size: 12px;
+	color: var(--mc-text-muted);
+	margin-top: 4px;
+}
+
+/* ==========================================================================
+   Empty State Card (No Active Run)
+   ========================================================================== */
+.mc-app .mc-empty-state {
+	background: var(--mc-surface);
+	border: 1px solid var(--mc-border);
+	border-radius: var(--mc-radius-lg);
+	padding: 48px 24px;
+	text-align: center;
+	box-shadow: var(--mc-shadow-sm);
+	margin-bottom: 24px;
+}
+
+.mc-app .mc-empty-icon {
+	width: 56px;
+	height: 56px;
+	margin: 0 auto 16px auto;
+	border-radius: 50%;
+	background: var(--mc-primary-subtle);
+	color: var(--mc-primary);
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	font-size: 24px;
+}
+
+.mc-app .mc-empty-title {
+	font-size: 18px;
+	font-weight: 700;
+	color: var(--mc-text);
+	margin: 0 0 8px 0;
+}
+
+.mc-app .mc-empty-desc {
+	font-size: 14px;
+	color: var(--mc-text-muted);
+	max-width: 540px;
+	margin: 0 auto 24px auto;
+	line-height: 1.5;
+}
+
+.mc-app .mc-empty-actions {
+	display: flex;
+	gap: 12px;
+	justify-content: center;
+	align-items: center;
+	flex-wrap: wrap;
+}
+
+/* ==========================================================================
+   Hero Overall Progress Banner (Live Migration)
+   ========================================================================== */
+.mc-app .mc-hero-progress {
+	background: var(--mc-surface);
+	border: 1px solid var(--mc-border);
+	border-radius: var(--mc-radius-lg);
+	padding: 24px;
+	box-shadow: var(--mc-shadow-md);
+	margin-bottom: 20px;
+}
+
+.mc-app .mc-hero-top {
+	display: flex;
+	justify-content: space-between;
+	align-items: baseline;
+	flex-wrap: wrap;
+	gap: 12px;
+	margin-bottom: 12px;
+}
+
+.mc-app .mc-hero-pct {
+	font-size: 36px;
+	font-weight: 800;
+	color: var(--mc-primary);
+	line-height: 1;
+}
+
+.mc-app .mc-hero-counts {
+	font-size: 15px;
+	font-weight: 600;
+	color: var(--mc-text);
+}
+
+.mc-app .mc-progress-track {
+	background: var(--mc-surface-raised);
+	border-radius: var(--mc-radius-full);
+	height: 16px;
+	overflow: hidden;
+	width: 100%;
+	margin-bottom: 16px;
+	border: 1px solid var(--mc-border-subtle);
+}
+
+.mc-app .mc-progress-fill {
+	background: linear-gradient(90deg, #1976d2 0%, #2e7d32 100%);
+	height: 100%;
+	border-radius: var(--mc-radius-full);
+	transition: width 0.4s ease;
+}
+
+@media (prefers-reduced-motion: reduce) {
+	.mc-app .mc-progress-fill {
+		transition: none;
+	}
+}
+
+.mc-app .mc-hero-stats-row {
+	display: grid;
+	grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+	gap: 16px;
+	padding-top: 14px;
+	border-top: 1px solid var(--mc-border-subtle);
+	font-size: 13px;
+}
+
+.mc-app .mc-stat-item {
+	display: flex;
+	flex-direction: column;
+	gap: 2px;
+}
+
+.mc-app .mc-stat-label {
+	font-size: 11px;
+	color: var(--mc-text-muted);
+	font-weight: 600;
+	text-transform: uppercase;
+}
+
+.mc-app .mc-stat-val {
+	font-weight: 700;
+	color: var(--mc-text);
+}
+
+/* ==========================================================================
+   UNIFIED HERO ACTION CARD / CONTROL PANEL
+   (Ensures buttons NEVER scatter or jump!)
+   ========================================================================== */
+.mc-app .mc-hero-actions-card {
+	background: var(--mc-surface);
+	border: 2px solid var(--mc-border);
+	border-radius: var(--mc-radius-lg);
+	padding: 20px;
+	margin-bottom: 20px;
+	box-shadow: var(--mc-shadow-md);
+}
+
+.mc-app .mc-hero-actions-card.stage-approval {
+	border-color: var(--mc-success-border);
+	background: #fdfefe;
+}
+
+.mc-app .mc-hero-actions-card.stage-warning {
+	border-color: var(--mc-warning-border);
+	background: #fffdfa;
+}
+
+.mc-app .mc-hero-actions-card.stage-failed {
+	border-color: var(--mc-danger-border);
+	background: #fffafa;
+}
+
+.mc-app .mc-checkpoint-header {
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	flex-wrap: wrap;
+	gap: 10px;
+	margin-bottom: 12px;
+}
+
+.mc-app .mc-checkpoint-title {
+	font-size: 17px;
+	font-weight: 700;
+	margin: 0;
+	color: var(--mc-text);
+}
+
+.mc-app .mc-invariant-banner {
+	display: inline-flex;
+	align-items: center;
+	gap: 6px;
+	background: var(--mc-surface-raised);
+	border: 1px solid var(--mc-border-subtle);
+	padding: 4px 10px;
+	border-radius: var(--mc-radius-sm);
+	font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+	font-size: 12px;
+	font-weight: 600;
+	color: var(--mc-text);
+	margin-bottom: 14px;
+	direction: ltr;
+}
+
+.mc-app .mc-checkpoint-grid {
+	display: grid;
+	grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+	gap: 10px;
+	background: var(--mc-surface-subtle);
+	border: 1px solid var(--mc-border-subtle);
+	border-radius: var(--mc-radius-md);
+	padding: 12px;
+	margin-bottom: 18px;
+}
+
+.mc-app .mc-grid-cell {
+	display: flex;
+	flex-direction: column;
+	gap: 2px;
+}
+
+.mc-app .mc-grid-label {
+	font-size: 11px;
+	color: var(--mc-text-muted);
+}
+
+.mc-app .mc-grid-val {
+	font-size: 14px;
+	font-weight: 700;
+	color: var(--mc-text);
+}
+
+/* Unified Action Button Toolbar */
+.mc-app .mc-unified-toolbar {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	flex-wrap: wrap;
+	gap: 12px;
+	padding-top: 14px;
+	border-top: 1px solid var(--mc-border-subtle);
+}
+
+.mc-app .mc-primary-group {
+	display: flex;
+	align-items: center;
+	flex-wrap: wrap;
+	gap: 10px;
+}
+
+.mc-app .mc-destructive-group {
+	display: flex;
+	align-items: center;
+	flex-wrap: wrap;
+	gap: 8px;
+}
+
+/* Button UI Components */
+.mc-app .mc-btn {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	gap: 6px;
+	padding: 8px 18px;
+	font-size: 13px;
+	font-weight: 700;
+	border-radius: var(--mc-radius-sm);
+	cursor: pointer;
+	text-decoration: none;
+	border: 1px solid transparent;
+	transition: var(--mc-transition);
+	line-height: 1.3;
+}
+
+.mc-app .mc-btn:focus {
+	outline: none;
+	box-shadow: var(--mc-focus-ring);
+}
+
+.mc-app .mc-btn-primary {
+	background: var(--mc-primary);
+	color: #ffffff;
+	border-color: var(--mc-primary);
+}
+
+.mc-app .mc-btn-primary:hover {
+	background: var(--mc-primary-hover);
+	border-color: var(--mc-primary-hover);
+	color: #ffffff;
+}
+
+.mc-app .mc-btn-success {
+	background: var(--mc-success);
+	color: #ffffff;
+	border-color: var(--mc-success);
+}
+
+.mc-app .mc-btn-success:hover {
+	background: var(--mc-success-hover);
+	border-color: var(--mc-success-hover);
+	color: #ffffff;
+}
+
+.mc-app .mc-btn-warning {
+	background: var(--mc-warning);
+	color: #ffffff;
+	border-color: var(--mc-warning);
+}
+
+.mc-app .mc-btn-warning:hover {
+	background: var(--mc-warning-hover);
+	border-color: var(--mc-warning-hover);
+	color: #ffffff;
+}
+
+.mc-app .mc-btn-danger {
+	background: var(--mc-danger);
+	color: #ffffff;
+	border-color: var(--mc-danger);
+}
+
+.mc-app .mc-btn-danger:hover {
+	background: var(--mc-danger-hover);
+	border-color: var(--mc-danger-hover);
+	color: #ffffff;
+}
+
+.mc-app .mc-btn-secondary {
+	background: var(--mc-surface-raised);
+	color: var(--mc-text);
+	border-color: var(--mc-border);
+}
+
+.mc-app .mc-btn-secondary:hover {
+	background: var(--mc-border-subtle);
+	border-color: var(--mc-border-hover);
+	color: var(--mc-text);
+}
+
+.mc-app .mc-btn-destructive-ghost {
+	background: transparent;
+	color: var(--mc-danger);
+	border-color: var(--mc-border-subtle);
+}
+
+.mc-app .mc-btn-destructive-ghost:hover {
+	background: var(--mc-danger-subtle);
+	border-color: var(--mc-danger-border);
+	color: var(--mc-danger);
+}
+
+/* ==========================================================================
+   Connected Vertical Stage Stepper
+   ========================================================================== */
+.mc-app .mc-timeline-card {
+	background: var(--mc-surface);
+	border: 1px solid var(--mc-border);
+	border-radius: var(--mc-radius-md);
+	padding: 18px 20px;
+	box-shadow: var(--mc-shadow-sm);
+	margin-bottom: 20px;
+}
+
+.mc-app .mc-timeline-title {
+	font-size: 15px;
+	font-weight: 700;
+	margin: 0 0 16px 0;
+	color: var(--mc-text);
+}
+
+.mc-app .mc-timeline-list {
+	list-style: none;
+	margin: 0;
+	padding: 0;
+	position: relative;
+}
+
+.mc-app .mc-timeline-item {
+	display: flex;
+	align-items: flex-start;
+	gap: 14px;
+	position: relative;
+	padding-bottom: 14px;
+}
+
+.mc-app .mc-timeline-item:last-child {
+	padding-bottom: 0;
+}
+
+.mc-app .mc-timeline-connector {
+	position: absolute;
+	top: 24px;
+	left: 12px;
+	bottom: 0;
+	width: 2px;
+	background: var(--mc-border-subtle);
+	z-index: 1;
+}
+
+.mc-app .mc-timeline-icon-box {
+	width: 26px;
+	height: 26px;
+	border-radius: 50%;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	font-size: 12px;
+	font-weight: 700;
+	flex-shrink: 0;
+	z-index: 2;
+	background: var(--mc-surface-raised);
+	border: 1px solid var(--mc-border);
+	color: var(--mc-text-muted);
+}
+
+.mc-app .mc-timeline-item.completed .mc-timeline-icon-box {
+	background: var(--mc-success-subtle);
+	border-color: var(--mc-success-border);
+	color: var(--mc-success);
+}
+
+.mc-app .mc-timeline-item.active .mc-timeline-icon-box {
+	background: var(--mc-primary);
+	border-color: var(--mc-primary);
+	color: #ffffff;
+	box-shadow: var(--mc-focus-ring);
+}
+
+.mc-app .mc-timeline-item.warning .mc-timeline-icon-box {
+	background: var(--mc-warning-subtle);
+	border-color: var(--mc-warning-border);
+	color: var(--mc-warning);
+}
+
+.mc-app .mc-timeline-item.failed .mc-timeline-icon-box {
+	background: var(--mc-danger-subtle);
+	border-color: var(--mc-danger-border);
+	color: var(--mc-danger);
+}
+
+.mc-app .mc-timeline-body {
+	flex: 1;
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	flex-wrap: wrap;
+	gap: 8px;
+	padding: 2px 0;
+}
+
+.mc-app .mc-timeline-info {
+	display: flex;
+	flex-direction: column;
+	gap: 2px;
+}
+
+.mc-app .mc-timeline-name {
+	font-size: 13px;
+	font-weight: 700;
+	color: var(--mc-text);
+}
+
+.mc-app .mc-timeline-key {
+	font-size: 11px;
+	color: var(--mc-text-muted);
+	font-family: monospace;
+}
+
+.mc-app .mc-timeline-meta {
+	display: flex;
+	align-items: center;
+	gap: 10px;
+}
+
+/* ==========================================================================
+   Modern Stage Plan Table
+   ========================================================================== */
+.mc-app .mc-plan-card {
+	background: var(--mc-surface);
+	border: 1px solid var(--mc-border);
+	border-radius: var(--mc-radius-md);
+	padding: 18px 20px;
+	box-shadow: var(--mc-shadow-sm);
+	margin-bottom: 20px;
+	overflow-x: auto;
+}
+
+.mc-app .mc-table {
+	width: 100%;
+	border-collapse: separate;
+	border-spacing: 0;
+	font-size: 13px;
+}
+
+.mc-app .mc-table th {
+	background: var(--mc-surface-raised);
+	color: var(--mc-text-muted);
+	font-weight: 700;
+	font-size: 11px;
+	text-transform: uppercase;
+	letter-spacing: 0.5px;
+	padding: 10px 14px;
+	border-bottom: 1px solid var(--mc-border);
+	text-align: start;
+	position: sticky;
+	top: 0;
+}
+
+.mc-app .mc-table td {
+	padding: 12px 14px;
+	border-bottom: 1px solid var(--mc-border-subtle);
+	color: var(--mc-text);
+	vertical-align: middle;
+}
+
+.mc-app .mc-table tr:last-child td {
+	border-bottom: none;
+}
+
+.mc-app .mc-table tr:hover td {
+	background: var(--mc-surface-subtle);
+}
+
+/* ==========================================================================
+   Execution Method Radio Cards
+   ========================================================================== */
+.mc-app .mc-mode-grid {
+	display: grid;
+	grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+	gap: 14px;
+	margin: 12px 0;
+}
+
+.mc-app .mc-mode-card {
+	border: 2px solid var(--mc-border-subtle);
+	background: var(--mc-surface);
+	border-radius: var(--mc-radius-md);
+	padding: 16px;
+	cursor: pointer;
+	transition: var(--mc-transition);
+	display: flex;
+	gap: 12px;
+	align-items: flex-start;
+}
+
+.mc-app .mc-mode-card:hover {
+	border-color: var(--mc-border-hover);
+	background: var(--mc-surface-subtle);
+}
+
+.mc-app .mc-mode-card.selected {
+	border-color: var(--mc-primary);
+	background: var(--mc-primary-subtle);
+}
+
+.mc-app .mc-mode-card input[type="radio"] {
+	margin-top: 3px;
+}
+
+.mc-app .mc-mode-title {
+	font-size: 14px;
+	font-weight: 700;
+	color: var(--mc-text);
+	margin: 0 0 4px 0;
+}
+
+.mc-app .mc-mode-desc {
+	font-size: 12px;
+	color: var(--mc-text-muted);
+	margin: 0;
+	line-height: 1.4;
+}
+
+/* ==========================================================================
+   CLI Processing Notice
+   ========================================================================== */
+.mc-app .mc-cli-notice {
+	background: var(--mc-info-subtle);
+	border: 1px solid var(--mc-info-border);
+	border-inline-start: 4px solid var(--mc-info);
+	border-radius: var(--mc-radius-md);
+	padding: 16px 20px;
+	margin-bottom: 20px;
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	flex-wrap: wrap;
+	gap: 14px;
+}
+
+.mc-app .mc-cli-cmd-block {
+	background: #0f172a;
+	color: #38bdf8;
+	padding: 10px 14px;
+	border-radius: var(--mc-radius-sm);
+	font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+	font-size: 12px;
+	direction: ltr;
+	overflow-x: auto;
+	margin-top: 8px;
+}
+
+/* ==========================================================================
+   RTL Enhancements
+   ========================================================================== */
+.mc-app.rtl {
+	direction: rtl;
+	text-align: right;
+}
+
+.mc-app.rtl .mc-timeline-connector {
+	left: auto;
+	right: 12px;
+}
+
+.mc-app.rtl .mc-table th,
+.mc-app.rtl .mc-table td {
+	text-align: right;
+}
+
+/* ==========================================================================
+   Responsive Breakpoints (1024px, 768px, 640px, 390px)
+   ========================================================================== */
+@media (max-width: 768px) {
+	.mc-app .mc-hero-progress {
+		padding: 16px;
+	}
+	.mc-app .mc-hero-pct {
+		font-size: 28px;
+	}
+	.mc-app .mc-page-header {
+		padding: 12px 14px;
+	}
+	.mc-app .mc-unified-toolbar {
+		flex-direction: column;
+		align-items: stretch;
+	}
+	.mc-app .mc-primary-group,
+	.mc-app .mc-destructive-group {
+		width: 100%;
+		justify-content: stretch;
+	}
+	.mc-app .mc-btn {
+		width: 100%;
+	}
+	.mc-app #dashboard-grid {
+		grid-template-columns: 1fr !important;
+	}
+}
+
+@media (max-width: 480px) {
+	.mc-app {
+		margin-top: 5px;
+	}
+	.mc-app .mc-kpi-grid {
+		grid-template-columns: 1fr;
+	}
+	.mc-app .mc-checkpoint-grid {
+		grid-template-columns: repeat(2, 1fr);
+	}
+}

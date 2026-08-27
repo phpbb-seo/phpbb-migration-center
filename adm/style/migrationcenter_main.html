@@ -1,0 +1,2721 @@
+<!-- INCLUDECSS @phpbbseo_migrationcenter/migrationcenter.css -->
+<!-- INCLUDE overall_header.html -->
+
+<link rel="stylesheet" href="../ext/phpbbseo/migrationcenter/styles/all/theme/migrationcenter.css" type="text/css" media="screen" />
+<style>
+/* Modern Scoped Stylesheet Injected */
+/**
+ * phpBB Migration Center - Modern Enterprise Design System
+ * Strictly scoped under .mc-app
+ *
+ * @copyright (c) 2026 phpBB SEO Team
+ * @license GNU General Public License, version 2 (GPL-2.0)
+ */
+
+.mc-app {
+	/* Design System CSS Custom Properties */
+	--mc-bg: #f8fafc;
+	--mc-surface: #ffffff;
+	--mc-surface-subtle: #f8fafc;
+	--mc-surface-raised: #f1f5f9;
+	
+	--mc-border: #d0d7de;
+	--mc-border-subtle: #e2e8f0;
+	--mc-border-hover: #94a3b8;
+	--mc-border-focus: #1976d2;
+
+	--mc-text: #0f172a;
+	--mc-text-muted: #64748b;
+	--mc-text-subtle: #94a3b8;
+
+	--mc-primary: #1976d2;
+	--mc-primary-hover: #1565c0;
+	--mc-primary-subtle: #e3f2fd;
+	--mc-primary-border: #90caf9;
+	
+	--mc-success: #2e7d32;
+	--mc-success-hover: #1b5e20;
+	--mc-success-subtle: #e8f5e9;
+	--mc-success-border: #a5d6a7;
+
+	--mc-warning: #d97706;
+	--mc-warning-hover: #b45309;
+	--mc-warning-subtle: #fffbeb;
+	--mc-warning-border: #fde68a;
+
+	--mc-danger: #dc2626;
+	--mc-danger-hover: #b91c1c;
+	--mc-danger-subtle: #fef2f2;
+	--mc-danger-border: #fecaca;
+
+	--mc-info: #0284c7;
+	--mc-info-subtle: #f0f9ff;
+	--mc-info-border: #bae6fd;
+
+	--mc-radius-sm: 6px;
+	--mc-radius-md: 10px;
+	--mc-radius-lg: 14px;
+	--mc-radius-full: 9999px;
+
+	--mc-shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+	--mc-shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.07), 0 2px 4px -2px rgba(0, 0, 0, 0.05);
+	--mc-shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.08), 0 4px 6px -4px rgba(0, 0, 0, 0.03);
+
+	--mc-focus-ring: 0 0 0 3px rgba(25, 118, 210, 0.25);
+	--mc-transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+
+	font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+	color: var(--mc-text);
+	line-height: 1.5;
+	margin-top: 10px;
+	box-sizing: border-box;
+}
+
+.mc-app * {
+	box-sizing: border-box;
+}
+
+/* ==========================================================================
+   Page Container Constraint
+   ========================================================================== */
+.mc-app .mc-container {
+	max-width: 1220px;
+	margin: 0 auto;
+}
+
+/* ==========================================================================
+   Modern Page Header
+   ========================================================================== */
+.mc-app .mc-page-header {
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	flex-wrap: wrap;
+	gap: 16px;
+	padding: 16px 20px;
+	background: var(--mc-surface);
+	border: 1px solid var(--mc-border);
+	border-radius: var(--mc-radius-md);
+	box-shadow: var(--mc-shadow-sm);
+	margin-bottom: 20px;
+}
+
+.mc-app .mc-header-main {
+	display: flex;
+	flex-direction: column;
+	gap: 4px;
+}
+
+.mc-app .mc-header-title-row {
+	display: flex;
+	align-items: center;
+	gap: 12px;
+	flex-wrap: wrap;
+}
+
+.mc-app .mc-header-title {
+	font-size: 20px;
+	font-weight: 700;
+	color: var(--mc-text);
+	margin: 0;
+	line-height: 1.2;
+}
+
+.mc-app .mc-header-subtitle {
+	font-size: 13px;
+	color: var(--mc-text-muted);
+	margin: 0;
+}
+
+.mc-app .mc-header-meta {
+	display: flex;
+	align-items: center;
+	gap: 14px;
+	flex-wrap: wrap;
+	font-size: 12px;
+	color: var(--mc-text-muted);
+}
+
+.mc-app .mc-meta-item {
+	display: inline-flex;
+	align-items: center;
+	gap: 6px;
+}
+
+.mc-app .mc-run-id-pill {
+	display: inline-flex;
+	align-items: center;
+	gap: 6px;
+	background: var(--mc-surface-raised);
+	border: 1px solid var(--mc-border-subtle);
+	padding: 3px 8px;
+	border-radius: var(--mc-radius-sm);
+	font-family: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace;
+	font-size: 12px;
+	color: var(--mc-primary);
+	direction: ltr;
+}
+
+.mc-app .mc-btn-copy {
+	background: none;
+	border: none;
+	cursor: pointer;
+	padding: 2px 4px;
+	border-radius: 4px;
+	font-size: 11px;
+	color: var(--mc-text-muted);
+	transition: var(--mc-transition);
+}
+
+.mc-app .mc-btn-copy:hover {
+	background: var(--mc-border-subtle);
+	color: var(--mc-text);
+}
+
+/* ==========================================================================
+   Status Badges
+   ========================================================================== */
+.mc-app .status-badge {
+	display: inline-flex;
+	align-items: center;
+	gap: 5px;
+	padding: 4px 10px;
+	border-radius: var(--mc-radius-full);
+	font-size: 11px;
+	font-weight: 700;
+	text-transform: uppercase;
+	letter-spacing: 0.5px;
+	line-height: 1;
+	border: 1px solid transparent;
+}
+
+.mc-app .status-ready,
+.mc-app .status-awaiting_worker { background-color: var(--mc-info-subtle); color: var(--mc-info); border-color: var(--mc-info-border); }
+.mc-app .status-running { background-color: var(--mc-primary-subtle); color: var(--mc-primary); border-color: var(--mc-primary-border); }
+.mc-app .status-awaiting_approval,
+.mc-app .status-stage_completed { background-color: var(--mc-success-subtle); color: var(--mc-success); border-color: var(--mc-success-border); }
+.mc-app .status-stage_completed_with_warnings,
+.mc-app .status-interrupted,
+.mc-app .status-warning { background-color: var(--mc-warning-subtle); color: var(--mc-warning); border-color: var(--mc-warning-border); }
+.mc-app .status-completed,
+.mc-app .status-finalized,
+.mc-app .status-success { background-color: var(--mc-success-subtle); color: var(--mc-success); border-color: var(--mc-success-border); }
+.mc-app .status-paused,
+.mc-app .status-pending,
+.mc-app .status-unstarted { background-color: var(--mc-surface-raised); color: var(--mc-text-muted); border-color: var(--mc-border-subtle); }
+.mc-app .status-failed,
+.mc-app .status-stage_failed,
+.mc-app .status-failure { background-color: var(--mc-danger-subtle); color: var(--mc-danger); border-color: var(--mc-danger-border); }
+.mc-app .status-cancelled,
+.mc-app .status-abandoned,
+.mc-app .status-rolled_back { background-color: var(--mc-surface-raised); color: var(--mc-text-muted); border-color: var(--mc-border); }
+
+/* ==========================================================================
+   KPI Summary Stat Cards (Dashboard Overview)
+   ========================================================================== */
+.mc-app .mc-kpi-grid {
+	display: grid;
+	grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+	gap: 16px;
+	margin-bottom: 20px;
+}
+
+.mc-app .mc-kpi-card {
+	background: var(--mc-surface);
+	border: 1px solid var(--mc-border);
+	border-radius: var(--mc-radius-md);
+	padding: 16px 18px;
+	box-shadow: var(--mc-shadow-sm);
+	display: flex;
+	flex-direction: column;
+	justify-content: space-between;
+}
+
+.mc-app .mc-kpi-label {
+	font-size: 12px;
+	font-weight: 600;
+	color: var(--mc-text-muted);
+	text-transform: uppercase;
+	letter-spacing: 0.5px;
+	margin-bottom: 6px;
+}
+
+.mc-app .mc-kpi-value {
+	font-size: 20px;
+	font-weight: 700;
+	color: var(--mc-text);
+	line-height: 1.2;
+}
+
+.mc-app .mc-kpi-subtext {
+	font-size: 12px;
+	color: var(--mc-text-muted);
+	margin-top: 4px;
+}
+
+/* ==========================================================================
+   Empty State Card (No Active Run)
+   ========================================================================== */
+.mc-app .mc-empty-state {
+	background: var(--mc-surface);
+	border: 1px solid var(--mc-border);
+	border-radius: var(--mc-radius-lg);
+	padding: 48px 24px;
+	text-align: center;
+	box-shadow: var(--mc-shadow-sm);
+	margin-bottom: 24px;
+}
+
+.mc-app .mc-empty-icon {
+	width: 56px;
+	height: 56px;
+	margin: 0 auto 16px auto;
+	border-radius: 50%;
+	background: var(--mc-primary-subtle);
+	color: var(--mc-primary);
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	font-size: 24px;
+}
+
+.mc-app .mc-empty-title {
+	font-size: 18px;
+	font-weight: 700;
+	color: var(--mc-text);
+	margin: 0 0 8px 0;
+}
+
+.mc-app .mc-empty-desc {
+	font-size: 14px;
+	color: var(--mc-text-muted);
+	max-width: 540px;
+	margin: 0 auto 24px auto;
+	line-height: 1.5;
+}
+
+.mc-app .mc-empty-actions {
+	display: flex;
+	gap: 12px;
+	justify-content: center;
+	align-items: center;
+	flex-wrap: wrap;
+}
+
+/* ==========================================================================
+   Hero Overall Progress Banner (Live Migration)
+   ========================================================================== */
+.mc-app .mc-hero-progress {
+	background: var(--mc-surface);
+	border: 1px solid var(--mc-border);
+	border-radius: var(--mc-radius-lg);
+	padding: 24px;
+	box-shadow: var(--mc-shadow-md);
+	margin-bottom: 20px;
+}
+
+.mc-app .mc-hero-top {
+	display: flex;
+	justify-content: space-between;
+	align-items: baseline;
+	flex-wrap: wrap;
+	gap: 12px;
+	margin-bottom: 12px;
+}
+
+.mc-app .mc-hero-pct {
+	font-size: 36px;
+	font-weight: 800;
+	color: var(--mc-primary);
+	line-height: 1;
+}
+
+.mc-app .mc-hero-counts {
+	font-size: 15px;
+	font-weight: 600;
+	color: var(--mc-text);
+}
+
+.mc-app .mc-progress-track {
+	background: var(--mc-surface-raised);
+	border-radius: var(--mc-radius-full);
+	height: 16px;
+	overflow: hidden;
+	width: 100%;
+	margin-bottom: 16px;
+	border: 1px solid var(--mc-border-subtle);
+}
+
+.mc-app .mc-progress-fill {
+	background: linear-gradient(90deg, #1976d2 0%, #2e7d32 100%);
+	height: 100%;
+	border-radius: var(--mc-radius-full);
+	transition: width 0.4s ease;
+}
+
+@media (prefers-reduced-motion: reduce) {
+	.mc-app .mc-progress-fill {
+		transition: none;
+	}
+}
+
+.mc-app .mc-hero-stats-row {
+	display: grid;
+	grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+	gap: 16px;
+	padding-top: 14px;
+	border-top: 1px solid var(--mc-border-subtle);
+	font-size: 13px;
+}
+
+.mc-app .mc-stat-item {
+	display: flex;
+	flex-direction: column;
+	gap: 2px;
+}
+
+.mc-app .mc-stat-label {
+	font-size: 11px;
+	color: var(--mc-text-muted);
+	font-weight: 600;
+	text-transform: uppercase;
+}
+
+.mc-app .mc-stat-val {
+	font-weight: 700;
+	color: var(--mc-text);
+}
+
+/* ==========================================================================
+   UNIFIED HERO ACTION CARD / CONTROL PANEL
+   (Ensures buttons NEVER scatter or jump!)
+   ========================================================================== */
+.mc-app .mc-hero-actions-card {
+	background: var(--mc-surface);
+	border: 2px solid var(--mc-border);
+	border-radius: var(--mc-radius-lg);
+	padding: 20px;
+	margin-bottom: 20px;
+	box-shadow: var(--mc-shadow-md);
+}
+
+.mc-app .mc-hero-actions-card.stage-approval {
+	border-color: var(--mc-success-border);
+	background: #fdfefe;
+}
+
+.mc-app .mc-hero-actions-card.stage-warning {
+	border-color: var(--mc-warning-border);
+	background: #fffdfa;
+}
+
+.mc-app .mc-hero-actions-card.stage-failed {
+	border-color: var(--mc-danger-border);
+	background: #fffafa;
+}
+
+.mc-app .mc-checkpoint-header {
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	flex-wrap: wrap;
+	gap: 10px;
+	margin-bottom: 12px;
+}
+
+.mc-app .mc-checkpoint-title {
+	font-size: 17px;
+	font-weight: 700;
+	margin: 0;
+	color: var(--mc-text);
+}
+
+.mc-app .mc-invariant-banner {
+	display: inline-flex;
+	align-items: center;
+	gap: 6px;
+	background: var(--mc-surface-raised);
+	border: 1px solid var(--mc-border-subtle);
+	padding: 4px 10px;
+	border-radius: var(--mc-radius-sm);
+	font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+	font-size: 12px;
+	font-weight: 600;
+	color: var(--mc-text);
+	margin-bottom: 14px;
+	direction: ltr;
+}
+
+.mc-app .mc-checkpoint-grid {
+	display: grid;
+	grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+	gap: 10px;
+	background: var(--mc-surface-subtle);
+	border: 1px solid var(--mc-border-subtle);
+	border-radius: var(--mc-radius-md);
+	padding: 12px;
+	margin-bottom: 18px;
+}
+
+.mc-app .mc-grid-cell {
+	display: flex;
+	flex-direction: column;
+	gap: 2px;
+}
+
+.mc-app .mc-grid-label {
+	font-size: 11px;
+	color: var(--mc-text-muted);
+}
+
+.mc-app .mc-grid-val {
+	font-size: 14px;
+	font-weight: 700;
+	color: var(--mc-text);
+}
+
+/* Unified Action Button Toolbar */
+.mc-app .mc-unified-toolbar {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	flex-wrap: wrap;
+	gap: 12px;
+	padding-top: 14px;
+	border-top: 1px solid var(--mc-border-subtle);
+}
+
+.mc-app .mc-primary-group {
+	display: flex;
+	align-items: center;
+	flex-wrap: wrap;
+	gap: 10px;
+}
+
+.mc-app .mc-destructive-group {
+	display: flex;
+	align-items: center;
+	flex-wrap: wrap;
+	gap: 8px;
+}
+
+/* Button UI Components */
+.mc-app .mc-btn {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	gap: 6px;
+	padding: 8px 18px;
+	font-size: 13px;
+	font-weight: 700;
+	border-radius: var(--mc-radius-sm);
+	cursor: pointer;
+	text-decoration: none;
+	border: 1px solid transparent;
+	transition: var(--mc-transition);
+	line-height: 1.3;
+}
+
+.mc-app .mc-btn:focus {
+	outline: none;
+	box-shadow: var(--mc-focus-ring);
+}
+
+.mc-app .mc-btn-primary {
+	background: var(--mc-primary);
+	color: #ffffff;
+	border-color: var(--mc-primary);
+}
+
+.mc-app .mc-btn-primary:hover {
+	background: var(--mc-primary-hover);
+	border-color: var(--mc-primary-hover);
+	color: #ffffff;
+}
+
+.mc-app .mc-btn-success {
+	background: var(--mc-success);
+	color: #ffffff;
+	border-color: var(--mc-success);
+}
+
+.mc-app .mc-btn-success:hover {
+	background: var(--mc-success-hover);
+	border-color: var(--mc-success-hover);
+	color: #ffffff;
+}
+
+.mc-app .mc-btn-warning {
+	background: var(--mc-warning);
+	color: #ffffff;
+	border-color: var(--mc-warning);
+}
+
+.mc-app .mc-btn-warning:hover {
+	background: var(--mc-warning-hover);
+	border-color: var(--mc-warning-hover);
+	color: #ffffff;
+}
+
+.mc-app .mc-btn-danger {
+	background: var(--mc-danger);
+	color: #ffffff;
+	border-color: var(--mc-danger);
+}
+
+.mc-app .mc-btn-danger:hover {
+	background: var(--mc-danger-hover);
+	border-color: var(--mc-danger-hover);
+	color: #ffffff;
+}
+
+.mc-app .mc-btn-secondary {
+	background: var(--mc-surface-raised);
+	color: var(--mc-text);
+	border-color: var(--mc-border);
+}
+
+.mc-app .mc-btn-secondary:hover {
+	background: var(--mc-border-subtle);
+	border-color: var(--mc-border-hover);
+	color: var(--mc-text);
+}
+
+.mc-app .mc-btn-destructive-ghost {
+	background: transparent;
+	color: var(--mc-danger);
+	border-color: var(--mc-border-subtle);
+}
+
+.mc-app .mc-btn-destructive-ghost:hover {
+	background: var(--mc-danger-subtle);
+	border-color: var(--mc-danger-border);
+	color: var(--mc-danger);
+}
+
+/* ==========================================================================
+   Connected Vertical Stage Stepper
+   ========================================================================== */
+.mc-app .mc-timeline-card {
+	background: var(--mc-surface);
+	border: 1px solid var(--mc-border);
+	border-radius: var(--mc-radius-md);
+	padding: 18px 20px;
+	box-shadow: var(--mc-shadow-sm);
+	margin-bottom: 20px;
+}
+
+.mc-app .mc-timeline-title {
+	font-size: 15px;
+	font-weight: 700;
+	margin: 0 0 16px 0;
+	color: var(--mc-text);
+}
+
+.mc-app .mc-timeline-list {
+	list-style: none;
+	margin: 0;
+	padding: 0;
+	position: relative;
+}
+
+.mc-app .mc-timeline-item {
+	display: flex;
+	align-items: flex-start;
+	gap: 14px;
+	position: relative;
+	padding-bottom: 14px;
+}
+
+.mc-app .mc-timeline-item:last-child {
+	padding-bottom: 0;
+}
+
+.mc-app .mc-timeline-connector {
+	position: absolute;
+	top: 24px;
+	left: 12px;
+	bottom: 0;
+	width: 2px;
+	background: var(--mc-border-subtle);
+	z-index: 1;
+}
+
+.mc-app .mc-timeline-icon-box {
+	width: 26px;
+	height: 26px;
+	border-radius: 50%;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	font-size: 12px;
+	font-weight: 700;
+	flex-shrink: 0;
+	z-index: 2;
+	background: var(--mc-surface-raised);
+	border: 1px solid var(--mc-border);
+	color: var(--mc-text-muted);
+}
+
+.mc-app .mc-timeline-item.completed .mc-timeline-icon-box {
+	background: var(--mc-success-subtle);
+	border-color: var(--mc-success-border);
+	color: var(--mc-success);
+}
+
+.mc-app .mc-timeline-item.active .mc-timeline-icon-box {
+	background: var(--mc-primary);
+	border-color: var(--mc-primary);
+	color: #ffffff;
+	box-shadow: var(--mc-focus-ring);
+}
+
+.mc-app .mc-timeline-item.warning .mc-timeline-icon-box {
+	background: var(--mc-warning-subtle);
+	border-color: var(--mc-warning-border);
+	color: var(--mc-warning);
+}
+
+.mc-app .mc-timeline-item.failed .mc-timeline-icon-box {
+	background: var(--mc-danger-subtle);
+	border-color: var(--mc-danger-border);
+	color: var(--mc-danger);
+}
+
+.mc-app .mc-timeline-body {
+	flex: 1;
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	flex-wrap: wrap;
+	gap: 8px;
+	padding: 2px 0;
+}
+
+.mc-app .mc-timeline-info {
+	display: flex;
+	flex-direction: column;
+	gap: 2px;
+}
+
+.mc-app .mc-timeline-name {
+	font-size: 13px;
+	font-weight: 700;
+	color: var(--mc-text);
+}
+
+.mc-app .mc-timeline-key {
+	font-size: 11px;
+	color: var(--mc-text-muted);
+	font-family: monospace;
+}
+
+.mc-app .mc-timeline-meta {
+	display: flex;
+	align-items: center;
+	gap: 10px;
+}
+
+/* ==========================================================================
+   Modern Stage Plan Table
+   ========================================================================== */
+.mc-app .mc-plan-card {
+	background: var(--mc-surface);
+	border: 1px solid var(--mc-border);
+	border-radius: var(--mc-radius-md);
+	padding: 18px 20px;
+	box-shadow: var(--mc-shadow-sm);
+	margin-bottom: 20px;
+	overflow-x: auto;
+}
+
+.mc-app .mc-table {
+	width: 100%;
+	border-collapse: separate;
+	border-spacing: 0;
+	font-size: 13px;
+}
+
+.mc-app .mc-table th {
+	background: var(--mc-surface-raised);
+	color: var(--mc-text-muted);
+	font-weight: 700;
+	font-size: 11px;
+	text-transform: uppercase;
+	letter-spacing: 0.5px;
+	padding: 10px 14px;
+	border-bottom: 1px solid var(--mc-border);
+	text-align: start;
+	position: sticky;
+	top: 0;
+}
+
+.mc-app .mc-table td {
+	padding: 12px 14px;
+	border-bottom: 1px solid var(--mc-border-subtle);
+	color: var(--mc-text);
+	vertical-align: middle;
+}
+
+.mc-app .mc-table tr:last-child td {
+	border-bottom: none;
+}
+
+.mc-app .mc-table tr:hover td {
+	background: var(--mc-surface-subtle);
+}
+
+/* ==========================================================================
+   Execution Method Radio Cards
+   ========================================================================== */
+.mc-app .mc-mode-grid {
+	display: grid;
+	grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+	gap: 14px;
+	margin: 12px 0;
+}
+
+.mc-app .mc-mode-card {
+	border: 2px solid var(--mc-border-subtle);
+	background: var(--mc-surface);
+	border-radius: var(--mc-radius-md);
+	padding: 16px;
+	cursor: pointer;
+	transition: var(--mc-transition);
+	display: flex;
+	gap: 12px;
+	align-items: flex-start;
+}
+
+.mc-app .mc-mode-card:hover {
+	border-color: var(--mc-border-hover);
+	background: var(--mc-surface-subtle);
+}
+
+.mc-app .mc-mode-card.selected {
+	border-color: var(--mc-primary);
+	background: var(--mc-primary-subtle);
+}
+
+.mc-app .mc-mode-card input[type="radio"] {
+	margin-top: 3px;
+}
+
+.mc-app .mc-mode-title {
+	font-size: 14px;
+	font-weight: 700;
+	color: var(--mc-text);
+	margin: 0 0 4px 0;
+}
+
+.mc-app .mc-mode-desc {
+	font-size: 12px;
+	color: var(--mc-text-muted);
+	margin: 0;
+	line-height: 1.4;
+}
+
+/* ==========================================================================
+   CLI Processing Notice
+   ========================================================================== */
+.mc-app .mc-cli-notice {
+	background: var(--mc-info-subtle);
+	border: 1px solid var(--mc-info-border);
+	border-inline-start: 4px solid var(--mc-info);
+	border-radius: var(--mc-radius-md);
+	padding: 16px 20px;
+	margin-bottom: 20px;
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	flex-wrap: wrap;
+	gap: 14px;
+}
+
+.mc-app .mc-cli-cmd-block {
+	background: #0f172a;
+	color: #38bdf8;
+	padding: 10px 14px;
+	border-radius: var(--mc-radius-sm);
+	font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+	font-size: 12px;
+	direction: ltr;
+	overflow-x: auto;
+	margin-top: 8px;
+}
+
+/* ==========================================================================
+   RTL Enhancements
+   ========================================================================== */
+.mc-app.rtl {
+	direction: rtl;
+	text-align: right;
+}
+
+.mc-app.rtl .mc-timeline-connector {
+	left: auto;
+	right: 12px;
+}
+
+.mc-app.rtl .mc-table th,
+.mc-app.rtl .mc-table td {
+	text-align: right;
+}
+
+/* ==========================================================================
+   Responsive Breakpoints (1024px, 768px, 640px, 390px)
+   ========================================================================== */
+@media (max-width: 768px) {
+	.mc-app .mc-hero-progress {
+		padding: 16px;
+	}
+	.mc-app .mc-hero-pct {
+		font-size: 28px;
+	}
+	.mc-app .mc-page-header {
+		padding: 12px 14px;
+	}
+	.mc-app .mc-unified-toolbar {
+		flex-direction: column;
+		align-items: stretch;
+	}
+	.mc-app .mc-primary-group,
+	.mc-app .mc-destructive-group {
+		width: 100%;
+		justify-content: stretch;
+	}
+	.mc-app .mc-btn {
+		width: 100%;
+	}
+	.mc-app #dashboard-grid {
+		grid-template-columns: 1fr !important;
+	}
+}
+
+@media (max-width: 480px) {
+	.mc-app {
+		margin-top: 5px;
+	}
+	.mc-app .mc-kpi-grid {
+		grid-template-columns: 1fr;
+	}
+	.mc-app .mc-checkpoint-grid {
+		grid-template-columns: repeat(2, 1fr);
+	}
+}
+</style>
+
+<div class="mc-app <!-- IF S_CONTENT_DIRECTION == 'rtl' -->rtl<!-- ENDIF -->">
+	<div class="mc-container">
+
+		<!-- ==================================================================
+		     HEADER SECTION
+		     ================================================================== -->
+		<div class="mc-page-header">
+			<div class="mc-header-main">
+				<div class="mc-header-title-row">
+					<h1 class="mc-header-title">{L_ACP_MIGRATION_CENTER}</h1>
+					<!-- IF MODE == 'overview' -->
+						<span class="status-badge status-ready">{L_OVERVIEW}</span>
+					<!-- ELSEIF MODE == 'wizard' -->
+						<span class="status-badge status-ready">Wizard Step {WIZARD_STEP}</span>
+					<!-- ELSEIF MODE == 'progress' -->
+						<span class="status-badge status-{RUN_STATUS}">{RUN_STATUS_LABEL}</span>
+					<!-- ELSEIF MODE == 'errors' -->
+						<span class="status-badge status-warning">{L_ERRORS}</span>
+					<!-- ELSEIF MODE == 'settings' -->
+						<span class="status-badge status-ready">{L_SETTINGS}</span>
+					<!-- ELSEIF MODE == 'finalize' -->
+						<span class="status-badge status-completed">Finalize &amp; Health</span>
+					<!-- ENDIF -->
+				</div>
+				<p class="mc-header-subtitle">{L_ACP_MIGRATION_CENTER_EXPLAIN}</p>
+			</div>
+
+			<div class="mc-header-meta">
+				<!-- IF HAS_ACTIVE_RUN -->
+					<div class="mc-meta-item">
+						<span class="mc-run-id-pill" title="{ACTIVE_RUN_ID}">
+							ID: <strong>{ACTIVE_RUN_SHORT_ID}</strong>
+							<button type="button" class="mc-btn-copy" onclick="navigator.clipboard.writeText('{ACTIVE_RUN_ID}'); this.textContent='✓'; setTimeout(() => this.textContent='📋', 2000);" title="{L_MIGRATION_COPY_ID}">📋</button>
+						</span>
+					</div>
+					<div class="mc-meta-item">
+						<span>{L_MIGRATION_SOURCE_SYSTEM}: <strong>{SOURCE_PLATFORM_LABEL}</strong></span>
+					</div>
+				<!-- ENDIF -->
+				<div class="mc-meta-item">
+					<a href="{U_ACTION}&amp;mode=overview" class="mc-btn mc-btn-secondary" style="padding: 4px 12px; font-size: 12px;">{L_ACP_MIGRATION_OVERVIEW}</a>
+				</div>
+			</div>
+		</div>
+
+		<!-- ==================================================================
+		     FLASH / ALERT NOTICES
+		     ================================================================== -->
+		<!-- IF S_ERROR -->
+			<div class="mc-hero-actions-card stage-failed" style="margin-bottom: 20px;">
+				<h4 style="margin: 0 0 6px 0; color: var(--mc-danger);">{L_ERROR}</h4>
+				<p style="margin: 0; font-size: 13px;">{ERROR_MSG}</p>
+			</div>
+		<!-- ENDIF -->
+
+		<!-- IF S_SUCCESS -->
+			<div class="mc-hero-actions-card stage-approval" style="margin-bottom: 20px;">
+				<h4 style="margin: 0 0 6px 0; color: var(--mc-success);">{L_SUCCESS}</h4>
+				<p style="margin: 0; font-size: 13px;">{SUCCESS_MSG}</p>
+			</div>
+		<!-- ENDIF -->
+
+		<!-- ==================================================================
+		     MODE: OVERVIEW
+		     ================================================================== -->
+		<!-- IF MODE == 'overview' -->
+
+			<!-- KPI Cards Grid -->
+			<div class="mc-kpi-grid">
+				<div class="mc-kpi-card">
+					<span class="mc-kpi-label">{L_MIGRATION_STATUS}</span>
+					<span class="mc-kpi-val">
+						<!-- IF HAS_ACTIVE_RUN -->
+							<span class="status-badge status-{ACTIVE_RUN_STATUS}">{ACTIVE_RUN_STATUS_LABEL}</span>
+						<!-- ELSEIF HAS_COMPLETED_RUN -->
+							<span class="status-badge status-{COMPLETED_RUN_STATUS}">{COMPLETED_RUN_STATUS_LABEL}</span>
+						<!-- ELSE -->
+							<span class="status-badge status-ready">Ready</span>
+						<!-- ENDIF -->
+					</span>
+					<span class="mc-kpi-sub">
+						<!-- IF HAS_ACTIVE_RUN -->
+							{SOURCE_PLATFORM_LABEL} &bull; {ACTIVE_RUN_WORKER_MODE}
+						<!-- ELSEIF HAS_COMPLETED_RUN -->
+							{COMPLETED_RUN_SOURCE}
+						<!-- ELSE -->
+							No active migration configured
+						<!-- ENDIF -->
+					</span>
+				</div>
+
+				<div class="mc-kpi-card">
+					<span class="mc-kpi-label">{L_PROGRESS}</span>
+					<span class="mc-kpi-val">{ACTIVE_RUN_OVERALL_PCT}%</span>
+					<span class="mc-kpi-sub">
+						<!-- IF HAS_ACTIVE_RUN -->
+							{ACTIVE_RUN_IMPORTED} of {ACTIVE_RUN_TOTAL_RECORDS} {L_RECORDS}
+						<!-- ELSEIF HAS_COMPLETED_RUN -->
+							{COMPLETED_RUN_IMPORTED} of {COMPLETED_RUN_TOTAL_RECORDS} {L_RECORDS}
+						<!-- ELSE -->
+							—
+						<!-- ENDIF -->
+					</span>
+				</div>
+
+				<div class="mc-kpi-card">
+					<span class="mc-kpi-label">Latest Migration</span>
+					<span class="mc-kpi-val" style="font-size: 18px;">
+						<!-- IF HAS_ACTIVE_RUN -->
+							{ACTIVE_RUN_CURRENT_STEP}
+						<!-- ELSEIF HAS_COMPLETED_RUN -->
+							<code>{COMPLETED_RUN_SHORT_ID}</code>
+						<!-- ELSE -->
+							None
+						<!-- ENDIF -->
+					</span>
+					<span class="mc-kpi-sub">
+						<!-- IF HAS_ACTIVE_RUN -->
+							Started: {ACTIVE_RUN_STARTED}
+						<!-- ELSEIF HAS_COMPLETED_RUN -->
+							Completed: {COMPLETED_RUN_COMPLETED}
+						<!-- ELSE -->
+							Ready to start
+						<!-- ENDIF -->
+					</span>
+				</div>
+
+				<div class="mc-kpi-card">
+					<span class="mc-kpi-label">Historical Runs</span>
+					<span class="mc-kpi-val">{TOTAL_TERMINAL_RUNS}</span>
+					<span class="mc-kpi-sub">Archived migration records</span>
+				</div>
+			</div>
+
+			<!-- Active Migration Hero / Latest Completed Run / Empty Onboarding State -->
+			<!-- IF HAS_ACTIVE_RUN -->
+				<div class="mc-hero-actions-card stage-approval" style="margin-bottom: 24px;">
+					<div class="mc-checkpoint-header">
+						<h3 class="mc-checkpoint-title">Active Migration Run in Progress: <code>{ACTIVE_RUN_SHORT_ID}</code></h3>
+						<span class="status-badge status-{ACTIVE_RUN_STATUS}">{ACTIVE_RUN_STATUS_LABEL}</span>
+					</div>
+					<p style="margin: 0 0 16px 0; font-size: 13px; color: var(--mc-text-muted);">
+						Source: <strong>{SOURCE_PLATFORM_LABEL}</strong> &bull; Current Stage: <strong>{ACTIVE_RUN_CURRENT_STEP}</strong> &bull; Progress: <strong>{ACTIVE_RUN_OVERALL_PCT}%</strong> ({ACTIVE_RUN_IMPORTED} / {ACTIVE_RUN_TOTAL_RECORDS} records)
+					</p>
+					<div class="mc-unified-toolbar">
+						<div class="mc-primary-group">
+							<a href="{U_ACTION}&amp;mode=progress&amp;run_id={ACTIVE_RUN_ID}" class="mc-btn mc-btn-primary" style="font-size: 14px; padding: 10px 24px;">Open Live Migration Dashboard &raquo;</a>
+						</div>
+					</div>
+				</div>
+			<!-- ELSEIF HAS_COMPLETED_RUN -->
+				<div class="mc-hero-actions-card stage-approval" style="margin-bottom: 24px; border-inline-start: 4px solid var(--mc-success);">
+					<div class="mc-checkpoint-header">
+						<h3 class="mc-checkpoint-title">&#10003; Latest Migration Completed: <code>{COMPLETED_RUN_SHORT_ID}</code></h3>
+						<span class="status-badge status-completed">{COMPLETED_RUN_STATUS_LABEL}</span>
+					</div>
+					<p style="margin: 0 0 16px 0; font-size: 13px; color: var(--mc-text-muted);">
+						Source: <strong>{COMPLETED_RUN_SOURCE}</strong> &bull; Total Imported: <strong>{COMPLETED_RUN_IMPORTED}</strong> of <strong>{COMPLETED_RUN_TOTAL_RECORDS}</strong> records (<strong>{COMPLETED_RUN_OVERALL_PCT}%</strong>) &bull; Completed at: <strong>{COMPLETED_RUN_COMPLETED}</strong>
+					</p>
+					<div class="mc-unified-toolbar">
+						<div class="mc-primary-group">
+							<a href="{U_COMPLETED_RUN_FINALIZE}" class="mc-btn mc-btn-success" style="font-size: 14px; padding: 10px 24px;">Health &amp; Finalization Dashboard &raquo;</a>
+							<a href="{U_COMPLETED_RUN_VIEW}" class="mc-btn mc-btn-secondary" style="font-size: 13px;">View Full Log &amp; Timeline</a>
+						</div>
+						<div class="mc-destructive-group">
+							<a href="{U_ACTION}&amp;mode=wizard" class="mc-btn mc-btn-secondary">{L_MIGRATION_START_NEW} &raquo;</a>
+						</div>
+					</div>
+				</div>
+			<!-- ELSE -->
+				<div class="mc-empty-state">
+					<div class="mc-empty-icon">&#9881;</div>
+					<h3 class="mc-empty-title">{L_MIGRATION_EMPTY_TITLE}</h3>
+					<p class="mc-empty-desc">{L_MIGRATION_EMPTY_EXPLAIN}</p>
+					<div class="mc-empty-actions">
+						<a href="{U_ACTION}&amp;mode=wizard" class="mc-btn mc-btn-primary" style="padding: 10px 24px; font-size: 14px;">{L_MIGRATION_START_NEW} &raquo;</a>
+					</div>
+				</div>
+			<!-- ENDIF -->
+
+			<!-- Recent Migration Runs Table -->
+			<div class="mc-plan-card">
+				<h3 style="margin: 0 0 14px 0; font-size: 16px; font-weight: 700; color: var(--mc-text);">{L_ACP_MIGRATION_RECENT_RUNS}</h3>
+				<table class="mc-table">
+					<thead>
+						<tr>
+							<th>{L_MIGRATION_RUN_ID}</th>
+							<th>{L_MIGRATION_SOURCE_SYSTEM}</th>
+							<th>{L_MIGRATION_STATUS}</th>
+							<th>Imported Records</th>
+							<th>{L_MIGRATION_STARTED_AT}</th>
+							<th>{L_MIGRATION_COMPLETED_AT}</th>
+							<th style="text-align: center;">{L_ACTION}</th>
+						</tr>
+					</thead>
+					<tbody>
+						<!-- BEGIN recent_runs -->
+							<tr>
+								<td><code>{recent_runs.RUN_ID_SHORT}</code></td>
+								<td><strong>{recent_runs.SOURCE_SYSTEM}</strong></td>
+								<td><span class="status-badge status-{recent_runs.STATUS}">{recent_runs.STATUS_LABEL}</span></td>
+								<td><strong>{recent_runs.IMPORTED}</strong> / {recent_runs.TOTAL_RECORDS} <span style="font-size: 11px; color: var(--mc-text-muted);">({recent_runs.PERCENTAGE}%)</span></td>
+								<td>{recent_runs.STARTED_AT}</td>
+								<td>{recent_runs.COMPLETED_AT}</td>
+								<td style="text-align: center; white-space: nowrap;">
+									<a href="{recent_runs.U_VIEW}" class="mc-btn mc-btn-secondary" style="padding: 3px 10px; font-size: 11px; margin-inline-end: 4px;">Log</a>
+									<!-- IF recent_runs.STATUS == 'completed' or recent_runs.STATUS == 'finalized' -->
+										<a href="{recent_runs.U_FINALIZE}" class="mc-btn mc-btn-primary" style="padding: 3px 10px; font-size: 11px;">Finalize</a>
+									<!-- ENDIF -->
+								</td>
+							</tr>
+						<!-- BEGINELSE -->
+							<tr>
+								<td colspan="7" style="text-align: center; color: var(--mc-text-muted); padding: 24px;">{L_MIGRATION_NO_RUNS}</td>
+							</tr>
+						<!-- END recent_runs -->
+					</tbody>
+				</table>
+			</div>
+
+		<!-- ==================================================================
+		     MODE: WIZARD
+		     ================================================================== -->
+		<!-- ELSEIF MODE == 'wizard' -->
+
+			<!-- Stepper Indicator -->
+			<div class="mc-page-header" style="padding: 12px 20px; margin-bottom: 20px;">
+				<div style="display: flex; width: 100%; justify-content: space-between; align-items: center; gap: 8px;">
+					<div class="mc-meta-item" style="font-weight: <!-- IF WIZARD_STEP == 1 -->bold; color: var(--mc-primary)<!-- ELSE -->normal<!-- ENDIF -->;">
+						<span style="display: inline-flex; width: 22px; height: 22px; border-radius: 50%; background: <!-- IF WIZARD_STEP > 1 -->var(--mc-success)<!-- ELSE -->var(--mc-primary)<!-- ENDIF -->; color: #fff; align-items: center; justify-content: center; font-size: 11px;">1</span>
+						<span>{L_STEPPER_STEP_1}</span>
+					</div>
+					<div style="flex: 1; height: 2px; background: <!-- IF WIZARD_STEP > 1 -->var(--mc-success)<!-- ELSE -->var(--mc-border-subtle)<!-- ENDIF -->;"></div>
+					<div class="mc-meta-item" style="font-weight: <!-- IF WIZARD_STEP == 2 -->bold; color: var(--mc-primary)<!-- ELSE -->normal<!-- ENDIF -->;">
+						<span style="display: inline-flex; width: 22px; height: 22px; border-radius: 50%; background: <!-- IF WIZARD_STEP > 2 -->var(--mc-success)<!-- ELSEIF WIZARD_STEP == 2 -->var(--mc-primary)<!-- ELSE -->var(--mc-surface-raised)<!-- ENDIF -->; color: <!-- IF WIZARD_STEP >= 2 -->#fff<!-- ELSE -->var(--mc-text-muted)<!-- ENDIF -->; align-items: center; justify-content: center; font-size: 11px;">2</span>
+						<span>{L_STEPPER_STEP_2}</span>
+					</div>
+					<div style="flex: 1; height: 2px; background: <!-- IF WIZARD_STEP > 2 -->var(--mc-success)<!-- ELSE -->var(--mc-border-subtle)<!-- ENDIF -->;"></div>
+					<div class="mc-meta-item" style="font-weight: <!-- IF WIZARD_STEP == 3 -->bold; color: var(--mc-primary)<!-- ELSE -->normal<!-- ENDIF -->;">
+						<span style="display: inline-flex; width: 22px; height: 22px; border-radius: 50%; background: <!-- IF WIZARD_STEP > 3 -->var(--mc-success)<!-- ELSEIF WIZARD_STEP == 3 -->var(--mc-primary)<!-- ELSE -->var(--mc-surface-raised)<!-- ENDIF -->; color: <!-- IF WIZARD_STEP >= 3 -->#fff<!-- ELSE -->var(--mc-text-muted)<!-- ENDIF -->; align-items: center; justify-content: center; font-size: 11px;">3</span>
+						<span>{L_STEPPER_STEP_3}</span>
+					</div>
+					<div style="flex: 1; height: 2px; background: <!-- IF WIZARD_STEP > 3 -->var(--mc-success)<!-- ELSE -->var(--mc-border-subtle)<!-- ENDIF -->;"></div>
+					<div class="mc-meta-item" style="font-weight: <!-- IF WIZARD_STEP == 4 -->bold; color: var(--mc-primary)<!-- ELSE -->normal<!-- ENDIF -->;">
+						<span style="display: inline-flex; width: 22px; height: 22px; border-radius: 50%; background: <!-- IF WIZARD_STEP > 4 -->var(--mc-success)<!-- ELSEIF WIZARD_STEP == 4 -->var(--mc-primary)<!-- ELSE -->var(--mc-surface-raised)<!-- ENDIF -->; color: <!-- IF WIZARD_STEP >= 4 -->#fff<!-- ELSE -->var(--mc-text-muted)<!-- ENDIF -->; align-items: center; justify-content: center; font-size: 11px;">4</span>
+						<span>{L_STEPPER_STEP_4}</span>
+					</div>
+					<div style="flex: 1; height: 2px; background: <!-- IF WIZARD_STEP > 4 -->var(--mc-success)<!-- ELSE -->var(--mc-border-subtle)<!-- ENDIF -->;"></div>
+					<div class="mc-meta-item" style="font-weight: <!-- IF WIZARD_STEP == 5 -->bold; color: var(--mc-primary)<!-- ELSE -->normal<!-- ENDIF -->;">
+						<span style="display: inline-flex; width: 22px; height: 22px; border-radius: 50%; background: <!-- IF WIZARD_STEP == 5 -->var(--mc-primary)<!-- ELSE -->var(--mc-surface-raised)<!-- ENDIF -->; color: <!-- IF WIZARD_STEP == 5 -->#fff<!-- ELSE -->var(--mc-text-muted)<!-- ENDIF -->; align-items: center; justify-content: center; font-size: 11px;">5</span>
+						<span>{L_STEPPER_STEP_5}</span>
+					</div>
+				</div>
+			</div>
+
+			<!-- Step 1: Backup & Safety Verification -->
+			<!-- IF WIZARD_STEP == 1 -->
+				<form id="wizard_step_1" method="post" action="{U_WIZARD_ACTION}&amp;step=2">
+					<div class="mc-plan-card">
+						<h3 style="margin: 0 0 10px 0; font-size: 17px; font-weight: 700; color: var(--mc-text);">{L_WIZARD_STEP_1_TITLE}</h3>
+						<p style="font-size: 14px; color: var(--mc-text-muted); margin-bottom: 20px;">{L_WIZARD_BACKUP_NOTICE}</p>
+
+						<!-- IF TARGET_NOT_EMPTY -->
+							<div class="mc-hero-actions-card stage-warning" style="margin-bottom: 20px;">
+								<h4 style="margin: 0 0 8px 0; color: var(--mc-warning);">{L_WARNING}: {L_TARGET_NOT_EMPTY_TITLE}</h4>
+								<p style="margin: 0 0 12px 0; font-size: 13px;">{L_TARGET_NOT_EMPTY_EXPLAIN}</p>
+								<div class="mc-checkpoint-grid" style="margin-bottom: 12px;">
+									<div class="mc-grid-cell">
+										<span class="mc-grid-label">{L_USERS}</span>
+										<span class="mc-grid-val">{TARGET_USERS}</span>
+									</div>
+									<div class="mc-grid-cell">
+										<span class="mc-grid-label">{L_TOPICS}</span>
+										<span class="mc-grid-val">{TARGET_TOPICS}</span>
+									</div>
+									<div class="mc-grid-cell">
+										<span class="mc-grid-label">{L_POSTS}</span>
+										<span class="mc-grid-val">{TARGET_POSTS}</span>
+									</div>
+								</div>
+								<label style="font-weight: 600; cursor: pointer;">
+									<input type="checkbox" name="confirm_not_empty" value="1" required /> {L_CONFIRM_NOT_EMPTY}
+								</label>
+							</div>
+						<!-- ELSE -->
+							<div class="mc-hero-actions-card stage-approval" style="margin-bottom: 20px;">
+								<p style="margin: 0; font-weight: 600; color: var(--mc-success);">{L_TARGET_CLEAN_NOTICE}</p>
+							</div>
+						<!-- ENDIF -->
+
+						<div class="mc-unified-toolbar">
+							<a href="{U_ACTION}&amp;mode=overview" class="mc-btn mc-btn-secondary">{L_BACK}</a>
+							<button type="submit" name="submit" class="mc-btn mc-btn-primary">{L_NEXT_STEP} &raquo;</button>
+						</div>
+					</div>
+				</form>
+
+			<!-- Step 2: Source System & Database Configuration -->
+			<!-- ELSEIF WIZARD_STEP == 2 -->
+				<form id="wizard_step_2" method="post" action="{U_WIZARD_ACTION}&amp;step=3">
+					<div class="mc-plan-card">
+						<h3 style="margin: 0 0 14px 0; font-size: 17px; font-weight: 700; color: var(--mc-text);">{L_WIZARD_STEP_2_TITLE}</h3>
+
+						<!-- IF DETECT_SUCCESS -->
+							<div class="mc-hero-actions-card stage-approval" style="margin-bottom: 16px; padding: 12px 16px;">
+								<p style="margin: 0; color: var(--mc-success); font-weight: 600;">{L_AUTODETECT_SUCCESS}</p>
+							</div>
+						<!-- ELSEIF DETECT_ERROR -->
+							<div class="mc-hero-actions-card stage-warning" style="margin-bottom: 16px; padding: 12px 16px;">
+								<p style="margin: 0; color: var(--mc-warning); font-weight: 600;">{L_AUTODETECT_ERROR}</p>
+							</div>
+						<!-- ENDIF -->
+
+						<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 16px; margin-bottom: 20px;">
+							<div>
+								<label for="source_system" style="display: block; font-weight: 600; margin-bottom: 4px;">{L_SOURCE_SYSTEM}</label>
+								<select id="source_system" name="source_system" class="inputbox" style="width: 100%; padding: 6px 10px;">
+									<option value="xenforo" <!-- IF SOURCE_SYSTEM == 'xenforo' -->selected="selected"<!-- ENDIF -->>XenForo 2.x</option>
+								</select>
+							</div>
+
+							<div>
+								<label for="source_path" style="display: block; font-weight: 600; margin-bottom: 4px;">{L_SOURCE_ROOT_PATH}</label>
+								<div style="display: flex; gap: 8px;">
+									<input type="text" id="source_path" name="source_path" value="{SOURCE_PATH}" class="inputbox" style="flex: 1; padding: 6px 10px;" />
+									<button type="submit" formaction="{U_WIZARD_ACTION}&amp;step=2&amp;action=autodetect" class="mc-btn mc-btn-secondary" style="padding: 6px 12px; font-size: 12px;">{L_AUTODETECT_CONFIG}</button>
+								</div>
+								<span style="font-size: 11px; color: var(--mc-text-muted);">{L_SOURCE_ROOT_PATH_EXPLAIN}</span>
+							</div>
+
+							<div>
+								<label for="db_host" style="display: block; font-weight: 600; margin-bottom: 4px;">{L_DATABASE_SERVER_HOST}</label>
+								<input type="text" id="db_host" name="db_host" value="{DB_HOST}" class="inputbox" style="width: 100%; padding: 6px 10px;" />
+							</div>
+
+							<div>
+								<label for="db_port" style="display: block; font-weight: 600; margin-bottom: 4px;">{L_DATABASE_SERVER_PORT}</label>
+								<input type="text" id="db_port" name="db_port" value="{DB_PORT}" class="inputbox" style="width: 100%; padding: 6px 10px;" />
+							</div>
+
+							<div>
+								<label for="db_name" style="display: block; font-weight: 600; margin-bottom: 4px;">{L_DATABASE_NAME}</label>
+								<input type="text" id="db_name" name="db_name" value="{DB_NAME}" class="inputbox" style="width: 100%; padding: 6px 10px;" />
+							</div>
+
+							<div>
+								<label for="db_user" style="display: block; font-weight: 600; margin-bottom: 4px;">{L_DATABASE_USERNAME}</label>
+								<input type="text" id="db_user" name="db_user" value="{DB_USER}" class="inputbox" style="width: 100%; padding: 6px 10px;" />
+							</div>
+
+							<div>
+								<label for="db_pass" style="display: block; font-weight: 600; margin-bottom: 4px;">{L_DATABASE_PASSWORD}</label>
+								<input type="password" id="db_pass" name="db_pass" value="{DB_PASS}" class="inputbox" style="width: 100%; padding: 6px 10px;" />
+								<span style="font-size: 11px; color: var(--mc-text-muted);">{L_DATABASE_PASSWORD_NOTE}</span>
+							</div>
+
+							<div>
+								<label for="table_prefix" style="display: block; font-weight: 600; margin-bottom: 4px;">{L_TABLE_PREFIX}</label>
+								<input type="text" id="table_prefix" name="table_prefix" value="{TABLE_PREFIX}" class="inputbox" style="width: 100%; padding: 6px 10px;" />
+							</div>
+						</div>
+
+						<div class="mc-unified-toolbar">
+							<a href="{U_WIZARD_ACTION}&amp;step=1" class="mc-btn mc-btn-secondary">{L_BACK}</a>
+							<button type="submit" name="submit" class="mc-btn mc-btn-primary">{L_NEXT_STEP} &raquo;</button>
+						</div>
+					</div>
+				</form>
+
+			<!-- Step 3: Preflight Validation -->
+			<!-- ELSEIF WIZARD_STEP == 3 -->
+				<form id="wizard_step_3" method="post" action="{U_WIZARD_ACTION}&amp;step=4">
+					<input type="hidden" name="source_system" value="{SOURCE_SYSTEM}" />
+					<input type="hidden" name="source_path" value="{SOURCE_PATH}" />
+					<input type="hidden" name="db_host" value="{DB_HOST}" />
+					<input type="hidden" name="db_port" value="{DB_PORT}" />
+					<input type="hidden" name="db_name" value="{DB_NAME}" />
+					<input type="hidden" name="db_user" value="{DB_USER}" />
+					<input type="hidden" name="db_pass" value="{DB_PASS}" />
+					<input type="hidden" name="table_prefix" value="{DB_PREFIX}" />
+					<div class="mc-plan-card">
+						<h3 style="margin: 0 0 14px 0; font-size: 17px; font-weight: 700; color: var(--mc-text);">{L_WIZARD_STEP_3_TITLE}</h3>
+
+						<table class="mc-table" style="margin-bottom: 20px;">
+							<thead>
+								<tr>
+									<th>{L_PREFLIGHT_CHECK_ITEM}</th>
+									<th>{L_STATUS}</th>
+									<th>{L_DETAILS}</th>
+								</tr>
+							</thead>
+							<tbody>
+								<!-- BEGIN preflight_checks -->
+									<tr>
+										<td><strong>{preflight_checks.TITLE}</strong></td>
+										<td>
+											<!-- IF preflight_checks.PASSED -->
+												<span class="status-badge status-completed">{L_SUCCESS}</span>
+											<!-- ELSEIF preflight_checks.WARNING -->
+												<span class="status-badge status-warning">{L_WARNING}</span>
+											<!-- ELSE -->
+												<span class="status-badge status-failed">{L_ERROR}</span>
+											<!-- ENDIF -->
+										</td>
+										<td style="font-size: 12px; color: var(--mc-text-muted);">{preflight_checks.MESSAGE}</td>
+									</tr>
+								<!-- END preflight_checks -->
+							</tbody>
+						</table>
+
+						<div class="mc-unified-toolbar">
+							<a href="{U_WIZARD_ACTION}&amp;step=2" class="mc-btn mc-btn-secondary">{L_BACK}</a>
+							<div>
+								<a href="{U_WIZARD_ACTION}&amp;step=3&amp;action=retry" class="mc-btn mc-btn-secondary" style="margin-inline-end: 8px;">{L_RETRY_CHECKS}</a>
+								<!-- IF PREFLIGHT_CAN_CONTINUE -->
+									<button type="submit" name="submit" class="mc-btn mc-btn-primary">{L_NEXT_STEP} &raquo;</button>
+								<!-- ENDIF -->
+							</div>
+						</div>
+					</div>
+				</form>
+
+			<!-- Step 4: Migration Content & Options -->
+			<!-- ELSEIF WIZARD_STEP == 4 -->
+				<form id="wizard_step_4" method="post" action="{U_WIZARD_ACTION}&amp;step=5">
+					<input type="hidden" name="source_system" value="{SOURCE_SYSTEM}" />
+					<input type="hidden" name="source_path" value="{SOURCE_PATH}" />
+					<input type="hidden" name="db_host" value="{DB_HOST}" />
+					<input type="hidden" name="db_port" value="{DB_PORT}" />
+					<input type="hidden" name="db_name" value="{DB_NAME}" />
+					<input type="hidden" name="db_user" value="{DB_USER}" />
+					<input type="hidden" name="db_pass" value="{DB_PASS}" />
+					<input type="hidden" name="table_prefix" value="{DB_PREFIX}" />
+					<div class="mc-plan-card">
+						<div style="display: flex; justify-content: space-between; align-items: baseline; flex-wrap: wrap; margin-bottom: 16px;">
+							<div>
+								<h3 style="margin: 0; font-size: 17px; font-weight: 700; color: var(--mc-text);">{L_MIGRATION_SELECT_CONTENT_TITLE}</h3>
+								<p style="margin: 4px 0 0 0; font-size: 13px; color: var(--mc-text-muted);">{L_MIGRATION_SELECT_CONTENT_EXPLAIN}</p>
+							</div>
+							<div style="display: flex; gap: 8px;">
+								<button type="button" class="mc-btn mc-btn-secondary" style="padding: 4px 10px; font-size: 12px;" onclick="document.querySelectorAll('.mc-step-cb').forEach(c => c.checked = true);">{L_SELECT_ALL}</button>
+							</div>
+						</div>
+
+						<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 16px; margin-bottom: 24px;">
+							<div class="mc-kpi-card" style="padding: 18px;">
+								<h4 style="margin: 0 0 14px 0; font-size: 14px; font-weight: 700; color: var(--mc-primary); border-bottom: 1px solid var(--mc-border-subtle); padding-bottom: 8px;">{L_CAT_MEMBERS_IDENTITY}</h4>
+								<!-- BEGIN group_1_steps -->
+									<label style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; font-size: 13px; cursor: pointer; padding: 2px 0;">
+										<span style="display: flex; align-items: center; gap: 8px;">
+											<input type="checkbox" class="mc-step-cb" name="steps[]" value="{group_1_steps.KEY}" <!-- IF group_1_steps.CHECKED -->checked="checked"<!-- ENDIF --> />
+											<span>{group_1_steps.LABEL}</span>
+										</span>
+										<!-- IF group_1_steps.COUNT > 0 -->
+											<span class="status-badge status-ready" style="font-size: 11px; padding: 2px 8px;">{group_1_steps.COUNT}</span>
+										<!-- ENDIF -->
+									</label>
+								<!-- END group_1_steps -->
+							</div>
+
+							<div class="mc-kpi-card" style="padding: 18px;">
+								<h4 style="margin: 0 0 14px 0; font-size: 14px; font-weight: 700; color: var(--mc-primary); border-bottom: 1px solid var(--mc-border-subtle); padding-bottom: 8px;">{L_CAT_FORUM_CONTENT}</h4>
+								<!-- BEGIN group_2_steps -->
+									<label style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; font-size: 13px; cursor: pointer; padding: 2px 0;">
+										<span style="display: flex; align-items: center; gap: 8px;">
+											<input type="checkbox" class="mc-step-cb" name="steps[]" value="{group_2_steps.KEY}" <!-- IF group_2_steps.CHECKED -->checked="checked"<!-- ENDIF --> />
+											<span>{group_2_steps.LABEL}</span>
+										</span>
+										<!-- IF group_2_steps.COUNT > 0 -->
+											<span class="status-badge status-ready" style="font-size: 11px; padding: 2px 8px;">{group_2_steps.COUNT}</span>
+										<!-- ENDIF -->
+									</label>
+								<!-- END group_2_steps -->
+							</div>
+
+							<div class="mc-kpi-card" style="padding: 18px;">
+								<h4 style="margin: 0 0 14px 0; font-size: 14px; font-weight: 700; color: var(--mc-primary); border-bottom: 1px solid var(--mc-border-subtle); padding-bottom: 8px;">{L_CAT_PRIVATE_MESSAGING}</h4>
+								<!-- BEGIN group_3_steps -->
+									<label style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; font-size: 13px; cursor: pointer; padding: 2px 0;">
+										<span style="display: flex; align-items: center; gap: 8px;">
+											<input type="checkbox" class="mc-step-cb" name="steps[]" value="{group_3_steps.KEY}" <!-- IF group_3_steps.CHECKED -->checked="checked"<!-- ENDIF --> />
+											<span>{group_3_steps.LABEL}</span>
+										</span>
+										<!-- IF group_3_steps.COUNT > 0 -->
+											<span class="status-badge status-ready" style="font-size: 11px; padding: 2px 8px;">{group_3_steps.COUNT}</span>
+										<!-- ENDIF -->
+									</label>
+								<!-- END group_3_steps -->
+							</div>
+
+							<div class="mc-kpi-card" style="padding: 18px;">
+								<h4 style="margin: 0 0 14px 0; font-size: 14px; font-weight: 700; color: var(--mc-primary); border-bottom: 1px solid var(--mc-border-subtle); padding-bottom: 8px;">{L_CAT_ADDITIONAL_DATA}</h4>
+								<!-- BEGIN group_4_steps -->
+									<label style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; font-size: 13px; cursor: pointer; padding: 2px 0;">
+										<span style="display: flex; align-items: center; gap: 8px;">
+											<input type="checkbox" class="mc-step-cb" name="steps[]" value="{group_4_steps.KEY}" <!-- IF group_4_steps.CHECKED -->checked="checked"<!-- ENDIF --> />
+											<span>{group_4_steps.LABEL}</span>
+										</span>
+										<!-- IF group_4_steps.COUNT > 0 -->
+											<span class="status-badge status-ready" style="font-size: 11px; padding: 2px 8px;">{group_4_steps.COUNT}</span>
+										<!-- ENDIF -->
+									</label>
+								<!-- END group_4_steps -->
+							</div>
+						</div>
+
+						<!-- Execution & Performance Settings -->
+						<div class="mc-plan-card" style="margin-bottom: 24px; background: #ffffff; border: 1px solid var(--mc-border); padding: 18px; border-radius: 8px;">
+							<h4 style="margin: 0 0 14px 0; font-size: 15px; font-weight: 700; color: var(--mc-primary); border-bottom: 1px solid var(--mc-border-subtle); padding-bottom: 8px;">
+								{L_EXECUTION_SETTINGS}
+							</h4>
+							<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 16px;">
+								<div>
+									<label for="batch_size" style="display: block; font-weight: 600; margin-bottom: 4px; font-size: 13px;">{L_DEFAULT_BATCH_SIZE}</label>
+									<input type="number" id="batch_size" name="batch_size" value="{BATCH_SIZE}" min="10" max="10000" class="inputbox" style="width: 100%; padding: 6px 10px;" />
+									<span style="font-size: 11px; color: var(--mc-text-muted);">{L_DEFAULT_BATCH_SIZE_EXPLAIN}</span>
+								</div>
+								<div>
+									<label for="lock_timeout" style="display: block; font-weight: 600; margin-bottom: 4px; font-size: 13px;">{L_WORKER_LOCK_TIMEOUT}</label>
+									<input type="number" id="lock_timeout" name="lock_timeout" value="{LOCK_TIMEOUT}" min="15" max="3600" class="inputbox" style="width: 100%; padding: 6px 10px;" />
+									<span style="font-size: 11px; color: var(--mc-text-muted);">{L_WORKER_LOCK_TIMEOUT_EXPLAIN}</span>
+								</div>
+							</div>
+							<div style="display: flex; gap: 20px; margin-top: 14px; flex-wrap: wrap;">
+								<label style="display: flex; align-items: center; gap: 8px; font-size: 13px; cursor: pointer;">
+									<input type="checkbox" name="preserve_ids" value="1" <!-- IF PRESERVE_IDS -->checked="checked"<!-- ENDIF --> />
+									<span><strong>{L_PRESERVE_IDS}</strong> ({L_PRESERVE_IDS_EXPLAIN})</span>
+								</label>
+								<label style="display: flex; align-items: center; gap: 8px; font-size: 13px; cursor: pointer;">
+									<input type="checkbox" name="dry_run" value="1" <!-- IF DRY_RUN -->checked="checked"<!-- ENDIF --> />
+									<span><strong>{L_DRY_RUN}</strong> ({L_DRY_RUN_EXPLAIN})</span>
+								</label>
+							</div>
+						</div>
+
+						<div class="mc-unified-toolbar">
+							<a href="{U_WIZARD_ACTION}&amp;step=3" class="mc-btn mc-btn-secondary">{L_BACK}</a>
+							<button type="submit" name="submit" class="mc-btn mc-btn-primary">{L_NEXT_STEP} &raquo;</button>
+						</div>
+					</div>
+				</form>
+
+			<!-- Step 5: Confirmation & Creation -->
+			<!-- ELSEIF WIZARD_STEP == 5 -->
+				<form id="wizard_step_5" method="post" action="{U_WIZARD_ACTION}&amp;step=5&amp;action=create_plan">
+					<input type="hidden" name="source_system" value="{SOURCE_SYSTEM}" />
+					<input type="hidden" name="source_path" value="{SOURCE_PATH}" />
+					<input type="hidden" name="db_host" value="{DB_HOST}" />
+					<input type="hidden" name="db_port" value="{DB_PORT}" />
+					<input type="hidden" name="db_name" value="{DB_NAME}" />
+					<input type="hidden" name="db_user" value="{DB_USER}" />
+					<input type="hidden" name="db_pass" value="{DB_PASS}" />
+					<input type="hidden" name="table_prefix" value="{DB_PREFIX}" />
+					<input type="hidden" name="dup_username_policy" value="{DUP_USERNAME_POLICY}" />
+					<input type="hidden" name="dup_email_policy" value="{DUP_EMAIL_POLICY}" />
+					<input type="hidden" name="orphan_policy" value="{ORPHAN_POLICY}" />
+					<input type="hidden" name="collision_policy" value="{COLLISION_POLICY}" />
+					<input type="hidden" name="prefix_policy" value="{PREFIX_POLICY}" />
+					<input type="hidden" name="missing_forum_policy" value="{MISSING_FORUM_POLICY}" />
+					<input type="hidden" name="unknown_type_policy" value="{UNKNOWN_TYPE_POLICY}" />
+					<input type="hidden" name="unknown_tag_policy" value="{UNKNOWN_TAG_POLICY}" />
+					<input type="hidden" name="malformed_bbcode_policy" value="{MALFORMED_BBCODE_POLICY}" />
+					<input type="hidden" name="attachment_policy" value="{ATTACHMENT_POLICY}" />
+					<input type="hidden" name="batch_size" value="{BATCH_SIZE}" />
+					<input type="hidden" name="lock_timeout" value="{LOCK_TIMEOUT}" />
+					<input type="hidden" name="preserve_ids" value="{PRESERVE_IDS}" />
+					<input type="hidden" name="dry_run" value="{DRY_RUN}" />
+					<div class="mc-plan-card">
+						<h3 style="margin: 0 0 14px 0; font-size: 17px; font-weight: 700; color: var(--mc-text);">{L_WIZARD_STEP_5_TITLE}</h3>
+						<p style="font-size: 13px; color: var(--mc-text-muted); margin-bottom: 20px;">{L_CONFIRMATION_EXPLAIN}</p>
+
+						<div class="mc-unified-toolbar">
+							<a href="{U_WIZARD_ACTION}&amp;step=4" class="mc-btn mc-btn-secondary">{L_BACK}</a>
+							<button type="submit" name="submit" class="mc-btn mc-btn-success" style="font-size: 14px; padding: 10px 24px;">{L_CREATE_MIGRATION_PLAN} &raquo;</button>
+						</div>
+					</div>
+				</form>
+			<!-- ENDIF -->
+
+		<!-- ==================================================================
+		     MODE: PROGRESS (Live Migration Dashboard)
+		     ================================================================== -->
+		<!-- ELSEIF MODE == 'progress' -->
+
+			<!-- Top Overall Hero Progress Banner -->
+			<div class="mc-hero-progress">
+				<div class="mc-hero-top">
+					<div>
+						<span class="mc-hero-pct" id="overall-pct-val">{OVERALL_PERCENT}%</span>
+						<span class="mc-hero-counts" id="overall-counts-text">&mdash; {TOTAL_IMPORTED} of {TOTAL_RECORDS} {L_RECORDS}</span>
+					</div>
+					<div>
+						<span style="font-size: 13px; color: var(--mc-text-muted);">{L_CURRENT_STAGE}: <strong style="color: var(--mc-primary); font-size: 14px;" id="curr-stage-text">{CURRENT_STEP_LABEL}</strong> ({CURRENT_STEP})</span>
+					</div>
+				</div>
+
+				<div class="mc-progress-track" id="overall-track" role="progressbar" aria-valuenow="{OVERALL_PERCENT}" aria-valuemin="0" aria-valuemax="100">
+					<div class="mc-progress-fill" id="overall-bar" style="width: {OVERALL_PERCENT}%;"></div>
+				</div>
+
+				<div class="mc-hero-stats-row">
+					<div class="mc-stat-item">
+						<span class="mc-stat-label">{L_RATE}</span>
+						<span class="mc-stat-val"><span id="proc-rate">{PROCESSING_RATE}</span> rec/s</span>
+					</div>
+					<div class="mc-stat-item">
+						<span class="mc-stat-label">{L_ETA}</span>
+						<span class="mc-stat-val" id="eta-time">{ETA_FORMATTED}</span>
+					</div>
+					<div class="mc-stat-item">
+						<span class="mc-stat-label">Started / Elapsed</span>
+						<span class="mc-stat-val">{START_TIME_FORMATTED} (<span id="elapsed-time">{ELAPSED_TIME_FORMATTED}</span>)</span>
+					</div>
+					<div class="mc-stat-item">
+						<span class="mc-stat-label">Worker Mode</span>
+						<span class="mc-stat-val" id="worker-mode-text">
+							<!-- IF IS_CLI_ACTIVE -->
+								CLI Worker &bull; Active
+							<!-- ELSEIF IS_AWAITING_WORKER -->
+								CLI Worker &bull; Waiting for connection
+							<!-- ELSEIF WORKER_MODE == 'cli' -->
+								CLI Worker
+							<!-- ELSE -->
+								Browser Worker
+							<!-- ENDIF -->
+						</span>
+					</div>
+				</div>
+			</div>
+
+			<!-- ==================================================================
+			     PERMANENT HERO ACTION CONTROL PANEL
+			     (Unified location: NEVER scatters or jumps!)
+			     ================================================================== -->
+			<!-- IF IS_AWAITING_APPROVAL and STAGE_REPORT -->
+				<div class="mc-hero-actions-card <!-- IF STAGE_REPORT_STATUS == 'stage_completed' -->stage-approval<!-- ELSEIF STAGE_REPORT_STATUS == 'stage_completed_with_warnings' -->stage-warning<!-- ELSE -->stage-failed<!-- ENDIF -->" id="hero-action-panel">
+					<div class="mc-checkpoint-header">
+						<h3 class="mc-checkpoint-title">
+							<!-- IF STAGE_REPORT_STATUS == 'stage_completed' -->{L_MIGRATION_STAGE_COMPLETED}<!-- ELSEIF STAGE_REPORT_STATUS == 'stage_completed_with_warnings' -->{L_MIGRATION_STAGE_COMPLETED_WITH_WARNINGS}<!-- ELSE -->{L_MIGRATION_STAGE_FAILED}<!-- ENDIF -->: <code>{STAGE_REPORT_STAGE_LABEL}</code>
+						</h3>
+						<span class="status-badge status-{STAGE_REPORT_STATUS}">{STAGE_REPORT_STATUS_LABEL}</span>
+					</div>
+
+					<div class="mc-invariant-banner">
+						{STAGE_REPORT_PROCESSED} processed = {STAGE_REPORT_CREATED} created + {STAGE_REPORT_REUSED} reused + {STAGE_REPORT_UPDATED} updated + {STAGE_REPORT_SKIPPED} skipped
+					</div>
+
+					<div class="mc-checkpoint-grid">
+						<div class="mc-grid-cell">
+							<span class="mc-grid-label">{L_MIGRATION_STAGE_SOURCE_TOTAL}</span>
+							<span class="mc-grid-val">{STAGE_REPORT_TOTAL}</span>
+						</div>
+						<div class="mc-grid-cell">
+							<span class="mc-grid-label">{L_MIGRATION_STAGE_CREATED}</span>
+							<span class="mc-grid-val" style="color: var(--mc-success);">{STAGE_REPORT_CREATED}</span>
+						</div>
+						<div class="mc-grid-cell">
+							<span class="mc-grid-label">{L_MIGRATION_STAGE_REUSED}</span>
+							<span class="mc-grid-val" style="color: var(--mc-primary);">{STAGE_REPORT_REUSED}</span>
+						</div>
+						<div class="mc-grid-cell">
+							<span class="mc-grid-label">{L_MIGRATION_STAGE_UPDATED}</span>
+							<span class="mc-grid-val">{STAGE_REPORT_UPDATED}</span>
+						</div>
+						<div class="mc-grid-cell">
+							<span class="mc-grid-label">{L_MIGRATION_STAGE_SKIPPED}</span>
+							<span class="mc-grid-val">{STAGE_REPORT_SKIPPED}</span>
+						</div>
+						<div class="mc-grid-cell">
+							<span class="mc-grid-label">{L_MIGRATION_STAGE_WARNINGS}</span>
+							<span class="mc-grid-val" style="color: var(--mc-warning);">{STAGE_REPORT_WARNINGS}</span>
+						</div>
+						<div class="mc-grid-cell">
+							<span class="mc-grid-label">{L_MIGRATION_STAGE_PERMANENTLY_FAILED}</span>
+							<span class="mc-grid-val" style="color: var(--mc-danger);">{STAGE_REPORT_FAILED}</span>
+						</div>
+						<div class="mc-grid-cell">
+							<span class="mc-grid-label">{L_MIGRATION_STAGE_RATE}</span>
+							<span class="mc-grid-val">{STAGE_REPORT_RATE} r/s</span>
+						</div>
+					</div>
+
+					<!-- Unified Action Button Toolbar -->
+					<div class="mc-unified-toolbar">
+						<div class="mc-primary-group">
+							<form action="{U_APPROVE_STAGE}" method="post" style="display: inline; margin: 0;">
+								{S_FORM_TOKEN}
+								<input type="hidden" name="expected_next_stage" value="{NEXT_STAGE}" />
+								<!-- IF CAN_CONTINUE_STAGE -->
+									<button type="submit" name="confirm_approve" value="1" class="mc-btn mc-btn-success" style="font-size: 14px; padding: 10px 22px;">{NEXT_STAGE_LABEL} &raquo;</button>
+								<!-- ENDIF -->
+								<!-- IF CAN_ACKNOWLEDGE_WARNINGS -->
+									<button type="submit" name="confirm_acknowledge" value="1" class="mc-btn mc-btn-warning" style="font-size: 14px; padding: 10px 22px;">{L_MIGRATION_ACKNOWLEDGE_WARNINGS}</button>
+								<!-- ENDIF -->
+							</form>
+
+							<!-- IF CAN_RETRY_STAGE -->
+								<form action="{U_PROGRESS_ACTION}" method="post" style="display: inline; margin: 0;">
+									{S_FORM_TOKEN}
+									<button type="submit" name="confirm_resume" value="1" class="mc-btn mc-btn-danger">{L_MIGRATION_RETRY_STAGE}</button>
+								</form>
+							<!-- ENDIF -->
+
+							<a href="{U_DOWNLOAD_STAGE_LOG}" class="mc-btn mc-btn-secondary">&#128229; {L_MIGRATION_DOWNLOAD_STAGE_LOG}</a>
+						</div>
+
+						<div class="mc-destructive-group">
+							<form action="{U_PROGRESS_ACTION}" method="post" style="display: inline; margin: 0;">
+								{S_FORM_TOKEN}
+								<!-- IF CAN_CANCEL and not IS_CLI_ACTIVE -->
+									<button type="submit" name="confirm_cancel" value="1" class="mc-btn mc-btn-destructive-ghost" onclick="return confirm('Are you sure you want to cancel? Already imported data will be preserved.');">{L_MIGRATION_CANCEL_BUTTON}</button>
+								<!-- ENDIF -->
+								<!-- IF CAN_FAST_RESET and not IS_CLI_ACTIVE -->
+									<button type="submit" name="confirm_fast_reset" value="1" class="mc-btn mc-btn-destructive-ghost" onclick="return confirm('Abandon this zero-import run and start over?');">{L_MIGRATION_FAST_RESET_BUTTON}</button>
+								<!-- ENDIF -->
+							</form>
+
+							<!-- IF CAN_ROLLBACK and not IS_CLI_ACTIVE -->
+								<a href="{U_CONFIRM_ROLLBACK}" class="mc-btn mc-btn-destructive-ghost">{L_MIGRATION_ROLLBACK_BUTTON}</a>
+							<!-- ENDIF -->
+						</div>
+					</div>
+				</div>
+
+			<!-- ELSEIF IS_AWAITING_WORKER -->
+				<!-- Dedicated CLI Worker Prepared Card -->
+				<div class="mc-hero-actions-card stage-approval" id="hero-action-panel">
+					<div class="mc-checkpoint-header">
+						<h3 class="mc-checkpoint-title">{L_MIGRATION_CLI_PREPARED_TITLE}</h3>
+						<span class="status-badge status-awaiting_worker">{L_MIGRATION_AWAITING_WORKER}</span>
+					</div>
+					<p style="margin: 0 0 12px 0; font-size: 13px; color: var(--mc-text);">
+						The migration has not started yet. Run the following command on the server to begin <strong>{CURRENT_STEP_LABEL}</strong>.
+					</p>
+
+					<!-- Exact Command Block with Copy Button -->
+					<div class="mc-cli-cmd-block" style="display: flex; justify-content: space-between; align-items: center; gap: 10px;">
+						<code id="cli-cmd-text" style="word-break: break-all;">{CLI_EXACT_COMMAND}</code>
+						<button type="button" class="mc-btn mc-btn-secondary" style="padding: 4px 10px; font-size: 11px; white-space: nowrap;" onclick="copyCliCommand();">
+							<span id="btn-copy-label">&#128203; {L_COPY_COMMAND}</span>
+						</button>
+					</div>
+
+					<!-- Metadata Grid -->
+					<div class="mc-checkpoint-grid" style="margin-top: 14px; margin-bottom: 14px;">
+						<div class="mc-grid-cell">
+							<span class="mc-grid-label">Run ID</span>
+							<span class="mc-grid-val" style="font-size: 12px;"><code>{ACTIVE_RUN_SHORT_ID}</code></span>
+						</div>
+						<div class="mc-grid-cell">
+							<span class="mc-grid-label">Stage</span>
+							<span class="mc-grid-val" style="color: var(--mc-primary);">{CURRENT_STEP_LABEL}</span>
+						</div>
+						<div class="mc-grid-cell">
+							<span class="mc-grid-label">Source</span>
+							<span class="mc-grid-val">{SOURCE_PLATFORM_LABEL}</span>
+						</div>
+						<div class="mc-grid-cell">
+							<span class="mc-grid-label">Status</span>
+							<span class="mc-grid-val" style="font-size: 12px; color: var(--mc-info);">{L_MIGRATION_AWAITING_WORKER}</span>
+						</div>
+						<div class="mc-grid-cell">
+							<span class="mc-grid-label">{L_MIGRATION_PREPARED_AT}</span>
+							<span class="mc-grid-val" style="font-size: 12px;">{CLI_PREPARED_AT}</span>
+						</div>
+						<div class="mc-grid-cell">
+							<span class="mc-grid-label">{L_MIGRATION_WAITING_DURATION}</span>
+							<span class="mc-grid-val" id="cli-waiting-timer">{CLI_WAITING_DURATION}</span>
+						</div>
+						<div class="mc-grid-cell">
+							<span class="mc-grid-label">Last Checked</span>
+							<span class="mc-grid-val" id="cli-last-checked" style="font-size: 12px;">Just now</span>
+						</div>
+						<div class="mc-grid-cell">
+							<span class="mc-grid-label">CLI Connected</span>
+							<span class="mc-grid-val" id="cli-connected-cell">
+								<span id="cli-connected-badge" class="status-badge status-pending">{L_MIGRATION_CLI_NOT_CONNECTED}</span>
+							</span>
+						</div>
+					</div>
+
+					<!-- Unified Action Button Toolbar -->
+					<div class="mc-unified-toolbar">
+						<div class="mc-primary-group">
+							<button type="button" class="mc-btn mc-btn-primary" onclick="copyCliCommand();">
+								<span id="btn-copy-label-main">&#128203; {L_COPY_COMMAND}</span>
+							</button>
+							<button type="button" class="mc-btn mc-btn-secondary" id="btn-have-started" onclick="checkCliWorkerNow();">
+								&#128260; {L_MIGRATION_I_HAVE_STARTED}
+							</button>
+						</div>
+						<div class="mc-destructive-group">
+							<form action="{U_PROGRESS_ACTION}" method="post" style="display: inline; margin: 0;">
+								{S_FORM_TOKEN}
+								<button type="submit" name="confirm_cancel_cli_prep" value="1" class="mc-btn mc-btn-destructive-ghost">
+									{L_MIGRATION_CANCEL_CLI_PREP}
+								</button>
+							</form>
+						</div>
+					</div>
+
+					<!-- Instructions Panel -->
+					<div class="mc-cli-instructions" style="margin-top: 14px; background: var(--mc-surface-raised); border: 1px solid var(--mc-border-subtle); border-radius: var(--mc-radius-sm); padding: 12px 16px;">
+						<h4 style="margin: 0 0 6px 0; font-size: 13px; font-weight: 700; color: var(--mc-text);">
+							<!-- IF IS_WINDOWS_SERVER -->Windows / XAMPP<!-- ELSE -->Linux / Unix<!-- ENDIF -->
+						</h4>
+						<ol style="margin: 0; padding-inline-start: 20px; font-size: 12px; color: var(--mc-text-muted); line-height: 1.6;">
+							<!-- IF IS_WINDOWS_SERVER -->
+								<li>Open Command Prompt or PowerShell.</li>
+								<li>Paste the exact command above.</li>
+								<li>Press Enter to begin.</li>
+								<li>Keep the terminal open while processing.</li>
+								<li>Return here to monitor live progress.</li>
+							<!-- ELSE -->
+								<li>Open your server terminal or SSH session.</li>
+								<li>Paste and run the exact command above.</li>
+								<li>Keep the process running (or run inside tmux / screen).</li>
+								<li>Return here to monitor live progress.</li>
+							<!-- ENDIF -->
+						</ol>
+					</div>
+
+					<!-- Troubleshooting Checklist -->
+					<div id="cli-troubleshooting" style="display: <!-- IF STARTUP_ERROR -->block<!-- ELSE -->none<!-- ENDIF -->; margin-top: 14px; background: var(--mc-warning-subtle); border: 1px solid var(--mc-warning-border); border-radius: var(--mc-radius-sm); padding: 12px 16px;">
+						<h4 style="margin: 0 0 6px 0; font-size: 13px; font-weight: 700; color: var(--mc-warning);">{L_MIGRATION_STILL_WAITING_TITLE}</h4>
+						<p style="margin: 0 0 8px 0; font-size: 12px; color: var(--mc-text);"><span id="cli-error-msg"><!-- IF STARTUP_ERROR -->{STARTUP_ERROR}<!-- ELSE -->{L_MIGRATION_STILL_WAITING_DESC}<!-- ENDIF --></span></p>
+						<ul style="margin: 0; padding-inline-start: 20px; font-size: 12px; color: var(--mc-text-muted); line-height: 1.5;">
+							<li>{L_MIGRATION_TROUBLESHOOTING_1}</li>
+							<li>{L_MIGRATION_TROUBLESHOOTING_2}</li>
+							<li>{L_MIGRATION_TROUBLESHOOTING_3}</li>
+							<li>{L_MIGRATION_TROUBLESHOOTING_4}</li>
+						</ul>
+					</div>
+				</div>
+
+			<!-- ELSEIF IS_READY -->
+				<div class="mc-hero-actions-card stage-approval" id="hero-action-panel">
+					<div class="mc-checkpoint-header">
+						<h3 class="mc-checkpoint-title">{L_MIGRATION_STAGE_READY_TITLE}: <code>{CURRENT_STEP}</code></h3>
+						<span class="status-badge status-ready">Ready</span>
+					</div>
+					<p style="margin: 0 0 16px 0; font-size: 13px; color: var(--mc-text-muted);">{L_MIGRATION_STAGE_READY_NOTICE}</p>
+					
+					<!-- Execution Method Selector -->
+					<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 14px; margin-bottom: 16px;">
+						<div class="mc-mode-card <!-- IF WORKER_MODE != 'cli' -->active<!-- ENDIF -->" id="mode-card-ajax" onclick="selectWorkerMode('ajax');">
+							<div class="mc-mode-header">
+								<input type="radio" name="ui_worker_mode" id="radio-mode-ajax" value="ajax" <!-- IF WORKER_MODE != 'cli' -->checked="checked"<!-- ENDIF --> onchange="selectWorkerMode('ajax');" />
+								<label for="radio-mode-ajax" class="mc-mode-title">{L_MIGRATION_BROWSER_WORKER}</label>
+							</div>
+							<p class="mc-mode-desc">{L_MIGRATION_BROWSER_WORKER_DESC}</p>
+						</div>
+
+						<div class="mc-mode-card <!-- IF WORKER_MODE == 'cli' -->active<!-- ENDIF -->" id="mode-card-cli" onclick="selectWorkerMode('cli');">
+							<div class="mc-mode-header">
+								<input type="radio" name="ui_worker_mode" id="radio-mode-cli" value="cli" <!-- IF WORKER_MODE == 'cli' -->checked="checked"<!-- ENDIF --> onchange="selectWorkerMode('cli');" />
+								<label for="radio-mode-cli" class="mc-mode-title">{L_MIGRATION_CLI_WORKER}</label>
+							</div>
+							<p class="mc-mode-desc">{L_MIGRATION_CLI_WORKER_DESC}</p>
+						</div>
+					</div>
+
+					<div class="mc-unified-toolbar">
+						<div class="mc-primary-group">
+							<div id="wrapper-start-ajax" style="display: <!-- IF WORKER_MODE == 'cli' -->none<!-- ELSE -->inline-block<!-- ENDIF -->;">
+								<button type="button" id="btn-start-ajax" class="mc-btn mc-btn-success" style="font-size: 14px; padding: 10px 24px;" onclick="startAjaxRunner();">
+									{START_BROWSER_STAGE_LABEL} &raquo;
+								</button>
+							</div>
+							<div id="wrapper-prepare-cli" style="display: <!-- IF WORKER_MODE == 'cli' -->inline-block<!-- ELSE -->none<!-- ENDIF -->;">
+								<form action="{U_PROGRESS_ACTION}" method="post" id="form-prepare-cli" style="display: inline; margin: 0;">
+									{S_FORM_TOKEN}
+									<input type="hidden" name="expected_stage" value="{CURRENT_STEP}" />
+									<button type="submit" name="confirm_prepare_cli" value="1" id="btn-prepare-cli" class="mc-btn mc-btn-primary" style="font-size: 14px; padding: 10px 24px;">
+										{PREPARE_CLI_STAGE_LABEL} &raquo;
+									</button>
+								</form>
+							</div>
+						</div>
+						<div class="mc-destructive-group">
+							<form action="{U_PROGRESS_ACTION}" method="post" style="display: inline; margin: 0;">
+								{S_FORM_TOKEN}
+								<button type="submit" name="confirm_cancel" value="1" class="mc-btn mc-btn-destructive-ghost" onclick="return confirm('Cancel this migration?');">{L_MIGRATION_CANCEL_BUTTON}</button>
+							</form>
+						</div>
+					</div>
+				</div>
+
+			<!-- ELSEIF RUN_STATUS == 'running' and not IS_CLI_ACTIVE -->
+				<div class="mc-hero-actions-card stage-approval" id="hero-action-panel">
+					<div class="mc-checkpoint-header">
+						<h3 class="mc-checkpoint-title">&#9654; Processing Batches in Browser...</h3>
+						<span class="status-badge status-running">Running</span>
+					</div>
+					<p style="margin: 0 0 16px 0; font-size: 13px; color: var(--mc-text-muted);">{L_MIGRATION_WORKING_NOTICE} Keep this page open.</p>
+
+					<div class="mc-unified-toolbar">
+						<div class="mc-primary-group">
+							<button type="button" id="btn-pause-ajax" class="mc-btn mc-btn-warning" onclick="pauseAjaxRunner();">{L_MIGRATION_PAUSE_BUTTON}</button>
+						</div>
+						<div class="mc-destructive-group">
+							<form action="{U_PROGRESS_ACTION}" method="post" style="display: inline; margin: 0;">
+								{S_FORM_TOKEN}
+								<button type="submit" name="confirm_cancel" value="1" class="mc-btn mc-btn-destructive-ghost" onclick="return confirm('Cancel this migration?');">{L_MIGRATION_CANCEL_BUTTON}</button>
+							</form>
+						</div>
+					</div>
+				</div>
+
+			<!-- ELSEIF IS_CLI_ACTIVE -->
+				<div class="mc-cli-notice" id="hero-action-panel">
+					<div>
+						<h4 style="margin: 0 0 4px 0; font-size: 15px; font-weight: 700; color: var(--mc-info);">{L_MIGRATION_CLI_ACTIVE_TITLE}</h4>
+						<p style="margin: 0; font-size: 13px; color: var(--mc-text);">{L_MIGRATION_CLI_ACTIVE_DESC} You may safely close or navigate away from this page.</p>
+						<div class="mc-cli-cmd-block"><code>{CLI_RESUME_CMD}</code></div>
+					</div>
+					<div>
+						<span style="font-size: 12px; color: var(--mc-text-muted);">{L_MIGRATION_HEARTBEAT_LAST}: <strong id="cli-heartbeat-age">{HEARTBEAT_AGE}s ago</strong></span>
+					</div>
+				</div>
+
+			<!-- ELSEIF RUN_STATUS == 'paused' -->
+				<div class="mc-hero-actions-card stage-warning" id="hero-action-panel">
+					<div class="mc-checkpoint-header">
+						<h3 class="mc-checkpoint-title">&#10074;&#10074; Migration Paused</h3>
+						<span class="status-badge status-paused">Paused</span>
+					</div>
+					<p style="margin: 0 0 16px 0; font-size: 13px; color: var(--mc-text-muted);">{L_MIGRATION_PAUSED_NOTICE}</p>
+
+					<div class="mc-unified-toolbar">
+						<div class="mc-primary-group">
+							<!-- IF WORKER_MODE == 'ajax' -->
+								<button type="button" id="btn-start-ajax" class="mc-btn mc-btn-primary" onclick="startAjaxRunner();">{L_MIGRATION_START_PROCESSING} &raquo;</button>
+							<!-- ELSE -->
+								<form action="{U_PROGRESS_ACTION}" method="post" style="display: inline; margin: 0;">
+									{S_FORM_TOKEN}
+									<input type="hidden" name="expected_stage" value="{CURRENT_STEP}" />
+									<button type="submit" name="confirm_prepare_cli" value="1" class="mc-btn mc-btn-primary">{PREPARE_CLI_STAGE_LABEL} &raquo;</button>
+								</form>
+							<!-- ENDIF -->
+						</div>
+						<div class="mc-destructive-group">
+							<form action="{U_PROGRESS_ACTION}" method="post" style="display: inline; margin: 0;">
+								{S_FORM_TOKEN}
+								<button type="submit" name="confirm_cancel" value="1" class="mc-btn mc-btn-destructive-ghost" onclick="return confirm('Cancel this migration?');">{L_MIGRATION_CANCEL_BUTTON}</button>
+							</form>
+							<!-- IF CAN_ROLLBACK -->
+								<a href="{U_CONFIRM_ROLLBACK}" class="mc-btn mc-btn-destructive-ghost">{L_MIGRATION_ROLLBACK_BUTTON}</a>
+							<!-- ENDIF -->
+						</div>
+					</div>
+				</div>
+
+			<!-- ELSEIF RUN_STATUS == 'completed' or CAN_FINALIZE or RAW_RUN_STATUS == 'finalized' -->
+				<div class="mc-hero-actions-card stage-approval" id="hero-action-panel" style="margin-bottom: 20px; border-inline-start: 4px solid var(--mc-success);">
+					<div class="mc-checkpoint-header">
+						<div>
+							<h3 class="mc-checkpoint-title" style="color: var(--mc-success);">&#10003; {L_MIGRATION_COMPLETED_TITLE}</h3>
+							<p style="margin: 4px 0 0 0; font-size: 13px; color: var(--mc-text-muted);">{L_POST_MIGRATION_OPERATIONS_EXPLAIN}</p>
+						</div>
+						<!-- IF ALL_FINAL_STEPS_DONE -->
+							<span class="status-badge status-completed">&#10003; All Steps Finalized</span>
+						<!-- ELSE -->
+							<span class="status-badge status-warning">Action Required</span>
+						<!-- ENDIF -->
+					</div>
+
+					<!-- Post-Migration Operations Grid -->
+					<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 14px; margin: 18px 0;">
+						<!-- Card 1: Recounts & Resynchronize -->
+						<div style="background: #ffffff; border: 1px solid var(--mc-border); border-radius: 6px; padding: 14px; display: flex; flex-direction: column; justify-content: space-between;">
+							<div>
+								<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+									<strong style="font-size: 13px; color: var(--mc-text);">{L_STAGE_FINALIZATION}</strong>
+									<!-- IF FINALIZATION_DONE -->
+										<span class="status-badge status-completed" style="font-size: 11px;">&#10003; {L_SUCCESS}</span>
+									<!-- ELSE -->
+										<span class="status-badge status-unstarted" style="font-size: 11px;">Pending</span>
+									<!-- ENDIF -->
+								</div>
+								<p style="font-size: 12px; color: var(--mc-text-muted); margin: 0 0 10px 0;">Resynchronize user counts, topic/post counters, and permissions.</p>
+							</div>
+							<div>
+								<a href="{U_RUN_FINALIZATION}" class="mc-btn <!-- IF FINALIZATION_DONE -->mc-btn-secondary<!-- ELSE -->mc-btn-primary<!-- ENDIF -->" style="width: 100%; text-align: center; box-sizing: border-box; font-size: 12px; padding: 6px 10px;">
+									<!-- IF FINALIZATION_DONE -->&#10003; Re-run Recounts<!-- ELSE -->&#9654; {L_RUN_RECOUNTS}<!-- ENDIF -->
+								</a>
+							</div>
+						</div>
+
+						<!-- Card 2: Search Index -->
+						<div style="background: #ffffff; border: 1px solid var(--mc-border); border-radius: 6px; padding: 14px; display: flex; flex-direction: column; justify-content: space-between;">
+							<div>
+								<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+									<strong style="font-size: 13px; color: var(--mc-text);">{L_STAGE_SEARCH_INDEX}</strong>
+									<!-- IF SEARCH_INDEX_DONE -->
+										<span class="status-badge status-completed" style="font-size: 11px;">&#10003; {L_SUCCESS}</span>
+									<!-- ELSE -->
+										<span class="status-badge status-unstarted" style="font-size: 11px;">Pending</span>
+									<!-- ENDIF -->
+								</div>
+								<p style="font-size: 12px; color: var(--mc-text-muted); margin: 0 0 10px 0;">
+									<!-- IF SEARCH_INDEX_DONE -->
+										Indexed {SEARCH_INDEXED_COUNT} posts into full-text search backend.
+									<!-- ELSE -->
+										Build full-text search index for all migrated topics and posts.
+									<!-- ENDIF -->
+								</p>
+							</div>
+							<div>
+								<a href="{U_RUN_SEARCH_INDEX}" class="mc-btn <!-- IF SEARCH_INDEX_DONE -->mc-btn-secondary<!-- ELSE -->mc-btn-primary<!-- ENDIF -->" style="width: 100%; text-align: center; box-sizing: border-box; font-size: 12px; padding: 6px 10px;">
+									<!-- IF SEARCH_INDEX_DONE -->&#10003; Re-build Index<!-- ELSE -->&#9654; {L_BUILD_SEARCH_INDEX}<!-- ENDIF -->
+								</a>
+							</div>
+						</div>
+
+						<!-- Card 3: Final Health Verification -->
+						<div style="background: #ffffff; border: 1px solid var(--mc-border); border-radius: 6px; padding: 14px; display: flex; flex-direction: column; justify-content: space-between;">
+							<div>
+								<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+									<strong style="font-size: 13px; color: var(--mc-text);">{L_STAGE_FINAL_VERIFICATION}</strong>
+									<!-- IF VERIFY_DONE -->
+										<!-- IF VERIFY_PASSED -->
+											<span class="status-badge status-completed" style="font-size: 11px;">&#10003; 11/11 Passed</span>
+										<!-- ELSE -->
+											<span class="status-badge status-warning" style="font-size: 11px;">! Warnings</span>
+										<!-- ENDIF -->
+									<!-- ELSE -->
+										<span class="status-badge status-unstarted" style="font-size: 11px;">Pending</span>
+									<!-- ENDIF -->
+								</div>
+								<p style="font-size: 12px; color: var(--mc-text-muted); margin: 0 0 10px 0;">Run comprehensive 11-point data integrity and orphan validation suite.</p>
+							</div>
+							<div>
+								<a href="{U_RUN_VERIFY}" class="mc-btn <!-- IF VERIFY_DONE -->mc-btn-secondary<!-- ELSE -->mc-btn-primary<!-- ENDIF -->" style="width: 100%; text-align: center; box-sizing: border-box; font-size: 12px; padding: 6px 10px;">
+									<!-- IF VERIFY_DONE -->&#10003; Re-verify Health<!-- ELSE -->&#9654; {L_VERIFY_HEALTH}<!-- ENDIF -->
+								</a>
+							</div>
+						</div>
+					</div>
+
+					<div class="mc-unified-toolbar" style="margin-top: 14px;">
+						<div class="mc-primary-group">
+							<!-- IF ALL_FINAL_STEPS_DONE -->
+								<a href="{U_FINALIZE_LINK}" class="mc-btn mc-btn-success" style="font-size: 14px; padding: 10px 24px;">&#10003; {L_MIGRATION_FINALIZE_BUTTON} &raquo;</a>
+							<!-- ELSE -->
+								<a href="{U_RUN_ALL_FINAL}" class="mc-btn mc-btn-success" style="font-size: 14px; padding: 10px 24px; font-weight: 700;">&#9889; {L_RUN_ALL_FINAL_STEPS} &raquo;</a>
+							<!-- ENDIF -->
+							<a href="{U_ACTION}&amp;mode=overview" class="mc-btn mc-btn-secondary">{L_BACK_TO_OVERVIEW}</a>
+						</div>
+						<div class="mc-destructive-group">
+							<a href="{U_ACTION}&amp;mode=errors" class="mc-btn mc-btn-secondary">View Error Log</a>
+						</div>
+					</div>
+				</div>
+
+			<!-- ELSEIF IS_ABANDONED -->
+				<div class="mc-hero-actions-card" id="hero-action-panel">
+					<div class="mc-checkpoint-header">
+						<h3 class="mc-checkpoint-title">Migration Abandoned</h3>
+						<span class="status-badge status-abandoned">Abandoned</span>
+					</div>
+					<p style="margin: 0 0 16px 0; font-size: 13px; color: var(--mc-text-muted);">This migration was abandoned before writing records.</p>
+					
+					<div class="mc-unified-toolbar">
+						<div class="mc-primary-group">
+							<a href="{U_ACTION}&amp;mode=wizard" class="mc-btn mc-btn-primary">{L_MIGRATION_START_NEW} &raquo;</a>
+							<a href="{U_ACTION}&amp;mode=overview" class="mc-btn mc-btn-secondary">{L_BACK_TO_OVERVIEW}</a>
+						</div>
+					</div>
+				</div>
+			<!-- ENDIF -->
+
+			<!-- Ajax Error Alert -->
+			<div id="ajax-error-box" class="mc-hero-actions-card stage-failed" style="display: none; margin-bottom: 20px;">
+				<h4 style="margin: 0 0 4px 0; color: var(--mc-danger);">{L_ERROR}</h4>
+				<p id="ajax-error-message" style="margin: 0; font-size: 13px;"></p>
+			</div>
+
+			<!-- Bottom Grid: Timeline + Plan -->
+			<div style="display: grid; grid-template-columns: 320px 1fr; gap: 20px;" id="dashboard-grid">
+				<!-- Stage Timeline -->
+				<div class="mc-timeline-card">
+					<h3 class="mc-timeline-title">Stage Timeline</h3>
+					<ul class="mc-timeline-list" id="stage-timeline-list">
+						<!-- BEGIN stage_timeline -->
+							<li class="mc-timeline-item {stage_timeline.STATUS_CLASS}" id="timeline-{stage_timeline.STAGE_KEY}">
+								<div class="mc-timeline-connector"></div>
+								<div class="mc-timeline-icon-box">{stage_timeline.ICON}</div>
+								<div class="mc-timeline-body">
+									<div class="mc-timeline-info">
+										<span class="mc-timeline-name">{stage_timeline.STAGE_TITLE}</span>
+										<span class="mc-timeline-key">{stage_timeline.SUMMARY}</span>
+									</div>
+								</div>
+							</li>
+						<!-- END stage_timeline -->
+					</ul>
+				</div>
+
+				<!-- Migration Plan Steps Table -->
+				<div class="mc-plan-card">
+					<h3 style="margin: 0 0 14px 0; font-size: 15px; font-weight: 700; color: var(--mc-text);">Migration Plan</h3>
+					<table class="mc-table">
+						<thead>
+							<tr>
+								<th>#</th>
+								<th>Stage</th>
+								<th>Status</th>
+								<th>Imported</th>
+								<th>Skipped</th>
+								<th>Failed</th>
+								<th>Total</th>
+								<th>Progress</th>
+							</tr>
+						</thead>
+						<tbody>
+							<!-- BEGIN progress_steps -->
+								<tr id="step-row-{progress_steps.NAME}">
+									<td>{progress_steps.ORDER}</td>
+									<td><strong>{progress_steps.LABEL}</strong></td>
+									<td><span class="status-badge status-{progress_steps.STATUS}">{progress_steps.STATUS}</span></td>
+									<td class="step-imp">{progress_steps.IMPORTED}</td>
+									<td class="step-skp">{progress_steps.SKIPPED}</td>
+									<td class="step-fld">{progress_steps.FAILED}</td>
+									<td class="step-tot">
+										<!-- IF progress_steps.TOTAL > 0 -->
+											{progress_steps.TOTAL}
+										<!-- ELSE -->
+											<span style="color: var(--mc-text-muted); font-size: 11px;">{L_MIGRATION_NO_RECORDS_LABEL}</span>
+										<!-- ENDIF -->
+									</td>
+									<td class="step-pct">
+										<!-- IF progress_steps.TOTAL > 0 -->
+											<strong>{progress_steps.PERCENT}%</strong>
+										<!-- ELSEIF progress_steps.STATUS == 'completed' -->
+											<span style="color: var(--mc-success); font-weight: 600;">Done</span>
+										<!-- ELSE -->
+											<span style="color: var(--mc-text-muted); font-size: 11px;">{L_MIGRATION_NOT_APPLICABLE}</span>
+										<!-- ENDIF -->
+									</td>
+								</tr>
+							<!-- END progress_steps -->
+						</tbody>
+					</table>
+				</div>
+			</div>
+
+		<!-- ==================================================================
+		     MODE: ERRORS
+		     ================================================================== -->
+		<!-- ELSEIF MODE == 'errors' -->
+			<div class="mc-plan-card">
+				<h3 style="margin: 0 0 14px 0; font-size: 17px; font-weight: 700; color: var(--mc-text);">{L_ACP_MIGRATION_ERRORS}</h3>
+				<table class="mc-table">
+					<thead>
+						<tr>
+							<th>ID</th>
+							<th>Stage</th>
+							<th>Code</th>
+							<th>Severity</th>
+							<th>Message</th>
+							<th>Source ID</th>
+							<th>Time</th>
+						</tr>
+					</thead>
+					<tbody>
+						<!-- BEGIN errors -->
+							<tr>
+								<td>{errors.ERROR_ID}</td>
+								<td><strong>{errors.STAGE}</strong></td>
+								<td><code>{errors.ERROR_CODE}</code></td>
+								<td><span class="status-badge status-{errors.SEVERITY}">{errors.SEVERITY}</span></td>
+								<td style="max-width: 300px; word-break: break-word;">{errors.MESSAGE}</td>
+								<td>{errors.SOURCE_ID}</td>
+								<td>{errors.LOGGED_AT}</td>
+							</tr>
+						<!-- BEGINELSE -->
+							<tr>
+								<td colspan="7" style="text-align: center; color: var(--mc-text-muted); padding: 24px;">No migration errors recorded.</td>
+							</tr>
+						<!-- END errors -->
+					</tbody>
+				</table>
+			</div>
+
+		<!-- ==================================================================
+		     MODE: FINALIZE & HEALTH CHECK
+		     ================================================================== -->
+		<!-- ELSEIF MODE == 'finalize' -->
+
+			<!-- IF FINALIZE_SUCCESS -->
+				<div class="mc-hero-actions-card stage-approval" style="margin-bottom: 20px;">
+					<h4 style="margin: 0 0 6px 0; color: var(--mc-success);">&#10003; {L_SUCCESS}</h4>
+					<p style="margin: 0; font-size: 13px;">All board statistics, topic/post counts, and permissions have been resynchronized successfully.</p>
+				</div>
+			<!-- ENDIF -->
+
+			<!-- IF SEARCH_INDEX_SUCCESS -->
+				<div class="mc-hero-actions-card stage-approval" style="margin-bottom: 20px;">
+					<h4 style="margin: 0 0 6px 0; color: var(--mc-success);">&#10003; Search Index Built</h4>
+					<p style="margin: 0; font-size: 13px;">Search index build completed ({INDEXED_COUNT} posts indexed).</p>
+				</div>
+			<!-- ENDIF -->
+
+			<!-- IF HAS_SELECTED_RUN -->
+				<!-- KPI Cards Grid for Health Verification -->
+				<div class="mc-kpi-grid">
+					<div class="mc-kpi-card">
+						<span class="mc-kpi-label">Health Checks</span>
+						<span class="mc-kpi-val">{TOTAL_CHECKS_PASSED} / {TOTAL_CHECKS_COUNT}</span>
+						<span class="mc-kpi-sub">
+							<!-- IF TOTAL_CHECKS_FAILED > 0 -->
+								<span style="color: var(--mc-danger); font-weight: 700;">{TOTAL_CHECKS_FAILED} Failed</span>
+							<!-- ELSE -->
+								<span style="color: var(--mc-success); font-weight: 700;">100% Passed</span>
+							<!-- ENDIF -->
+						</span>
+					</div>
+
+					<div class="mc-kpi-card">
+						<span class="mc-kpi-label">Migration Status</span>
+						<span class="mc-kpi-val"><span class="status-badge status-{RUN_STATUS}">{RUN_STATUS}</span></span>
+						<span class="mc-kpi-sub">ID: {FINALIZE_RUN_ID}</span>
+					</div>
+
+					<div class="mc-kpi-card">
+						<span class="mc-kpi-label">Search Backend</span>
+						<span class="mc-kpi-val" style="font-size: 18px;">{SEARCH_BACKEND_NAME}</span>
+						<span class="mc-kpi-sub">{SEARCH_BACKEND_CLASS}</span>
+					</div>
+				</div>
+
+				<!-- Verification Checks Table -->
+				<div class="mc-plan-card" style="margin-bottom: 24px;">
+					<div class="mc-checkpoint-header">
+						<h3 class="mc-checkpoint-title">Data Integrity & Health Checks</h3>
+						<span class="status-badge <!-- IF TOTAL_CHECKS_FAILED > 0 -->status-failed<!-- ELSE -->status-completed<!-- ENDIF -->">
+							<!-- IF TOTAL_CHECKS_FAILED > 0 -->Attention Needed<!-- ELSE -->All Checks Passed<!-- ENDIF -->
+						</span>
+					</div>
+					<table class="mc-table">
+						<thead>
+							<tr>
+								<th style="width: 250px;">Check Name</th>
+								<th style="width: 120px;">Status</th>
+								<th>Diagnostic Details</th>
+							</tr>
+						</thead>
+						<tbody>
+							<!-- BEGIN verify_checks -->
+								<tr>
+									<td><strong>{verify_checks.LABEL}</strong></td>
+									<td>
+										<!-- IF verify_checks.STATUS == 'pass' or verify_checks.STATUS == 'passed' -->
+											<span class="status-badge status-completed">&#10003; Pass</span>
+										<!-- ELSEIF verify_checks.STATUS == 'warning' -->
+											<span class="status-badge status-warning">! Warning</span>
+										<!-- ELSE -->
+											<span class="status-badge status-failed">&#10007; Failed</span>
+										<!-- ENDIF -->
+									</td>
+									<td style="font-size: 13px; color: var(--mc-text);">{verify_checks.MESSAGE}</td>
+								</tr>
+							<!-- BEGINELSE -->
+								<tr>
+									<td colspan="3" style="text-align: center; color: var(--mc-text-muted); padding: 20px;">No verification checks available.</td>
+								</tr>
+							<!-- END verify_checks -->
+						</tbody>
+					</table>
+				</div>
+
+				<!-- Two Action Cards: Board Recounts + Search Index -->
+				<!-- IF IS_FINALIZED -->
+					<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 20px; margin-bottom: 24px;">
+						<!-- Finalizers Card (Completed) -->
+						<div class="mc-plan-card" style="display: flex; flex-direction: column; justify-content: space-between; border-inline-start: 4px solid var(--mc-success);">
+							<div>
+								<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+									<h3 style="margin: 0; font-size: 15px; font-weight: 700; color: var(--mc-text);">{L_STAGE_FINALIZATION}</h3>
+									<span class="status-badge status-completed" style="font-size: 11px;">&#10003; {L_STATUS_SYNCHRONIZED}</span>
+								</div>
+								<p style="margin: 0 0 12px 0; font-size: 13px; color: var(--mc-text-muted); line-height: 1.5;">
+									{L_RECOUNTS_COMPLETED_DESC}
+								</p>
+							</div>
+							<div style="margin-top: 10px; padding-top: 10px; border-top: 1px solid var(--mc-border-subtle); display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px;">
+								<span style="font-size: 11px; color: var(--mc-text-muted);">Finalized: <strong>{FINALIZED_AT_FORMATTED}</strong></span>
+								<form action="{U_FINALIZE_ACTION}" method="post" style="margin: 0;">
+									<button type="submit" name="action" value="run_finalizers" class="mc-btn mc-btn-secondary" style="font-size: 11px; padding: 4px 10px;">
+										&#128260; {L_RERUN_RECOUNTS}
+									</button>
+								</form>
+							</div>
+						</div>
+
+						<!-- Search Index Card (Completed / Maintained) -->
+						<div class="mc-plan-card" style="display: flex; flex-direction: column; justify-content: space-between; <!-- IF IS_SEARCH_INDEXED -->border-inline-start: 4px solid var(--mc-success);<!-- ELSE -->border-inline-start: 4px solid var(--mc-warning);<!-- ENDIF -->">
+							<div>
+								<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+									<h3 style="margin: 0; font-size: 15px; font-weight: 700; color: var(--mc-text);">{L_BUILD_SEARCH_INDEX} ({SEARCH_BACKEND_NAME})</h3>
+									<!-- IF IS_SEARCH_INDEXED -->
+										<span class="status-badge status-completed" style="font-size: 11px;">&#10003; {L_STATUS_INDEXED}</span>
+									<!-- ELSE -->
+										<span class="status-badge status-warning" style="font-size: 11px;">Pending</span>
+									<!-- ENDIF -->
+								</div>
+								<p style="margin: 0 0 12px 0; font-size: 13px; color: var(--mc-text-muted); line-height: 1.5;">
+									<!-- IF IS_SEARCH_INDEXED -->
+										{L_SEARCH_INDEX_COMPLETED_DESC}
+									<!-- ELSE -->
+										Build or update the phpBB search index for all migrated posts using <strong>{SEARCH_BACKEND_NAME}</strong>.
+									<!-- ENDIF -->
+								</p>
+							</div>
+							<div style="margin-top: 10px; padding-top: 10px; border-top: 1px solid var(--mc-border-subtle); display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px;">
+								<span style="font-size: 11px; color: var(--mc-text-muted);">
+									<!-- IF IS_SEARCH_INDEXED -->Indexed: <strong>{SEARCH_INDEXED_AT_FORMATTED}</strong><!-- ELSE -->Status: <strong>Not Built</strong><!-- ENDIF -->
+								</span>
+								<form action="{U_FINALIZE_ACTION}" method="post" style="margin: 0;">
+									<button type="submit" name="action" value="run_search_index" class="mc-btn mc-btn-secondary" style="font-size: 11px; padding: 4px 10px;">
+										&#128260; {L_RERUN_SEARCH_INDEX}
+									</button>
+								</form>
+							</div>
+						</div>
+					</div>
+				<!-- ELSE -->
+					<div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 24px;">
+						<!-- Finalizers Card -->
+						<div class="mc-plan-card">
+							<h3 style="margin: 0 0 8px 0; font-size: 16px; font-weight: 700; color: var(--mc-text);">{L_STAGE_FINALIZATION}</h3>
+							<p style="margin: 0 0 16px 0; font-size: 13px; color: var(--mc-text-muted);">
+								Resynchronize user post counts, topic first/last post associations, forum reply totals, and prune orphan notifications.
+							</p>
+							<form action="{U_FINALIZE_ACTION}" method="post" style="margin-bottom: 12px;">
+								<button type="submit" name="action" value="run_finalizers" class="mc-btn mc-btn-primary" <!-- IF not CAN_FINALIZE -->disabled<!-- ENDIF -->>
+									{L_RUN_RECOUNTS} &raquo;
+								</button>
+							</form>
+							<div class="mc-cli-cmd-block" style="font-size: 12px;"><code>{CLI_FINALIZE_CMD}</code></div>
+						</div>
+
+						<!-- Search Index Card -->
+						<div class="mc-plan-card">
+							<h3 style="margin: 0 0 8px 0; font-size: 16px; font-weight: 700; color: var(--mc-text);">{L_BUILD_SEARCH_INDEX}</h3>
+							<p style="margin: 0 0 16px 0; font-size: 13px; color: var(--mc-text-muted);">
+								Build or update the phpBB search index for all migrated posts using the configured backend (<strong>{SEARCH_BACKEND_NAME}</strong>).
+							</p>
+							<form action="{U_FINALIZE_ACTION}" method="post" style="margin-bottom: 12px;">
+								<button type="submit" name="action" value="run_search_index" class="mc-btn mc-btn-primary" <!-- IF not CAN_FINALIZE -->disabled<!-- ENDIF -->>
+									{L_BUILD_SEARCH_INDEX} &raquo;
+								</button>
+							</form>
+							<div class="mc-cli-cmd-block" style="font-size: 12px;"><code>{CLI_SEARCH_CMD}</code></div>
+						</div>
+					</div>
+				<!-- ENDIF -->
+
+				<div class="mc-unified-toolbar" style="margin-top: 10px;">
+					<div class="mc-primary-group">
+						<a href="{U_ACTION}&amp;mode=overview" class="mc-btn mc-btn-secondary">{L_ACP_MIGRATION_OVERVIEW} &raquo;</a>
+					</div>
+				</div>
+
+			<!-- ELSE -->
+				<div class="mc-plan-card">
+					<h3 style="margin: 0 0 14px 0; font-size: 17px; font-weight: 700; color: var(--mc-text);">Select a Migration Run to Finalize</h3>
+					<table class="mc-table">
+						<thead>
+							<tr>
+								<th>Run ID</th>
+								<th>Source</th>
+								<th>Status</th>
+								<th>Started At</th>
+								<th>Completed At</th>
+								<th>Action</th>
+							</tr>
+						</thead>
+						<tbody>
+							<!-- BEGIN finalize_runs -->
+								<tr>
+									<td><strong>{finalize_runs.RUN_ID}</strong></td>
+									<td>{finalize_runs.SOURCE}</td>
+									<td><span class="status-badge status-{finalize_runs.STATUS}">{finalize_runs.STATUS}</span></td>
+									<td>{finalize_runs.STARTED_AT}</td>
+									<td>{finalize_runs.COMPLETED_AT}</td>
+									<td>
+										<a href="{finalize_runs.U_SELECT}" class="mc-btn mc-btn-secondary" style="padding: 4px 12px; font-size: 12px;">Select &raquo;</a>
+									</td>
+								</tr>
+							<!-- BEGINELSE -->
+								<tr>
+									<td colspan="6" style="text-align: center; color: var(--mc-text-muted); padding: 24px;">No completed migration runs found.</td>
+								</tr>
+							<!-- END finalize_runs -->
+						</tbody>
+					</table>
+				</div>
+			<!-- ENDIF -->
+
+		<!-- ENDIF -->
+
+		<!-- ==================================================================
+		     FOOTER: phpBB SEO Suite Promo & Copyright Bar
+		     ================================================================== -->
+		<div class="mc-seo-pro-banner" style="margin-top: 32px; background: #ffffff; border: 1px solid #dbeafe; border-radius: 12px; padding: 24px; box-shadow: 0 4px 16px rgba(37, 99, 235, 0.05);">
+			<div style="display: flex; justify-content: space-between; align-items: flex-start; gap: 16px; margin-bottom: 18px; flex-wrap: wrap;">
+				<div style="flex: 1; min-width: 280px;">
+					<div style="display: inline-flex; align-items: center; gap: 6px; background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%); color: #1d4ed8; font-size: 11px; font-weight: 700; padding: 3px 10px; border-radius: 20px; margin-bottom: 8px; border: 1px solid #bfdbfe;">
+						<span>🚀</span> {L_SEO_SUITE_BADGE}
+					</div>
+					<h3 style="margin: 0 0 6px 0; font-size: 16px; font-weight: 700; color: #1e3a8a;">{L_SEO_SUITE_TITLE}</h3>
+					<p style="margin: 0; font-size: 13px; color: var(--mc-text-muted); line-height: 1.6;">{L_SEO_SUITE_DESC}</p>
+				</div>
+				<div style="display: flex; gap: 10px; flex-wrap: wrap;">
+					<a href="{L_SEO_GITHUB_URL}" target="_blank" rel="noopener" class="mc-btn mc-btn-secondary" style="font-size: 12px; padding: 8px 16px; border-radius: 6px; text-decoration: none; display: inline-flex; align-items: center; gap: 6px;">
+						<svg width="14" height="14" viewBox="0 0 16 16" fill="currentColor"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"></path></svg>
+						<span>{L_SEO_GET_LITE}</span>
+					</a>
+					<a href="{L_SEO_SUITE_URL}" target="_blank" rel="noopener" class="mc-btn mc-btn-primary" style="background: linear-gradient(135deg, #2563eb 0%, #4f46e5 100%); border: none; font-size: 12px; font-weight: 600; padding: 8px 18px; border-radius: 6px; box-shadow: 0 2px 6px rgba(37, 99, 235, 0.25); text-decoration: none;">
+						{L_SEO_GET_PRO} &raquo;
+					</a>
+				</div>
+			</div>
+
+			<!-- Features Comparison Grid -->
+			<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 16px;">
+				<!-- Lite Edition Box -->
+				<div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 14px 16px;">
+					<h4 style="margin: 0 0 10px 0; font-size: 13px; font-weight: 700; color: #334155; display: flex; align-items: center; justify-content: space-between;">
+						<span>📦 {L_SEO_LITE_TITLE}</span>
+						<span style="font-size: 10px; background: #e2e8f0; color: #475569; padding: 1px 6px; border-radius: 4px; font-weight: 600;">FREE</span>
+					</h4>
+					<ul style="margin: 0; padding: 0; list-style: none; font-size: 12px; color: #475569; display: flex; flex-direction: column; gap: 6px;">
+						<li style="display: flex; align-items: flex-start; gap: 6px;">
+							<span style="color: #059669; font-weight: 700;">&#10003;</span>
+							<span>{L_SEO_LITE_F1}</span>
+						</li>
+						<li style="display: flex; align-items: flex-start; gap: 6px;">
+							<span style="color: #059669; font-weight: 700;">&#10003;</span>
+							<span>{L_SEO_LITE_F2}</span>
+						</li>
+						<li style="display: flex; align-items: flex-start; gap: 6px;">
+							<span style="color: #059669; font-weight: 700;">&#10003;</span>
+							<span>{L_SEO_LITE_F3}</span>
+						</li>
+						<li style="display: flex; align-items: flex-start; gap: 6px;">
+							<span style="color: #059669; font-weight: 700;">&#10003;</span>
+							<span>{L_SEO_LITE_F4}</span>
+						</li>
+					</ul>
+				</div>
+
+				<!-- Pro Edition Box -->
+				<div style="background: linear-gradient(135deg, #f0fdf4 0%, #eff6ff 100%); border: 1px solid #bfdbfe; border-radius: 8px; padding: 14px 16px;">
+					<h4 style="margin: 0 0 10px 0; font-size: 13px; font-weight: 700; color: #1e3a8a; display: flex; align-items: center; justify-content: space-between;">
+						<span>⚡ {L_SEO_PRO_TITLE}</span>
+						<span style="font-size: 10px; background: linear-gradient(135deg, #2563eb 0%, #4f46e5 100%); color: #ffffff; padding: 1px 6px; border-radius: 4px; font-weight: 700;">PRO</span>
+					</h4>
+					<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 6px; font-size: 12px; color: #1e293b;">
+						<div style="display: flex; align-items: flex-start; gap: 6px;">
+							<span style="color: #2563eb; font-weight: 700;">★</span>
+							<span>{L_SEO_PRO_F1}</span>
+						</div>
+						<div style="display: flex; align-items: flex-start; gap: 6px;">
+							<span style="color: #2563eb; font-weight: 700;">★</span>
+							<span>{L_SEO_PRO_F2}</span>
+						</div>
+						<div style="display: flex; align-items: flex-start; gap: 6px;">
+							<span style="color: #2563eb; font-weight: 700;">★</span>
+							<span>{L_SEO_PRO_F3}</span>
+						</div>
+						<div style="display: flex; align-items: flex-start; gap: 6px;">
+							<span style="color: #2563eb; font-weight: 700;">★</span>
+							<span>{L_SEO_PRO_F4}</span>
+						</div>
+						<div style="display: flex; align-items: flex-start; gap: 6px;">
+							<span style="color: #2563eb; font-weight: 700;">★</span>
+							<span>{L_SEO_PRO_F5}</span>
+						</div>
+						<div style="display: flex; align-items: flex-start; gap: 6px;">
+							<span style="color: #2563eb; font-weight: 700;">★</span>
+							<span>{L_SEO_PRO_F6}</span>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+
+		<div class="mc-footer-copyright-bar" style="margin-top: 20px; padding: 16px 4px 8px 4px; border-top: 1px solid var(--mc-border-subtle); display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px; font-size: 12px; color: var(--mc-text-muted);">
+			<div>
+				{L_FOOTER_COPYRIGHT}
+			</div>
+			<div>
+				{L_FOOTER_ALL_RIGHTS}
+			</div>
+		</div>
+
+	</div>
+</div>
+
+<script>
+function selectWorkerMode(mode) {
+	var ajaxCard = document.getElementById('mode-card-ajax');
+	var cliCard = document.getElementById('mode-card-cli');
+	var radioAjax = document.getElementById('radio-mode-ajax');
+	var radioCli = document.getElementById('radio-mode-cli');
+	var wrapAjax = document.getElementById('wrapper-start-ajax');
+	var wrapCli = document.getElementById('wrapper-prepare-cli');
+
+	if (mode === 'cli') {
+		if (ajaxCard) ajaxCard.classList.remove('active');
+		if (cliCard) cliCard.classList.add('active');
+		if (radioCli) radioCli.checked = true;
+		if (wrapAjax) wrapAjax.style.display = 'none';
+		if (wrapCli) wrapCli.style.display = 'inline-block';
+	} else {
+		if (cliCard) cliCard.classList.remove('active');
+		if (ajaxCard) ajaxCard.classList.add('active');
+		if (radioAjax) radioAjax.checked = true;
+		if (wrapCli) wrapCli.style.display = 'none';
+		if (wrapAjax) wrapAjax.style.display = 'inline-block';
+	}
+}
+
+function copyCliCommand() {
+	var cmdEl = document.getElementById('cli-cmd-text');
+	if (!cmdEl) return;
+	var text = cmdEl.textContent.trim();
+	if (navigator.clipboard && navigator.clipboard.writeText) {
+		navigator.clipboard.writeText(text).then(showCopiedNotice).catch(fallbackCopy);
+	} else {
+		fallbackCopy();
+	}
+}
+
+function fallbackCopy() {
+	var cmdEl = document.getElementById('cli-cmd-text');
+	if (!cmdEl) return;
+	var temp = document.createElement('textarea');
+	temp.value = cmdEl.textContent.trim();
+	document.body.appendChild(temp);
+	temp.select();
+	document.execCommand('copy');
+	document.body.removeChild(temp);
+	showCopiedNotice();
+}
+
+function showCopiedNotice() {
+	var lbl = document.getElementById('btn-copy-label');
+	var lblMain = document.getElementById('btn-copy-label-main');
+	if (lbl) lbl.textContent = '✓ {L_MIGRATION_CMD_COPIED}!';
+	if (lblMain) lblMain.textContent = '✓ {L_MIGRATION_CMD_COPIED}!';
+	setTimeout(function() {
+		if (lbl) lbl.innerHTML = '&#128203; {L_COPY_COMMAND}';
+		if (lblMain) lblMain.innerHTML = '&#128203; {L_COPY_COMMAND}';
+	}, 3000);
+}
+
+function checkCliWorkerNow() {
+	var lastChecked = document.getElementById('cli-last-checked');
+	if (lastChecked) lastChecked.textContent = 'Checking now...';
+	pollCliWorkerStatus(true);
+}
+
+<!-- IF MODE == 'progress' -->
+var isAjaxRunning = false;
+var pollInterval = null;
+var ajaxStepUrl = '{U_AJAX_STEP_URL}'.replace(/&amp;/g, '&');
+var pollUrl = '{U_POLL_URL}'.replace(/&amp;/g, '&');
+var rawRunStatus = '{RAW_RUN_STATUS}';
+var isCliActive = <!-- IF IS_CLI_ACTIVE -->true<!-- ELSE -->false<!-- ENDIF -->;
+var isAwaitingWorker = <!-- IF IS_AWAITING_WORKER -->true<!-- ELSE -->false<!-- ENDIF -->;
+var waitingSeconds = parseInt('{CLI_WAITING_DURATION_SECONDS}', 10) || 0;
+
+function parseSafeJson(text) {
+	try {
+		return JSON.parse(text);
+	} catch (e) {
+		var start = text.indexOf('{');
+		var end = text.lastIndexOf('}');
+		if (start !== -1 && end !== -1 && end > start) {
+			return JSON.parse(text.substring(start, end + 1));
+		}
+		throw e;
+	}
+}
+
+function formatDuration(sec) {
+	var h = Math.floor(sec / 3600);
+	var m = Math.floor((sec % 3600) / 60);
+	var s = sec % 60;
+	return (h < 10 ? '0' : '') + h + ':' + (m < 10 ? '0' : '') + m + ':' + (s < 10 ? '0' : '') + s;
+}
+
+function updateProgressUi(data) {
+	if (!data) return;
+
+	if (data.overall_percent !== undefined) {
+		var pctVal = document.getElementById('overall-pct-val');
+		var trk = document.getElementById('overall-track');
+		var bar = document.getElementById('overall-bar');
+		if (pctVal) pctVal.textContent = data.overall_percent + '%';
+		if (trk) trk.setAttribute('aria-valuenow', data.overall_percent);
+		if (bar) bar.style.width = data.overall_percent + '%';
+	}
+
+	if (data.total_imported !== undefined && data.total_records !== undefined) {
+		var counts = document.getElementById('overall-counts-text');
+		if (counts) counts.textContent = '— ' + data.total_imported + ' of ' + data.total_records + ' {L_RECORDS}';
+	}
+
+	if (data.processing_rate !== undefined) {
+		var r = document.getElementById('proc-rate');
+		if (r) r.textContent = data.processing_rate;
+	}
+
+	if (data.eta_formatted !== undefined) {
+		var eta = document.getElementById('eta-time');
+		if (eta) eta.textContent = data.eta_formatted;
+	}
+
+	if (data.elapsed_formatted !== undefined) {
+		var el = document.getElementById('elapsed-time');
+		if (el) el.textContent = data.elapsed_formatted;
+	}
+
+	if (data.current_step_lbl) {
+		var stg = document.getElementById('curr-stage-text');
+		if (stg) stg.textContent = data.current_step_lbl;
+	}
+
+	if (data.heartbeat_age !== undefined) {
+		var hb = document.getElementById('cli-heartbeat-age');
+		if (hb) hb.textContent = data.heartbeat_age + 's ago';
+	}
+
+	if (data.steps && Array.isArray(data.steps)) {
+		data.steps.forEach(function(s) {
+			var row = document.getElementById('step-row-' + s.step_name);
+			if (row) {
+				var imp = row.querySelector('.step-imp');
+				var skp = row.querySelector('.step-skp');
+				var fld = row.querySelector('.step-fld');
+				var tot = row.querySelector('.step-tot');
+				var pct = row.querySelector('.step-pct');
+				if (imp) imp.textContent = s.imported_records;
+				if (skp) skp.textContent = s.skipped_records;
+				if (fld) fld.textContent = s.failed_records;
+				if (tot && s.total_records > 0) tot.textContent = s.total_records;
+				if (pct && s.total_records > 0) pct.innerHTML = '<strong>' + Math.min(100, Math.round(((parseInt(s.imported_records) + parseInt(s.skipped_records)) / s.total_records) * 100)) + '%</strong>';
+			}
+		});
+	}
+}
+
+function startAjaxRunner() {
+	if (isAjaxRunning) return;
+	isAjaxRunning = true;
+	var btn = document.getElementById('btn-start-ajax');
+	if (btn) {
+		btn.disabled = true;
+		btn.textContent = 'Processing Batches...';
+	}
+	var errBox = document.getElementById('ajax-error-box');
+	if (errBox) errBox.style.display = 'none';
+	executeBatchStep();
+}
+
+function pauseAjaxRunner() {
+	isAjaxRunning = false;
+	var btn = document.getElementById('btn-start-ajax');
+	if (btn) {
+		btn.disabled = false;
+		btn.textContent = '{L_MIGRATION_START_PROCESSING}';
+	}
+}
+
+function executeBatchStep() {
+	if (!isAjaxRunning) return;
+
+	var xhr = new XMLHttpRequest();
+	xhr.open('POST', ajaxStepUrl + '&t=' + new Date().getTime(), true);
+	xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
+	xhr.setRequestHeader('Accept', 'application/json');
+
+	xhr.onreadystatechange = function() {
+		if (xhr.readyState === 4) {
+			if (xhr.status === 200) {
+				try {
+					var res = parseSafeJson(xhr.responseText);
+					updateProgressUi(res);
+
+					if (res.run_status === 'awaiting_approval' || res.run_status === 'stage_completed' || res.run_status === 'completed' || res.stage_completed) {
+						isAjaxRunning = false;
+						window.location.reload();
+					} else if (res.run_status === 'running') {
+						setTimeout(executeBatchStep, 250);
+					} else {
+						isAjaxRunning = false;
+						window.location.reload();
+					}
+				} catch (err) {
+					isAjaxRunning = false;
+					showAjaxError('Failed to parse batch response: ' + err.message);
+				}
+			} else {
+				isAjaxRunning = false;
+				try {
+					var errRes = parseSafeJson(xhr.responseText);
+					showAjaxError(errRes.error || 'Server error ' + xhr.status);
+				} catch (e) {
+					showAjaxError('HTTP Error ' + xhr.status + ': ' + xhr.statusText);
+				}
+			}
+		}
+	};
+	xhr.send('submit_step=1');
+}
+
+function showAjaxError(msg) {
+	var box = document.getElementById('ajax-error-box');
+	var txt = document.getElementById('ajax-error-message');
+	if (box && txt) {
+		txt.textContent = msg;
+		box.style.display = 'block';
+	}
+}
+
+function pollCliWorkerStatus(isManualCheck) {
+	var xhr = new XMLHttpRequest();
+	xhr.open('GET', pollUrl + '&t=' + new Date().getTime(), true);
+	xhr.setRequestHeader('Accept', 'application/json');
+	xhr.onreadystatechange = function() {
+		if (xhr.readyState === 4) {
+			var lastChecked = document.getElementById('cli-last-checked');
+			if (lastChecked) lastChecked.textContent = 'Just now';
+
+			if (xhr.status === 200) {
+				try {
+					var data = parseSafeJson(xhr.responseText);
+					updateProgressUi(data);
+
+					if (data.cli_connected || data.raw_status === 'running') {
+						var badge = document.getElementById('cli-connected-badge');
+						if (badge) {
+							badge.className = 'status-badge status-running';
+							badge.textContent = '{L_MIGRATION_CLI_CONNECTED_YES}';
+						}
+						// If transitioning from awaiting_worker to running, reload to show active CLI dashboard
+						if (isAwaitingWorker) {
+							if (pollInterval) { clearInterval(pollInterval); pollInterval = null; }
+							window.location.reload();
+							return;
+						}
+					} else if (data.startup_error) {
+						var tb = document.getElementById('cli-troubleshooting');
+						var errMsg = document.getElementById('cli-error-msg');
+						if (tb && errMsg) {
+							errMsg.textContent = data.startup_error;
+							tb.style.display = 'block';
+						}
+					} else if (isManualCheck) {
+						var tb = document.getElementById('cli-troubleshooting');
+						if (tb) tb.style.display = 'block';
+					}
+
+					// Only reload when the status actually changes to a milestone state
+					if (data.raw_status && data.raw_status !== rawRunStatus) {
+						if (data.raw_status === 'awaiting_approval' || data.raw_status === 'stage_completed' || data.raw_status === 'completed' || data.raw_status === 'finalized' || data.raw_status === 'failed' || data.raw_status === 'interrupted') {
+							if (pollInterval) { clearInterval(pollInterval); pollInterval = null; }
+							window.location.reload();
+						}
+					}
+				} catch (e) {}
+			}
+		}
+	};
+	xhr.send();
+}
+
+// Background polling and timer
+var isTerminal = (rawRunStatus === 'completed' || rawRunStatus === 'finalized' || rawRunStatus === 'cancelled' || rawRunStatus === 'abandoned' || rawRunStatus === 'rolled_back');
+var isCheckpoint = (rawRunStatus === 'awaiting_approval' || rawRunStatus === 'stage_completed' || rawRunStatus === 'stage_completed_with_warnings' || rawRunStatus === 'stage_failed' || rawRunStatus === 'paused');
+
+if (isAwaitingWorker) {
+	setInterval(function() {
+		waitingSeconds++;
+		var timerEl = document.getElementById('cli-waiting-timer');
+		if (timerEl) timerEl.textContent = formatDuration(waitingSeconds);
+
+		// Show troubleshooting after 15 seconds
+		if (waitingSeconds >= 15) {
+			var tb = document.getElementById('cli-troubleshooting');
+			if (tb) tb.style.display = 'block';
+		}
+	}, 1000);
+
+	pollInterval = setInterval(function() {
+		pollCliWorkerStatus(false);
+	}, 1500);
+} else if (!isTerminal && !isCheckpoint) {
+	// Poll live progress only when CLI worker is actively running in background
+	pollInterval = setInterval(function() {
+		if (!isAjaxRunning) {
+			pollCliWorkerStatus(false);
+		}
+	}, 1500);
+}
+<!-- ENDIF -->
+</script>
+
+<!-- INCLUDE overall_footer.html -->

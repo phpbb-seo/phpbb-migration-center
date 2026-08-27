@@ -1,0 +1,227 @@
+services:
+    phpbbseo.migrationcenter.id_mapper:
+        class: phpbbseo\migrationcenter\core\mapping\id_mapper
+        arguments:
+            - '@dbal.conn'
+            - '%core.table_prefix%'
+
+    phpbbseo.migrationcenter.lock_manager:
+        class: phpbbseo\migrationcenter\core\state\lock_manager
+        arguments:
+            - '@dbal.conn'
+            - '%core.table_prefix%'
+            - 300
+
+    phpbbseo.migrationcenter.state_manager:
+        class: phpbbseo\migrationcenter\core\state\state_manager
+        arguments:
+            - '@dbal.conn'
+            - '%core.table_prefix%'
+
+    phpbbseo.migrationcenter.source.xenforo:
+        class: phpbbseo\migrationcenter\source\xenforo\xenforo_source_provider
+        arguments:
+            - '%core.root_path%'
+
+    phpbbseo.migrationcenter.provider_registry:
+        class: phpbbseo\migrationcenter\core\engine\provider_registry
+        calls:
+            - [register, ['@phpbbseo.migrationcenter.source.xenforo']]
+
+    phpbbseo.migrationcenter.step.groups:
+        class: phpbbseo\migrationcenter\source\xenforo\step\groups_step
+
+    phpbbseo.migrationcenter.step.users:
+        class: phpbbseo\migrationcenter\source\xenforo\step\users_step
+
+    phpbbseo.migrationcenter.step.group_memberships:
+        class: phpbbseo\migrationcenter\source\xenforo\step\group_memberships_step
+
+    phpbbseo.migrationcenter.step.global_permissions:
+        class: phpbbseo\migrationcenter\source\xenforo\step\global_permissions_step
+
+    phpbbseo.migrationcenter.step.forums:
+        class: phpbbseo\migrationcenter\source\xenforo\step\forums_step
+
+    phpbbseo.migrationcenter.step.node_permissions:
+        class: phpbbseo\migrationcenter\source\xenforo\step\node_permissions_step
+
+    phpbbseo.migrationcenter.step.topics:
+        class: phpbbseo\migrationcenter\source\xenforo\step\topics_step
+
+    phpbbseo.migrationcenter.step.posts:
+        class: phpbbseo\migrationcenter\source\xenforo\step\posts_step
+
+    phpbbseo.migrationcenter.step.attachments:
+        class: phpbbseo\migrationcenter\source\xenforo\step\attachments_step
+
+    phpbbseo.migrationcenter.step.avatars:
+        class: phpbbseo\migrationcenter\source\xenforo\step\avatars_step
+
+    phpbbseo.migrationcenter.step.conversations:
+        class: phpbbseo\migrationcenter\source\xenforo\step\conversations_step
+
+    phpbbseo.migrationcenter.step.conversation_messages:
+        class: phpbbseo\migrationcenter\source\xenforo\step\conversation_messages_step
+
+    phpbbseo.migrationcenter.step.conversation_attachments:
+        class: phpbbseo\migrationcenter\source\xenforo\step\conversation_attachments_step
+
+    phpbbseo.migrationcenter.step.polls:
+        class: phpbbseo\migrationcenter\source\xenforo\step\polls_step
+
+    phpbbseo.migrationcenter.step.bans:
+        class: phpbbseo\migrationcenter\source\xenforo\step\bans_step
+
+    phpbbseo.migrationcenter.step_registry:
+        class: phpbbseo\migrationcenter\core\engine\step_registry
+        calls:
+            - [register, ['@phpbbseo.migrationcenter.step.groups']]
+            - [register, ['@phpbbseo.migrationcenter.step.users']]
+            - [register, ['@phpbbseo.migrationcenter.step.group_memberships']]
+            - [register, ['@phpbbseo.migrationcenter.step.global_permissions']]
+            - [register, ['@phpbbseo.migrationcenter.step.forums']]
+            - [register, ['@phpbbseo.migrationcenter.step.node_permissions']]
+            - [register, ['@phpbbseo.migrationcenter.step.topics']]
+            - [register, ['@phpbbseo.migrationcenter.step.posts']]
+            - [register, ['@phpbbseo.migrationcenter.step.attachments']]
+            - [register, ['@phpbbseo.migrationcenter.step.avatars']]
+            - [register, ['@phpbbseo.migrationcenter.step.conversations']]
+            - [register, ['@phpbbseo.migrationcenter.step.conversation_messages']]
+            - [register, ['@phpbbseo.migrationcenter.step.conversation_attachments']]
+            - [register, ['@phpbbseo.migrationcenter.step.polls']]
+            - [register, ['@phpbbseo.migrationcenter.step.bans']]
+
+    phpbbseo.migrationcenter.target_writer:
+        class: phpbbseo\migrationcenter\core\writer\phpbb_target_writer
+        arguments:
+            - '@dbal.conn'
+            - '@config'
+            - '@cache.driver'
+            - '@phpbbseo.migrationcenter.id_mapper'
+            - '%core.table_prefix%'
+
+    phpbbseo.migrationcenter.engine:
+        class: phpbbseo\migrationcenter\core\engine\migration_engine
+        arguments:
+            - '@phpbbseo.migrationcenter.provider_registry'
+            - '@phpbbseo.migrationcenter.step_registry'
+            - '@phpbbseo.migrationcenter.state_manager'
+            - '@phpbbseo.migrationcenter.lock_manager'
+            - '@phpbbseo.migrationcenter.id_mapper'
+            - '@phpbbseo.migrationcenter.target_writer'
+
+    phpbbseo.migrationcenter.console.check:
+        class: phpbbseo\migrationcenter\console\command\check_command
+        arguments:
+            - '@phpbbseo.migrationcenter.provider_registry'
+        tags:
+            - { name: console.command }
+
+    phpbbseo.migrationcenter.console.run:
+        class: phpbbseo\migrationcenter\console\command\run_command
+        arguments:
+            - '@phpbbseo.migrationcenter.engine'
+        tags:
+            - { name: console.command }
+
+    phpbbseo.migrationcenter.console.resume:
+        class: phpbbseo\migrationcenter\console\command\resume_command
+        arguments:
+            - '@phpbbseo.migrationcenter.engine'
+        tags:
+            - { name: console.command }
+
+    phpbbseo.migrationcenter.console.pause:
+        class: phpbbseo\migrationcenter\console\command\pause_command
+        arguments:
+            - '@phpbbseo.migrationcenter.engine'
+        tags:
+            - { name: console.command }
+
+    phpbbseo.migrationcenter.console.status:
+        class: phpbbseo\migrationcenter\console\command\status_command
+        arguments:
+            - '@phpbbseo.migrationcenter.engine'
+        tags:
+            - { name: console.command }
+
+    phpbbseo.migrationcenter.console.retry:
+        class: phpbbseo\migrationcenter\console\command\retry_command
+        arguments:
+            - '@phpbbseo.migrationcenter.engine'
+        tags:
+            - { name: console.command }
+
+    phpbbseo.migrationcenter.finalizer:
+        class: phpbbseo\migrationcenter\core\finalization\phpbb_finalizer
+        arguments:
+            - '@dbal.conn'
+            - '@config'
+            - '@cache.driver'
+            - '@phpbbseo.migrationcenter.id_mapper'
+            - '%core.table_prefix%'
+
+    phpbbseo.migrationcenter.search_indexer:
+        class: phpbbseo\migrationcenter\core\search\search_indexer
+        arguments:
+            - '@dbal.conn'
+            - '@config'
+            - '@auth'
+            - '@user'
+            - '@dispatcher'
+            - '@phpbbseo.migrationcenter.id_mapper'
+            - '%core.table_prefix%'
+            - '%core.root_path%'
+            - '%core.php_ext%'
+
+    phpbbseo.migrationcenter.verifier:
+        class: phpbbseo\migrationcenter\core\verification\migration_verifier
+        arguments:
+            - '@dbal.conn'
+            - '@config'
+            - '@phpbbseo.migrationcenter.id_mapper'
+            - '%core.table_prefix%'
+
+    phpbbseo.migrationcenter.console.finalize:
+        class: phpbbseo\migrationcenter\console\command\finalize_command
+        arguments:
+            - '@phpbbseo.migrationcenter.finalizer'
+        tags:
+            - { name: console.command }
+
+    phpbbseo.migrationcenter.console.search_index:
+        class: phpbbseo\migrationcenter\console\command\search_index_command
+        arguments:
+            - '@phpbbseo.migrationcenter.search_indexer'
+        tags:
+            - { name: console.command }
+
+    phpbbseo.migrationcenter.console.verify:
+        class: phpbbseo\migrationcenter\console\command\verify_command
+        arguments:
+            - '@phpbbseo.migrationcenter.engine'
+            - '@phpbbseo.migrationcenter.verifier'
+        tags:
+            - { name: console.command }
+
+    phpbbseo.migrationcenter.rollback_manager:
+        class: phpbbseo\migrationcenter\core\rollback\rollback_manager
+        arguments:
+            - '@dbal.conn'
+            - '@config'
+            - '@cache.driver'
+            - '@phpbbseo.migrationcenter.id_mapper'
+            - '@phpbbseo.migrationcenter.lock_manager'
+            - '@phpbbseo.migrationcenter.state_manager'
+            - '%core.table_prefix%'
+            - '%core.root_path%'
+
+    phpbbseo.migrationcenter.listener:
+        class: phpbbseo\migrationcenter\event\main_listener
+        arguments:
+            - '@dbal.conn'
+            - '%core.table_prefix%'
+        tags:
+            - { name: event.listener }
+

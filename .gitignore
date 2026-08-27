@@ -1,0 +1,17 @@
+﻿# Temporary & Development files
+scratch/
+tests/tmp/
+*.log
+*.tmp
+*.bak
+.DS_Store
+Thumbs.db
+
+# IDE & Editor files
+.idea/
+.vscode/
+*.sublime-workspace
+*.sublime-project
+
+# OS files
+Desktop.ini

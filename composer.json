@@ -1,0 +1,28 @@
+{
+    "name": "phpbbseo/migrationcenter",
+    "type": "phpbb-extension",
+    "description": "Enterprise-grade, extensible forum migration framework for phpBB 3.3+ (XenForo, vBulletin, MyBB, and more).",
+    "homepage": "https://github.com/phpbb-seo/phpbb-migration-center",
+    "version": "1.0.0",
+    "license": "GPL-2.0-only",
+    "authors": [
+        {
+            "name": "phpBB SEO Team",
+            "homepage": "https://phpbbseo.com",
+            "role": "Lead Developer"
+        }
+    ],
+    "require": {
+        "php": ">=7.4.0 || >=8.0.0",
+        "phpbb/phpbb": ">=3.3.0,<3.4.0@dev",
+        "ext-json": "*",
+        "ext-pdo": "*",
+        "ext-mbstring": "*"
+    },
+    "extra": {
+        "display-name": "phpBB Migration Center",
+        "soft-require": {
+            "phpbb/phpbb": ">=3.3.0,<3.4.0@dev"
+        }
+    }
+}
