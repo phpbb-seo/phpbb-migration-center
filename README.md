@@ -1,57 +1,28 @@
 # 🚀 phpBB Migration Center
 
-[![Version](https://img.shields.io/badge/version-1.0.0-blue.svg?style=flat-square)](https://github.com/phpbb-seo/phpbb-migration-center/releases)
-[![phpBB](https://img.shields.io/badge/phpBB-3.3.0%20..%203.3.13%2B-green.svg?style=flat-square)](https://www.phpbb.com)
-[![PHP](https://img.shields.io/badge/PHP-7.4%20|%208.0%20|%208.1%20|%208.2%20|%208.3%20|%208.4-purple.svg?style=flat-square)](https://php.net)
+[![Version](https://img.shields.io/badge/version-0.1.0--alpha.1-blue.svg?style=flat-square)](https://github.com/phpbb-seo/phpbb-migration-center)
+[![phpBB](https://img.shields.io/badge/phpBB-3.3.x-green.svg?style=flat-square)](https://www.phpbb.com)
+[![PHP](https://img.shields.io/badge/PHP-%3E%3D%207.4-purple.svg?style=flat-square)](https://php.net)
 [![License](https://img.shields.io/badge/license-GPL--2.0-yellow.svg?style=flat-square)](LICENSE)
-[![Tests](https://img.shields.io/badge/tests-39%2F39%20passed%20(100%25)-brightgreen.svg?style=flat-square)]()
+[![Tests](https://github.com/phpbb-seo/phpbb-migration-center/actions/workflows/tests.yml/badge.svg)](https://github.com/phpbb-seo/phpbb-migration-center/actions/workflows/tests.yml)
 
-**phpBB Migration Center** is an enterprise-grade, blazing-fast, and fully extensible forum migration framework for **phpBB 3.3+**.
+**phpBB Migration Center** is a modular forum converter and migration framework for transferring established online communities to **phpBB 3.3+**.
 
-It enables administrators to migrate communities of any size—from small niche discussion boards to massive enterprise communities with millions of posts and users—from platforms like **XenForo**, **vBulletin**, **MyBB**, **SMF**, **Invision Community (IPB)**, and more into phpBB **without losing passwords, attachments, permissions, or search traffic**.
+It provides controlled migration stages, Browser and CLI workers, persistent progress tracking, manual approval checkpoints, password compatibility, permission translation, recovery tools, and post-migration verification.
 
----
-
-## ✨ Key Features & Highlights
-
-- 🔐 **Zero Password Resets (Universal Password Handler):**  
-  Users can log in immediately using their existing passwords. The system natively authenticates hashes created with **Bcrypt**, **Argon2i / Argon2id**, **SHA-256**, and legacy **MD5 Salted** schemes, transparently re-hashing them into phpBB's native format on first login.
-- ⚡ **Scalable Keyset Pagination (`O(log N)` Performance):**  
-  Uses sequential primary key cursors instead of slow SQL `OFFSET`. Performance remains blazing fast whether processing post #10 or post #10,000,000.
-- 📉 **Bounded Memory Consumption (< 20 MB RAM):**  
-  Memory is actively recycled after each batch. You will never encounter `Memory Limit Exhausted` crashes, even on multi-gigabyte databases.
-- 🖥️ **Dual Execution Modes (Web AJAX & Terminal CLI):**  
-  - **Browser Worker (AJAX):** Beautiful live progress dashboard with real-time ETA, processing rate counters, and stage checkpoints.
-  - **CLI Worker (Terminal Daemon):** Run in SSH/tmux without webserver timeouts (`php bin/phpbbcli.php migrationcenter:run ...`).
-- 🛡️ **Crash-Resilient with Instant Resume:**  
-  If your server restarts or an SSH connection drops, the state machine saves the exact last record processed. Simply click **Resume** to pick up seamlessly where you left off.
-- 🧪 **11-Rule Automated Health & Integrity Suite:**  
-  Validates relational integrity, orphan posts, physical files on disk, multilingual Unicode/Persian/Arabic fidelity, and security ACLs before going live.
-- 🔄 **Atomic Rollback & Safety Guard:**  
-  Test migrations with complete peace of mind. Reset or roll back safely with a single click.
+> [!WARNING]
+> **This project is currently an Alpha development release.**  
+> Use it only on backed-up staging environments. Do not run it against a live production forum without independent testing and a verified recovery plan.
 
 ---
 
-## 📦 Supported Source Platforms
+## 🚀 Quick Start (Alpha Testing Setup)
 
-| Source Platform | Supported Versions | Status |
-| :--- | :--- | :---: |
-| **XenForo** | 2.3.x, 2.2.x, 2.1.x, 2.0.x, 1.5.x | **Native & Tested** |
-| **vBulletin** | 3.8.x, 4.2.x, 5.x | **Supported** |
-| **MyBB** | 1.8.x | **Supported** |
-| **SMF (Simple Machines Forum)** | 2.0.x, 2.1.x | **Supported** |
-| **Invision Community (IPB)** | 4.x, 3.4.x | **Supported** |
+> [!IMPORTANT]
+> Install this Alpha release exclusively on a **test/staging phpBB installation** with a complete database and filesystem backup.
 
----
-
-## 🚀 Quick Start Guide (3 Simple Steps)
-
-You don't need advanced server or phpBB knowledge to use this tool. Follow these simple steps:
-
-### Step 1: Upload the Extension
-1. Download the latest release `.zip` package from [GitHub Releases](https://github.com/phpbb-seo/phpbb-migration-center/releases).
-2. Extract the archive on your computer.
-3. Upload the files to your phpBB root directory so the folder structure is:
+1. **Download or Clone the Repository:**  
+   Clone or place the repository contents into your phpBB directory so the folder structure is:
    ```text
    phpBB_ROOT/
    └── ext/
@@ -65,106 +36,407 @@ You don't need advanced server or phpBB knowledge to use this tool. Follow these
                ├── core/
                └── ...
    ```
-
-### Step 2: Enable the Extension
-1. Log in to your phpBB **Administration Control Panel (ACP)**.
-2. Go to the **Customise** tab &raquo; **Manage extensions**.
-3. Under *Disabled Extensions*, find **phpBB Migration Center** and click **Enable**.
-
-### Step 3: Run the Migration Wizard
-1. In the ACP navigation bar, click the new **Migration Center** tab &raquo; **Migration Wizard**.
-2. **Step 1:** Select your source forum platform (e.g. *XenForo*).
-3. **Step 2:** Enter your source database connection details and source files path (or click *Auto-Detect*).
-4. **Step 3:** Review the automatic **Preflight Health Checks**.
-5. **Step 4:** Set your preferred batch size and attachment options.
-6. **Step 5:** Click **Create Migration Plan** and start migrating!
+2. **Enable the Extension:**  
+   Log in to your phpBB **Administration Control Panel (ACP)**, navigate to **Customise** &raquo; **Manage extensions**, find **phpBB Migration Center**, and click **Enable**.
+3. **Run Preflight Checks:**  
+   In the ACP navigation bar, click the **Migration Center** tab &raquo; **Migration Wizard**. Enter your source database connection details and verify the preflight diagnostics before creating a plan.
+4. **Execute & Review:**  
+   Execute migration stages using either the Browser AJAX worker or the recommended CLI worker command displayed in the ACP, reviewing each stage reconciliation report before approving continuation.
 
 ---
 
-## 📊 15-Stage Migration Pipeline
+## ✨ Key Features
 
-The framework executes migration across 15 sequentially isolated stages:
+- 🧩 **Modular source-connector architecture:** Shared migration engine separated from platform-specific conversion logic.
+- 🖥️ **Browser-based AJAX migration worker:** Live progress visualization with percentage counters and error reporting.
+- 💻 **CLI worker for large migrations:** Background daemon execution without webserver timeout restrictions.
+- 📊 **Persisted live progress:** Continual recording of source cursors, created/updated/skipped/failed counters, processing rate, and ETA.
+- ⏸️ **Manual approval checkpoints:** Safe pauses between stages with detailed reconciliation reporting.
+- 🔄 **Pause and controlled resume:** Interruption detection with exact-record resume capability.
+- 🔐 **Password compatibility handlers:** Native support for supported source password formats with automatic upgrade on first login.
+- 👥 **User, group, and membership migration:** Preserves user profiles, avatars, signatures, and group relations.
+- 🛡️ **Security-focused permission translation:** Conservative mapping of administrative, moderator, and forum-scoped ACLs.
+- 💬 **Forum, topic, post, and BBCode conversion:** Tree hierarchy preservation with automated BBCode and Unicode normalization.
+- 📎 **Attachment and avatar migration:** File existence checks, safe destination hashing, and SHA-256 integrity verification.
+- ✉️ **Private conversation and message migration:** Multi-user conversation threading with folder and attachment support.
+- 📊 **Poll, vote, and ban migration:** Topic poll options, voter records, and moderation banlists.
+- ↩️ **Rollback and reset controls:** Migration-owned record tracking for safe reversal and cleanup.
+- 🔍 **Finalization and verification:** Board recounts, search indexing, and automated 11-point data integrity test suite.
 
-| Stage # | Stage Name | Description |
-| :---: | :--- | :--- |
-| **1** | **User Groups** | Custom usergroups, ranks, badges, and group colors |
-| **2** | **Users & Profiles** | User accounts, emails, passwords, avatars, signatures, and registration dates |
-| **3** | **Group Memberships** | Primary and secondary usergroup assignments |
-| **4** | **Global Permissions** | Administrator and moderator global ACL permissions |
-| **5** | **Forums & Categories** | Full nested hierarchy (`left_id` / `right_id` tree structures) |
-| **6** | **Forum Permissions** | Forum-scoped access rights (view, read, post, reply, download, poll) |
-| **7** | **Topics & Threads** | Thread metadata, view counts, sticky/locked states, and pointers |
-| **8** | **Posts & Messages** | Post contents with automated BBCode, emoji, media, and Unicode conversion |
-| **9** | **Post Attachments** | Physical file transfers with SHA-256 integrity verification |
-| **10** | **User Avatars** | Profile pictures and upload gallery synchronization |
-| **11** | **Conversations** | Private message threads and participant folders |
-| **12** | **PM Messages** | Private message contents and conversation history |
-| **13** | **PM Attachments** | Files and documents attached within private messages |
-| **14** | **Polls & Votes** | Topic poll questions, choices, restrictions, and voter ballots |
-| **15** | **Bans & Blacklists** | User, email, and IP address moderation bans |
+*Feature availability may depend on the active source connector and the source-platform version.*
 
 ---
 
-## 💻 CLI Commands (For Large Production Boards)
+## 🚧 Project Status
 
-For large boards (50,000+ posts), running migration via the Command Line Interface (CLI) is recommended:
+phpBB Migration Center is currently under active development and community testing.
+
+| Component | Status |
+| :--- | :---: |
+| **Migration framework core** | Alpha |
+| **ACP migration wizard** | Alpha |
+| **Browser AJAX worker** | Alpha testing |
+| **CLI worker** | Alpha testing |
+| **Stage checkpoints** | Alpha testing |
+| **Rollback and recovery** | Alpha testing |
+| **Final verification suite** | Alpha testing |
+| **XenForo connector** | **Alpha — Under active testing** |
+| **vBulletin connector** | Planned |
+| **MyBB connector** | Planned |
+| **SMF connector** | Planned |
+| **Invision Community connector** | Planned |
+
+A platform is supported only after its connector has been implemented, tested, and officially released. At present, the repository contains the XenForo source connector. Other platforms listed above are part of the planned connector roadmap and are not yet available.
+
+---
+
+## 🔌 Source Platform Connectors
+
+Migration Center separates its shared migration engine from platform-specific conversion logic.
+
+- **The common core provides:**
+  - Migration lifecycle and stage management
+  - Browser and CLI execution
+  - Cursor and progress persistence
+  - Worker locks and heartbeat monitoring
+  - Manual stage checkpoints
+  - Reconciliation reporting
+  - Recovery and rollback coordination
+  - Finalization and verification
+- **Each connector provides:**
+  - Source configuration detection
+  - Source database queries
+  - Data normalization
+  - Password compatibility
+  - Permission translation
+  - BBCode conversion
+  - Attachment and avatar resolution
+  - Platform-specific migration policies
+
+This architecture allows future converters to reuse the same migration workflow without duplicating the core engine.
+
+---
+
+## 📦 Current Connector: XenForo to phpBB
+
+The current development connector targets migration from **XenForo to phpBB**. Its intended migration domains include:
+
+- User groups
+- Users and supported password hashes
+- Primary and secondary group memberships
+- Global permissions
+- Forums and categories
+- Forum-specific permissions
+- Topics and posts
+- BBCode and supported content
+- Post attachments
+- User avatars
+- Private conversations
+- Private messages
+- Private-message attachments
+- Polls and votes
+- User, email, and IP bans
+
+*Compatibility must be verified against the exact source version and test data before any production migration.*
+
+---
+
+## ⚙️ Migration Architecture
+
+Migration Center uses bounded batches and cursor-based pagination to process source records. After each successfully committed batch, it persists:
+
+- Current stage
+- Source cursor
+- Processed count
+- Created count
+- Reused count
+- Updated count
+- Skipped count
+- Failed count
+- Worker type
+- Worker heartbeat
+- Stage and run status
+
+The database remains the authoritative source of migration progress. Opening or refreshing the ACP page does not independently advance a migration.
+
+*Actual migration performance depends on the source database, target database, selected stages, server resources, storage, and content complexity.*
+
+---
+
+## 🖥️ Browser and CLI Workers
+
+Both execution methods use the same migration engine, run ID, stage plan, cursors, counters, and locking system.
+
+### Browser AJAX Worker
+The Browser Worker is intended for smaller migrations and testing. It provides:
+- Live ACP progress visualization
+- Stage and overall percentages
+- Reconciliation counters
+- Processing rate and ETA when available
+- Visible error reporting
+- Automatic stopping at stage checkpoints
+
+*The browser must remain open and active while its worker is processing.*
+
+### CLI Worker
+The CLI Worker is intended for larger migration workloads and environments where web-server timeouts may interrupt browser processing. It provides:
+- Terminal startup validation
+- Progress reporting after committed batches
+- Worker heartbeat and lock ownership
+- Progress monitoring from the ACP
+- Controlled interruption recovery
+- Automatic stopping at stage checkpoints
+
+*Only one worker may process a migration run at a time.*
+
+Use phpBB CLI help to inspect the arguments and options available in the installed version:
 
 ```bash
-# Start a new migration run directly from the terminal
-php bin/phpbbcli.php migrationcenter:run xenforo
-
-# Resume an existing or paused migration run
-php bin/phpbbcli.php migrationcenter:resume <RUN_ID>
-
-# Finalize board statistics and recounts
-php bin/phpbbcli.php migrationcenter:finalize <RUN_ID>
-
-# Populate the fulltext search index in batches
-php bin/phpbbcli.php migrationcenter:search-index <RUN_ID> --batch-size=1000
-
-# Run the automated 11-point health and relational integrity test suite
-php bin/phpbbcli.php migrationcenter:verify <RUN_ID>
+# Inspect arguments and options for available CLI commands:
+php bin/phpbbcli.php migrationcenter:check --help
+php bin/phpbbcli.php migrationcenter:run --help
+php bin/phpbbcli.php migrationcenter:resume --help
+php bin/phpbbcli.php migrationcenter:status --help
+php bin/phpbbcli.php migrationcenter:pause --help
+php bin/phpbbcli.php migrationcenter:retry --help
+php bin/phpbbcli.php migrationcenter:finalize --help
+php bin/phpbbcli.php migrationcenter:search-index --help
+php bin/phpbbcli.php migrationcenter:verify --help
 ```
 
----
-
-## ❓ Frequently Asked Questions (FAQ)
-
-<details>
-<summary><strong>Q: Will my users have to reset their passwords?</strong></summary>
-
-**No.** The built-in `Universal Password Handler` validates existing password hashes natively (**Bcrypt**, **Argon2**, **SHA-256**, **MD5 Salted**) when users log in and transparently upgrades them to phpBB's native password format on their first successful login.
-</details>
-
-<details>
-<summary><strong>Q: Will my search engine rankings (SEO) drop after migrating?</strong></summary>
-
-**No.** Combine this extension with our free companion suite [phpBB SEO Framework Lite](https://github.com/phpbb-seo/) or Pro Edition at [www.phpbbseo.com](https://www.phpbbseo.com/) to get automatic 301 redirects, clean URLs (`/topic/slug-id/`), and XML Sitemaps without losing rankings.
-</details>
-
-<details>
-<summary><strong>Q: What happens if my internet disconnects during migration?</strong></summary>
-
-Nothing is lost. The migration state is continually saved in the database. Open the ACP or SSH terminal and click/run **Resume** to continue from the exact last record.
-</details>
-
-<details>
-<summary><strong>Q: Can I test the migration without affecting my live phpBB users?</strong></summary>
-
-**Yes.** You can enable **Dry Run Mode** in Step 4 of the Wizard to simulate data mapping and statistics calculation without writing records to the target database.
-</details>
+> [!TIP]
+> **Do not construct a CLI command manually** when the ACP provides a command for an existing migration run. Use the exact command and Run ID displayed in the Migration Center interface.
 
 ---
 
-## 🤝 Contributing & Support
+## 🧭 Controlled Migration Stages
 
-- **Bug Reports & Feature Requests:** [GitHub Issues](https://github.com/phpbb-seo/phpbb-migration-center/issues)
-- **Official Website:** [www.phpbbseo.com](https://www.phpbbseo.com/)
-- **GitHub Organization:** [github.com/phpbb-seo](https://github.com/phpbb-seo/)
+The framework organizes migration data into the following canonical sequence:
+
+| Stage # | Stage Key | Canonical Stage Name |
+| :---: | :--- | :--- |
+| **1** | `groups` | User Groups |
+| **2** | `users` | Users and Passwords |
+| **3** | `group_memberships` | Group Memberships |
+| **4** | `global_permissions` | Global Permissions |
+| **5** | `forums` | Forums and Categories |
+| **6** | `node_permissions` | Forum Permissions |
+| **7** | `topics` | Topics |
+| **8** | `posts` | Posts and BBCode |
+| **9** | `attachments` | Post Attachments |
+| **10** | `avatars` | User Avatars |
+| **11** | `conversations` | Private Conversations |
+| **12** | `conversation_messages` | Private Messages |
+| **13** | `conversation_attachments` | Private-Message Attachments |
+| **14** | `polls` | Polls and Votes |
+| **15** | `bans` | Bans and Blacklists |
+| **16** | `finalization` | Finalization and Recounts |
+| **17** | `search_index` | Search Index |
+| **18** | `final_verification` | Final Verification |
+
+*Only selected and supported stages containing applicable source data are included in the migration workload.*
+
+---
+
+## ✅ Manual Stage Checkpoints
+
+Migration Center stops after each completed stage and produces a reconciliation report.
+
+```text
+Stage Completed: User Groups
+Processed: 6 | Created: 2 | Reused: 4 | Updated: 0 | Skipped: 0 | Failed: 0
+```
+
+The next stage does not start until the administrator reviews the result and explicitly approves progression. This workflow is designed to reveal mapping or conversion problems before dependent records are processed.
+
+---
+
+## 🔐 Password Compatibility
+
+Where supported by the active source connector, imported users may continue signing in with their existing passwords. After successful authentication, a compatible legacy password hash is transparently upgraded to phpBB’s native password format.
+
+- Migration Center does not decrypt passwords and does not require access to plain-text user credentials.
+- Password compatibility depends on the exact source platform, source version, and hashing configuration.
+- Unsupported password formats are reported rather than treated as successfully preserved.
+
+---
+
+## 🛡️ Permission Migration
+
+Forum platforms do not use identical permission systems. Some source permissions cannot be represented exactly in phpBB.
+
+Migration Center classifies permission mappings as:
+- Exact mappings
+- Reduced-fidelity mappings
+- Unsupported rules
+- Forum-specific rules
+- Rules requiring administrator review
+
+Unsupported access rules use conservative defaults instead of silently granting additional permissions. Existing phpBB founders and protected administrative identities are never automatically replaced or elevated by a migration.
+
+---
+
+## 📎 Attachments and Avatars
+
+Depending on connector support and administrator-selected policies, file migration includes:
+- Source-path validation
+- File existence checks
+- Safe destination naming
+- Collision handling
+- File-size validation
+- Hash verification (SHA-256)
+- Attachment-reference conversion
+- Migration-owned file cleanup
+- Missing-file reporting
+
+*Always verify source and target filesystem paths during preflight checks.*
+
+---
+
+## 🔄 Recovery and Rollback
+
+Every successfully committed batch records its cursor and counters. If processing is interrupted, Migration Center detects the inactive worker and provides a controlled recovery workflow.
+
+Available recovery behavior includes:
+- **Pause:** Clean stop after the current committed batch
+- **Resume:** Continuation from persisted progress
+- **Stale-Worker Detection:** Heartbeat-based inactive worker reclamation
+- **Lock Protection:** Worker-lock conflict prevention
+- **Retry:** Re-execution of supported failed items
+- **Rollback:** Removal of migration-owned records
+- **Fast Reset:** Instant reset for zero-write runs
+
+*Rollback capability depends on migration state and ownership records. It is not a replacement for a complete target database and filesystem backup.*
+
+---
+
+## 🔍 Finalization and Verification
+
+After data migration, the framework can perform controlled post-migration operations:
+- Forum, topic, post, and user recounts
+- Board-statistics synchronization
+- Search-index rebuilding
+- Referential-integrity checks
+- Orphaned-record detection
+- Attachment and avatar verification
+- Counter reconciliation
+- Permission-safety checks
+- Unicode and multilingual text-encoding checks
+- Migration-error review
+
+*A run should not be considered verified while blocking integrity errors remain.*
+
+---
+
+## 📋 Requirements
+
+- **phpBB:** 3.3.0 to 3.3.x
+- **PHP:** 7.4 or newer (compatible with PHP 8.x)
+- **PHP Extensions:** `json`, `pdo`, `mbstring`
+- **Database:** Access to source forum database
+- **Filesystem:** Read access to source files when migrating attachments or avatars
+- **Backups:** A complete target database and filesystem backup
+- **CLI:** Terminal access required for CLI Worker mode
+
+---
+
+## 🧪 Testing
+
+The repository includes automated test suites for migration components and lifecycle behavior.
+
+Automated tests do not replace real migration testing against representative source data. Before deploying migrated data, verify:
+- Real ACP wizard workflow
+- Browser AJAX execution
+- CLI execution
+- Stage reconciliation reports
+- User authentication
+- Forum permissions
+- Attachments and avatars
+- Private messages
+- Search indexing
+- Rollback behavior
+- Final integrity verification suite
+
+---
+
+## ⚠️ Alpha Testing Safety Guidelines
+
+Before testing:
+1. **Create a complete backup** of the target phpBB database.
+2. **Back up** the target `files/` and avatar upload directories.
+3. **Use a staging or disposable** phpBB installation.
+4. **Keep the source forum read-only.**
+5. **Do not reuse production database credentials** in public reports.
+6. **Remove passwords, absolute private paths, and sensitive values** from screenshots and logs.
+7. **Verify every stage reconciliation report** before approving continuation.
+8. **Do not rely on Alpha software** as the sole copy of a production migration plan.
+
+---
+
+## 🐞 Reporting Issues
+
+Please use [GitHub Issues](https://github.com/phpbb-seo/phpbb-migration-center/issues) for reproducible bugs and feature requests.
+
+Include:
+- phpBB version
+- PHP version
+- Source platform and exact version
+- Migration Center commit hash or release tag
+- Worker mode used (Browser AJAX or CLI)
+- Affected migration stage
+- Expected behavior vs actual behavior
+- Sanitized error message and logs
+- Exact reproduction steps
+
+*Never include database passwords, private keys, session identifiers, or unredacted private user data.*
+
+---
+
+## 🤝 Contributing
+
+Community testing, technical reviews, documentation improvements, and new source connectors are welcome.
+
+Before contributing:
+1. Open an issue describing the proposed change.
+2. Keep platform-specific logic inside its connector.
+3. Do not duplicate shared migration-engine functionality.
+4. Add or update relevant tests.
+5. Preserve source read-only behavior.
+6. Avoid including real user data in fixtures.
+7. Ensure existing automated tests continue to pass.
+
+---
+
+## 🗺️ Roadmap
+
+Planned development areas include:
+- Continued XenForo connector testing and version compatibility
+- vBulletin connector
+- MyBB connector
+- SMF connector
+- Invision Community connector
+- Expanded password handlers
+- Additional BBCode mappings
+- Extended migration fixtures
+- Broader multilingual and RTL testing
+- Improved documentation and packaging
+
+*Roadmap items are development goals and do not represent current compatibility guarantees.*
+
+---
+
+## 💬 Support and Discussion
+
+- **GitHub Issues:** [https://github.com/phpbb-seo/phpbb-migration-center/issues](https://github.com/phpbb-seo/phpbb-migration-center/issues)
+- **Official Website:** [https://www.phpbbseo.com/](https://www.phpbbseo.com/)
+- **GitHub Organization:** [https://github.com/phpbb-seo](https://github.com/phpbb-seo)
 
 ---
 
 ## 📄 License
 
 This extension is licensed under the [GNU General Public License v2 (GPL-2.0)](LICENSE).  
-Copyright (c) 2026 **phpBB SEO Team** ([www.phpbbseo.com](https://www.phpbbseo.com/)).
+Copyright (c) 2026 **phpBB SEO Team** ([https://www.phpbbseo.com/](https://www.phpbbseo.com/)).
+
+### Disclaimer
+*Migration tools modify complex relational data and filesystem content. Although Migration Center is designed around controlled batches, checkpoints, and recovery mechanisms, no migration tool can guarantee compatibility with every database customization, third-party add-on, or server environment. Always test on a backed-up staging installation and independently verify results before using migrated data in production.*
