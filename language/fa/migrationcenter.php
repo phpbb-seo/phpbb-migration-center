@@ -544,8 +544,8 @@ $lang = array_merge($lang, array(
 	'SEO_GET_LITE'                              => 'مخزن گیت‌هاب (نسخه رایگان Lite)',
 	'SEO_GET_PRO'                               => 'مشاهده و تهیه نسخه Pro',
 	'SEO_GITHUB_URL'                            => 'https://github.com/phpbb-seo/',
-	'SEO_SUITE_URL'                             => 'https://phpbbseo.com',
-	'FOOTER_COPYRIGHT'                          => 'مرکز جامع مهاجرت phpBB &bull; طراحی و توسعه با &hearts; توسط <a href="https://phpbbseo.com" target="_blank" rel="noopener" style="color: inherit; font-weight: 700; text-decoration: underline;">phpBBSEO.com</a> &bull; متن‌باز در <a href="https://github.com/phpbb-seo/" target="_blank" rel="noopener" style="color: inherit; font-weight: 700; text-decoration: underline;">GitHub</a>',
+	'SEO_SUITE_URL'                             => 'https://www.phpbbseo.com/',
+	'FOOTER_COPYRIGHT'                          => 'مرکز جامع مهاجرت phpBB &bull; طراحی و توسعه با &hearts; توسط <a href="https://www.phpbbseo.com/" target="_blank" rel="noopener" style="color: inherit; font-weight: 700; text-decoration: underline;">phpBBSEO.com</a> &bull; متن‌باز در <a href="https://github.com/phpbb-seo/" target="_blank" rel="noopener" style="color: inherit; font-weight: 700; text-decoration: underline;">GitHub</a>',
 	'FOOTER_ALL_RIGHTS'                         => 'تمامی حقوق محفوظ است.',
 ));
 ?>

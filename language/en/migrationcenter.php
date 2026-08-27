@@ -557,8 +557,8 @@ $lang = array_merge($lang, array(
 	'SEO_GET_LITE'                              => 'GitHub Repository (Free Lite)',
 	'SEO_GET_PRO'                               => 'Explore Pro Edition',
 	'SEO_GITHUB_URL'                            => 'https://github.com/phpbb-seo/',
-	'SEO_SUITE_URL'                             => 'https://phpbbseo.com',
-	'FOOTER_COPYRIGHT'                          => 'phpBB Migration Center &bull; Developed with &hearts; by <a href="https://phpbbseo.com" target="_blank" rel="noopener" style="color: inherit; font-weight: 700; text-decoration: underline;">phpBBSEO.com</a> &bull; Open Source on <a href="https://github.com/phpbb-seo/" target="_blank" rel="noopener" style="color: inherit; font-weight: 700; text-decoration: underline;">GitHub</a>',
+	'SEO_SUITE_URL'                             => 'https://www.phpbbseo.com/',
+	'FOOTER_COPYRIGHT'                          => 'phpBB Migration Center &bull; Developed with &hearts; by <a href="https://www.phpbbseo.com/" target="_blank" rel="noopener" style="color: inherit; font-weight: 700; text-decoration: underline;">phpBBSEO.com</a> &bull; Open Source on <a href="https://github.com/phpbb-seo/" target="_blank" rel="noopener" style="color: inherit; font-weight: 700; text-decoration: underline;">GitHub</a>',
 	'FOOTER_ALL_RIGHTS'                         => 'All rights reserved.',
 ));
 ?>
