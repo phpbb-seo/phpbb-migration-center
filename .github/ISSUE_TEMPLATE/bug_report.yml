@@ -1,0 +1,82 @@
+name: Bug Report
+description: Create a bug report to help us improve phpBB Migration Center
+title: "[Bug]: "
+labels: ["bug", "triage"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thank you for reporting an issue! Please provide as much sanitized information as possible.
+        
+        > [!CAUTION]
+        > **NEVER submit database passwords, session IDs, cookies, private messages, personal user credentials, or unredacted database dumps.**
+
+  - type: input
+    id: phpbb_version
+    attributes:
+      label: phpBB Version
+      placeholder: "e.g. 3.3.13"
+    validations:
+      required: true
+
+  - type: input
+    id: php_version
+    attributes:
+      label: PHP Version & Database
+      placeholder: "e.g. PHP 8.2.12 / MySQL 8.0"
+    validations:
+      required: true
+
+  - type: input
+    id: ext_version
+    attributes:
+      label: Migration Center Version / Git Commit
+      placeholder: "e.g. v0.1.0-beta.1 or commit 617359f"
+    validations:
+      required: true
+
+  - type: dropdown
+    id: worker_mode
+    attributes:
+      label: Worker Execution Mode
+      options:
+        - "Browser AJAX Worker"
+        - "CLI Worker (Terminal Daemon)"
+        - "Both / Not Applicable"
+    validations:
+      required: true
+
+  - type: textarea
+    id: description
+    attributes:
+      label: Describe the Bug
+      description: A clear and concise description of what the bug is.
+    validations:
+      required: true
+
+  - type: textarea
+    id: reproduction
+    attributes:
+      label: Steps to Reproduce
+      description: Steps to reproduce the behavior.
+      placeholder: |
+        1. Go to 'ACP -> Migration Center'
+        2. Click on '...'
+        3. See error
+    validations:
+      required: true
+
+  - type: textarea
+    id: error_logs
+    attributes:
+      label: Sanitized Error Logs / Output
+      description: Paste any sanitized error messages, PHP warnings, or stack traces (ensure all passwords/paths are removed).
+      render: shell
+
+  - type: checkboxes
+    id: backup_confirm
+    attributes:
+      label: Safety Confirmation
+      options:
+        - label: "I confirm that I am testing on a backed-up staging environment, and no sensitive credentials or personal user data are included in this report."
+          required: true

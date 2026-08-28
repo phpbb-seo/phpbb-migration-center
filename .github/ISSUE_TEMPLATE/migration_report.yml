@@ -1,0 +1,99 @@
+name: Migration Run Report
+description: Submit a structured report of a test migration run (success or failure)
+title: "[Migration Report]: "
+labels: ["migration-report", "community-test"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thank you for testing phpBB Migration Center! Please share the results of your migration run to help us expand platform compatibility.
+
+        > [!CAUTION]
+        > **DO NOT SUBMIT:**
+        > - Database passwords or connection credentials
+        > - Session tokens, cookies, or auth keys
+        > - Private message content or user email addresses
+        > - Sensitive absolute filesystem paths
+        > - Unredacted database dumps
+
+  - type: input
+    id: source_platform
+    attributes:
+      label: Source Forum Platform & Version
+      placeholder: "e.g. XenForo 2.3.12 (or XenForo 2.1 / 1.5)"
+    validations:
+      required: true
+
+  - type: input
+    id: target_environment
+    attributes:
+      label: phpBB, PHP & Database Versions
+      placeholder: "e.g. phpBB 3.3.13, PHP 8.2, MariaDB 10.6"
+    validations:
+      required: true
+
+  - type: dropdown
+    id: worker_mode
+    attributes:
+      label: Worker Mode Used
+      options:
+        - "Browser AJAX Worker"
+        - "CLI Worker"
+        - "Mixed (Started in Browser, Resumed in CLI)"
+    validations:
+      required: true
+
+  - type: dropdown
+    id: overall_outcome
+    attributes:
+      label: Overall Migration Outcome
+      options:
+        - "100% Completed & Verified"
+        - "Completed with Warnings"
+        - "Stopped at Checkpoint"
+        - "Failed with Error"
+    validations:
+      required: true
+
+  - type: input
+    id: affected_stage
+    attributes:
+      label: Affected Stage (if interrupted or failed)
+      placeholder: "e.g. attachments, posts, global_permissions, or None"
+
+  - type: textarea
+    id: sanitized_counters
+    attributes:
+      label: Sanitized Stage Counters / Dataset Summary
+      description: Summary of records processed (e.g. Users: 500, Topics: 2000, Posts: 15000, Attachments: 120).
+      placeholder: |
+        - Users: 100
+        - Forums: 38
+        - Topics: 538
+        - Posts: 7,822
+        - Attachments: 5
+
+  - type: textarea
+    id: error_summary
+    attributes:
+      label: Sanitized Error Message or Warning (if any)
+      description: Error code, message, and sanitized backtrace if an error occurred.
+      render: shell
+
+  - type: textarea
+    id: notes
+    attributes:
+      label: Additional Observations / Suggestions
+      description: Any notes on performance, encoding, BBCode formatting, or password logins.
+
+  - type: checkboxes
+    id: safety_checklist
+    attributes:
+      label: Safety & Staging Checklist
+      options:
+        - label: "I performed this migration on a backed-up staging/test environment."
+          required: true
+        - label: "I kept the source forum database in read-only mode during the test."
+          required: true
+        - label: "I verified that no passwords, personal private messages, or sensitive tokens are present in this report."
+          required: true

@@ -1,6 +1,6 @@
 # 🚀 phpBB Migration Center
 
-[![Version](https://img.shields.io/badge/version-0.1.0--alpha.1-blue.svg?style=flat-square)](https://github.com/phpbb-seo/phpbb-migration-center)
+[![Version](https://img.shields.io/badge/version-0.1.0--beta.1-blue.svg?style=flat-square)](https://github.com/phpbb-seo/phpbb-migration-center)
 [![phpBB](https://img.shields.io/badge/phpBB-3.3.x-green.svg?style=flat-square)](https://www.phpbb.com)
 [![PHP](https://img.shields.io/badge/PHP-%3E%3D%207.4-purple.svg?style=flat-square)](https://php.net)
 [![License](https://img.shields.io/badge/license-GPL--2.0-yellow.svg?style=flat-square)](LICENSE)
@@ -11,15 +11,15 @@
 It provides controlled migration stages, Browser and CLI workers, persistent progress tracking, manual approval checkpoints, password compatibility, permission translation, recovery tools, and post-migration verification.
 
 > [!WARNING]
-> **This project is currently an Alpha development release.**  
-> Use it only on backed-up staging environments. Do not run it against a live production forum without independent testing and a verified recovery plan.
+> **Beta Testing Release:**  
+> This project is currently a **Beta development release**. Use it only on backed-up staging environments. Do not run it against a live production forum without independent testing and a verified recovery plan.
 
 ---
 
-## 🚀 Quick Start (Alpha Testing Setup)
+## 🚀 Quick Start (Beta Testing Setup)
 
 > [!IMPORTANT]
-> Install this Alpha release exclusively on a **test/staging phpBB installation** with a complete database and filesystem backup.
+> Install this Beta release exclusively on a **test/staging phpBB installation** with a complete database and filesystem backup.
 
 1. **Download or Clone the Repository:**  
    Clone or place the repository contents into your phpBB directory so the folder structure is:
@@ -73,14 +73,14 @@ phpBB Migration Center is currently under active development and community testi
 
 | Component | Status |
 | :--- | :---: |
-| **Migration framework core** | Alpha |
-| **ACP migration wizard** | Alpha |
-| **Browser AJAX worker** | Alpha testing |
-| **CLI worker** | Alpha testing |
-| **Stage checkpoints** | Alpha testing |
-| **Rollback and recovery** | Alpha testing |
-| **Final verification suite** | Alpha testing |
-| **XenForo connector** | **Alpha — Under active testing** |
+| **Migration framework core** | Beta |
+| **ACP migration wizard** | Beta |
+| **Browser AJAX worker** | Beta testing |
+| **CLI worker** | Beta testing |
+| **Stage checkpoints** | Beta testing |
+| **Rollback and recovery** | Beta testing |
+| **Final verification suite** | Beta testing |
+| **XenForo connector** | **Beta — Under active testing** |
 | **vBulletin connector** | Planned |
 | **MyBB connector** | Planned |
 | **SMF connector** | Planned |
@@ -359,7 +359,7 @@ Automated tests do not replace real migration testing against representative sou
 
 ---
 
-## ⚠️ Alpha Testing Safety Guidelines
+## ⚠️ Beta Testing Safety Guidelines
 
 Before testing:
 1. **Create a complete backup** of the target phpBB database.
@@ -369,7 +369,7 @@ Before testing:
 5. **Do not reuse production database credentials** in public reports.
 6. **Remove passwords, absolute private paths, and sensitive values** from screenshots and logs.
 7. **Verify every stage reconciliation report** before approving continuation.
-8. **Do not rely on Alpha software** as the sole copy of a production migration plan.
+8. **Do not rely on Beta software** as the sole copy of a production migration plan.
 
 ---
 
