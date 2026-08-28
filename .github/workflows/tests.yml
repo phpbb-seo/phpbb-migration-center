@@ -23,7 +23,7 @@ jobs:
         uses: shivammathur/setup-php@v2
         with:
           php-version: ${{ matrix.php }}
-          extensions: json, pdo, mbstring, pdo_sqlite
+          extensions: json, pdo, mbstring
           coverage: none
 
       - name: Validate composer.json
@@ -31,3 +31,6 @@ jobs:
 
       - name: PHP Syntax Check (Lint)
         run: find . -type f -name "*.php" -not -path "./tests/tmp/*" -not -path "./scratch/*" -exec php -l {} +
+
+      - name: Run CI-Safe Automated Tests
+        run: php tests/ci_runner.php
