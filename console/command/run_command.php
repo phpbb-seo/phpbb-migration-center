@@ -90,7 +90,19 @@ class run_command extends Command
 		$config->db_user = (string)$input->getOption('db-user');
 		$config->batch_size = $batch_size;
 		$is_vb = in_array(strtolower($source), ['vbulletin', 'vbulletin3', 'vbulletin4', 'vb3', 'vb4'], true);
-		$config->db_prefix = ($is_vb && $input->getOption('db-prefix') === 'xf_') ? '' : (string)$input->getOption('db-prefix');
+		$is_mybb = in_array(strtolower($source), ['mybb', 'mybb18'], true);
+		if ($is_vb && $input->getOption('db-prefix') === 'xf_')
+		{
+			$config->db_prefix = '';
+		}
+		else if ($is_mybb && $input->getOption('db-prefix') === 'xf_')
+		{
+			$config->db_prefix = 'mybb_';
+		}
+		else
+		{
+			$config->db_prefix = (string)$input->getOption('db-prefix');
+		}
 		$config->dry_run   = (bool)$input->getOption('dry-run');
 		$config->duplicate_username_policy = (string)$input->getOption('dup-user');
 		$config->duplicate_email_policy = (string)$input->getOption('dup-email');
@@ -119,6 +131,10 @@ class run_command extends Command
 			if ($is_vb)
 			{
 				$detected = \phpbbseo\migrationcenter\source\vbulletin\config\vb_config_detector::detect_from_path($config->source_path);
+			}
+			else if ($is_mybb)
+			{
+				$detected = \phpbbseo\migrationcenter\source\mybb\config\mybb_config_detector::detect_from_path($config->source_path);
 			}
 			else
 			{

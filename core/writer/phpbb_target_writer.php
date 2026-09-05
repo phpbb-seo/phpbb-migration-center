@@ -999,7 +999,7 @@ class phpbb_target_writer implements target_writer_interface
 
 		foreach ($permissions as $idx => $perm)
 		{
-			$source_node_id  = $perm['source_node_id'];
+			$source_node_id  = $perm['source_node_id'] ?? $perm['node_source_id'] ?? 0;
 			$phpbb_opt_name  = (string)$perm['phpbb_option'];
 			$auth_setting    = (int)$perm['auth_setting'];
 

@@ -276,11 +276,12 @@ class main_module
 		$db_user       = $request->variable('db_user', '');
 		$db_pass       = $request->variable('db_pass', $request->variable('db_password', ''));
 		$is_vb = in_array($source_system, ['vbulletin', 'vbulletin3', 'vbulletin4', 'vb3', 'vb4'], true);
-		$default_prefix = $is_vb ? '' : 'xf_';
+		$is_mybb = in_array($source_system, ['mybb', 'mybb18'], true);
+		$default_prefix = $is_vb ? '' : ($is_mybb ? 'mybb_' : 'xf_');
 		$db_prefix     = $request->variable('table_prefix', $request->variable('db_prefix', $default_prefix));
 		if (empty($db_prefix) && !$is_vb)
 		{
-			$db_prefix = 'xf_';
+			$db_prefix = $is_mybb ? 'mybb_' : 'xf_';
 		}
 
 		$db = $phpbb_container->get('dbal.conn');
@@ -315,6 +316,10 @@ class main_module
 				if ($is_vb)
 				{
 					$detected = \phpbbseo\migrationcenter\source\vbulletin\config\vb_config_detector::detect_from_path($source_path);
+				}
+				else if ($is_mybb)
+				{
+					$detected = \phpbbseo\migrationcenter\source\mybb\config\mybb_config_detector::detect_from_path($source_path);
 				}
 				else
 				{
@@ -368,6 +373,14 @@ class main_module
 						$rel_base . '/../vb4',
 					];
 				}
+				else if ($is_mybb)
+				{
+					$fallbacks = [
+						'C:/xampp/htdocs/mybb',
+						$rel_base . '/../mybb',
+						$rel_base . '/mybb',
+					];
+				}
 				else
 				{
 					$fallbacks = [
@@ -391,6 +404,10 @@ class main_module
 					if ($is_vb)
 					{
 						$detected = \phpbbseo\migrationcenter\source\vbulletin\config\vb_config_detector::detect_from_path($fb_path);
+					}
+					else if ($is_mybb)
+					{
+						$detected = \phpbbseo\migrationcenter\source\mybb\config\mybb_config_detector::detect_from_path($fb_path);
 					}
 					else
 					{
@@ -1855,6 +1872,10 @@ class main_module
 		if ($sys === 'xenforo')
 		{
 			return 'XenForo' . ($version ? " ({$version})" : ' 2.x');
+		}
+		if ($sys === 'mybb' || $sys === 'mybb18')
+		{
+			return 'MyBB' . ($version ? " ({$version})" : ' 1.8.x');
 		}
 		return ucfirst($system) . ($version ? " ({$version})" : '');
 	}

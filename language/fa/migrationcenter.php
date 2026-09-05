@@ -18,7 +18,7 @@ if (empty($lang) || !is_array($lang))
 
 $lang = array_merge($lang, array(
 	'ACP_MIGRATION_CENTER'              => 'مرکز مهاجرت (Migration Center)',
-	'ACP_MIGRATION_CENTER_EXPLAIN'      => 'چارچوب جامع و پیشرفته مهاجرت انجمن‌ها برای انتقال زنفورو، وی‌بولتین و سایر پلتفرم‌ها به phpBB.',
+	'ACP_MIGRATION_CENTER_EXPLAIN'      => 'چارچوب جامع و پیشرفته مهاجرت انجمن‌ها برای انتقال زنفورو، وی‌بولتین، مای‌بی‌بی (MyBB) و سایر پلتفرم‌ها به phpBB.',
 	'ACP_MIGRATION_OVERVIEW'            => 'نمای کلی مهاجرت',
 	'ACP_MIGRATION_WIZARD'              => 'ویزارد مهاجرت',
 	'ACP_MIGRATION_PROGRESS'            => 'پیشرفت زنده',

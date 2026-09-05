@@ -57,6 +57,10 @@ class provider_registry
 		{
 			return $this->providers['vbulletin'];
 		}
+		if (($system_name === 'mybb' || $system_name === 'mybb18') && isset($this->providers['mybb']))
+		{
+			return $this->providers['mybb'];
+		}
 		return null;
 	}
 
@@ -85,6 +89,10 @@ class provider_registry
 		if (in_array($system_name, ['vbulletin', 'vb3', 'vb4', 'vbulletin3', 'vbulletin4'], true))
 		{
 			return isset($this->providers['vbulletin3']) || isset($this->providers['vbulletin4']) || isset($this->providers['vbulletin']);
+		}
+		if (in_array($system_name, ['mybb', 'mybb18'], true))
+		{
+			return isset($this->providers['mybb']);
 		}
 		return false;
 	}

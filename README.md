@@ -83,11 +83,11 @@ phpBB Migration Center is currently under active development and community testi
 | **XenForo connector (XF 1.x & 2.x)** | **Beta — Under active testing** |
 | **vBulletin 3.8 connector** | **Beta — Under active testing** |
 | **vBulletin 4.2 connector** | **Beta — Under active testing** |
-| **MyBB connector** | Planned |
+| **MyBB 1.8 connector** | **Beta — Under active testing** |
 | **SMF connector** | Planned |
 | **Invision Community connector** | Planned |
 
-A platform is supported only after its connector has been implemented, tested, and officially released. The repository currently contains fully functional connectors for **XenForo** and **vBulletin (3.8 and 4.2)**. Other platforms listed above are part of the planned connector roadmap.
+A platform is supported only after its connector has been implemented, tested, and officially released. The repository currently contains fully functional connectors for **XenForo**, **vBulletin (3.8 and 4.2)**, and **MyBB 1.8**. Other platforms listed above are part of the planned connector roadmap.
 
 ---
 
@@ -154,6 +154,26 @@ Targets migration from vBulletin 3.8 and vBulletin 4.2 forums to phpBB:
 - Private Messages (vBulletin PM system to phpBB PMs)
 - Banlists: User bans and IP address bans
 - Automatic configuration detection from `includes/config.php`
+
+### 3. MyBB to phpBB (MyBB 1.8.x)
+Targets migration from MyBB 1.8 forums to phpBB:
+- User groups with group color styling (`namestyle` hex parser) and secondary group memberships (`additionalgroups`)
+- Users, profiles, signatures, websites, registration/activity timestamps, and MyBB password hashing (`md5(md5(salt) . md5(pass))` via native `$mcmybb$` password driver)
+- Forums, categories, display order, thread/post counts, and forum permissions
+- Topics, posts, polls, options, and votes
+- MyBB BBCode converter:
+  - Standardizes quotes: `[quote='Author' pid='123' dateline='...']` -> `[quote="Author"]`
+  - Inline attachment conversion: `[attachment=123]` -> phpBB attachment BBCode with inline comments
+  - Code (`[code]`) and PHP (`[php]`) blocks
+  - Video tags (`[video=youtube]`) to clean URLs
+  - Size normalization (`[size=small|medium|large|xx-large]` and numeric pt/px)
+  - Full UTF-8 / Persian / Arabic / Emoji preservation and XSS sanitization
+  - Native phpBB `s9e\TextFormatter` XML storage generation
+- Post attachments: MyBB `uploads/` and date-based `uploads/YYYYMM/` storage with MIME-type and file existence validation
+- Custom user avatars from `uploads/avatars/`
+- Private Messages (`mybb_privatemessages` inbox/sent items converted into phpBB private conversations)
+- Banlists: User bans and ban filters (IP/email)
+- Automatic configuration detection from `inc/config.php` and version detection from `inc/class_core.php`
 
 *Compatibility should always be verified against the exact source version and database backup on a staging environment before running a production migration.*
 

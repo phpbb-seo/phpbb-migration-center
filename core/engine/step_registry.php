@@ -70,6 +70,11 @@ class step_registry
 			{
 				return $this->provider_steps['vbulletin'][$name];
 			}
+			// MyBB aliases fallback
+			if ($provider === 'mybb18' && isset($this->provider_steps['mybb'][$name]))
+			{
+				return $this->provider_steps['mybb'][$name];
+			}
 			// Generic fallback allowed ONLY for explicitly generic shared steps
 			if (in_array($name, self::GENERIC_SHARED_STEPS, true) && isset($this->steps[$name]))
 			{
@@ -103,6 +108,10 @@ class step_registry
 			{
 				return $this->provider_steps['vbulletin'];
 			}
+			if ($provider === 'mybb18' && isset($this->provider_steps['mybb']))
+			{
+				return $this->provider_steps['mybb'];
+			}
 		}
 		return $this->steps;
 	}
@@ -123,6 +132,10 @@ class step_registry
 				return true;
 			}
 			if (in_array($provider, ['vbulletin3', 'vbulletin4', 'vb3', 'vb4'], true) && isset($this->provider_steps['vbulletin'][$name]))
+			{
+				return true;
+			}
+			if ($provider === 'mybb18' && isset($this->provider_steps['mybb'][$name]))
 			{
 				return true;
 			}

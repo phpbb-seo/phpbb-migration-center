@@ -1226,19 +1226,25 @@
 									var prf = document.getElementById('table_prefix') || document.getElementById('db_prefix');
 									var val = this.value;
 									var isVb = (val === 'vbulletin3' || val === 'vb3' || val === 'vbulletin4' || val === 'vb4');
+									var isMybb = (val === 'mybb' || val === 'mybb18');
 									if (isVb) {
-										if (prf && prf.value === 'xf_') { prf.value = ''; }
-										if (p && (p.value.indexOf('xen') !== -1 || p.value.indexOf('xf') !== -1)) { p.value = ''; }
+										if (prf && (prf.value === 'xf_' || prf.value === 'mybb_')) { prf.value = ''; }
+										if (p && (p.value.indexOf('xen') !== -1 || p.value.indexOf('xf') !== -1 || p.value.indexOf('mybb') !== -1)) { p.value = ''; }
 										if (p && !p.value) { p.placeholder = 'e.g. /var/www/vbulletin or ../vb'; }
+									} else if (isMybb) {
+										if (prf) { prf.value = 'mybb_'; }
+										if (p && (p.value.indexOf('xen') !== -1 || p.value.indexOf('xf') !== -1 || p.value.indexOf('vb') !== -1)) { p.value = ''; }
+										if (p && !p.value) { p.placeholder = 'e.g. /var/www/mybb or ../mybb'; }
 									} else {
-										if (prf && prf.value === '') { prf.value = 'xf_'; }
-										if (p && p.value.indexOf('vb') !== -1) { p.value = ''; }
+										if (prf && (prf.value === '' || prf.value === 'mybb_')) { prf.value = 'xf_'; }
+										if (p && (p.value.indexOf('vb') !== -1 || p.value.indexOf('mybb') !== -1)) { p.value = ''; }
 										if (p && !p.value) { p.placeholder = 'e.g. /var/www/xenforo or ../xenforo'; }
 									}
 								">
 									<option value="xenforo" <!-- IF SOURCE_SYSTEM == 'xenforo' -->selected="selected"<!-- ENDIF -->>XenForo 2.x</option>
 									<option value="vbulletin3" <!-- IF SOURCE_SYSTEM == 'vbulletin3' || SOURCE_SYSTEM == 'vb3' -->selected="selected"<!-- ENDIF -->>vBulletin 3.8.x</option>
 									<option value="vbulletin4" <!-- IF SOURCE_SYSTEM == 'vbulletin4' || SOURCE_SYSTEM == 'vb4' -->selected="selected"<!-- ENDIF -->>vBulletin 4.2.x</option>
+									<option value="mybb" <!-- IF SOURCE_SYSTEM == 'mybb' || SOURCE_SYSTEM == 'mybb18' -->selected="selected"<!-- ENDIF -->>MyBB 1.8.x</option>
 								</select>
 							</div>
 

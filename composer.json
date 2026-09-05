@@ -3,6 +3,7 @@
     "type": "phpbb-extension",
     "description": "Enterprise-grade, extensible forum migration framework for phpBB 3.3+ (XenForo, vBulletin, MyBB, and more).",
     "homepage": "https://github.com/phpbb-seo/phpbb-migration-center",
+    "version": "1.0.0",
     "license": "GPL-2.0-only",
     "authors": [
         {

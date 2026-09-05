@@ -18,7 +18,7 @@ if (empty($lang) || !is_array($lang))
 
 $lang = array_merge($lang, array(
 	'ACP_MIGRATION_CENTER'         => 'Migration Center',
-	'ACP_MIGRATION_CENTER_EXPLAIN' => 'Enterprise-grade forum migration framework for migrating XenForo, vBulletin, and other platforms into phpBB.',
+	'ACP_MIGRATION_CENTER_EXPLAIN' => 'Enterprise-grade forum migration framework for migrating XenForo, vBulletin, MyBB, and other platforms into phpBB.',
 	'ACP_MIGRATION_OVERVIEW'       => 'Migration Overview',
 	'ACP_MIGRATION_WIZARD'         => 'Migration Wizard',
 	'ACP_MIGRATION_PROGRESS'       => 'Live Progress',

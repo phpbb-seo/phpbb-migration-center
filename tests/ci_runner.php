@@ -63,6 +63,11 @@ $standalone_tests = [
     'VbCredentialPrecedenceRegressionTest' => \phpbbseo\migrationcenter\tests\unit\source\vbulletin\VbCredentialPrecedenceRegressionTest::class,
     'VbProviderSeparationTest'   => \phpbbseo\migrationcenter\tests\unit\source\vbulletin\VbProviderSeparationTest::class,
     'VbConfigDetectorTest'       => \phpbbseo\migrationcenter\tests\unit\source\vbulletin\vb_config_detector_test::class,
+    'MybbPasswordDriverTest'     => \phpbbseo\migrationcenter\tests\unit\source\mybb\MybbPasswordDriverTest::class,
+    'MybbMessageConverterTest'   => \phpbbseo\migrationcenter\tests\unit\source\mybb\MybbMessageConverterTest::class,
+    'MybbGroupNormalizerTest'    => \phpbbseo\migrationcenter\tests\unit\source\mybb\MybbGroupNormalizerTest::class,
+    'MybbUserNormalizerTest'     => \phpbbseo\migrationcenter\tests\unit\source\mybb\MybbUserNormalizerTest::class,
+    'MybbConfigDetectorTest'     => \phpbbseo\migrationcenter\tests\unit\source\mybb\MybbConfigDetectorTest::class,
 ];
 
 $passed = 0;

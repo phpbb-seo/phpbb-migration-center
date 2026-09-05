@@ -83,7 +83,20 @@ class check_command extends Command
 		$config->db_name = (string)$input->getOption('db-name');
 		$config->db_user = (string)$input->getOption('db-user');
 		$config->db_password = (string)$input->getOption('db-pass');
-		$config->db_prefix = (string)$input->getOption('db-prefix');
+		$is_vb = in_array(strtolower($source), ['vbulletin', 'vbulletin3', 'vbulletin4', 'vb3', 'vb4'], true);
+		$is_mybb = in_array(strtolower($source), ['mybb', 'mybb18'], true);
+		if ($is_vb && $input->getOption('db-prefix') === 'xf_')
+		{
+			$config->db_prefix = '';
+		}
+		else if ($is_mybb && $input->getOption('db-prefix') === 'xf_')
+		{
+			$config->db_prefix = 'mybb_';
+		}
+		else
+		{
+			$config->db_prefix = (string)$input->getOption('db-prefix');
+		}
 
 		$result = $provider->run_preflight($config);
 
