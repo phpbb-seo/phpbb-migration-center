@@ -304,6 +304,12 @@ class phpbb_target_writer implements target_writer_interface
 
 				// 7. Record ID mapping atomically (Preserving ban metadata for authoritative Bans phase)
 				$mapping_meta = [
+					'ownership'              => 'created',
+					'fingerprint'            => [
+						'username_clean' => $username_clean,
+						'user_email'     => $email,
+						'user_regdate'   => $regdate,
+					],
 					'primary_group_source'   => $user->primary_group_source_id,
 					'secondary_groups_source'=> $user->secondary_group_source_ids,
 					'is_admin'               => $user->is_admin,
@@ -383,7 +389,7 @@ class phpbb_target_writer implements target_writer_interface
 
 					if ($still_exists)
 					{
-						$is_builtin = ($group->is_builtin || !empty($group->canonical_name) || (int)$existing_target_id <= 7);
+						$is_builtin = ($group->is_builtin || !empty($group->canonical_name));
 						$results[$source_id] = [
 							'target_id' => (int)$existing_target_id,
 							'status'    => 'success',
@@ -400,15 +406,18 @@ class phpbb_target_writer implements target_writer_interface
 				if ($group->is_builtin || !empty($group->canonical_name))
 				{
 					$canonical = $group->canonical_name ?: $group->group_name;
-					$sql = 'SELECT group_id FROM ' . $this->table_prefix . 'groups WHERE group_name = ' . "'" . $this->db->sql_escape($canonical) . "'";
+					$sql = 'SELECT group_id FROM ' . $this->table_prefix . 'groups 
+							WHERE group_name = ' . "'" . $this->db->sql_escape($canonical) . "' 
+							AND group_type = 3";
 					$res = $this->db->sql_query($sql);
 					$target_id = (int)$this->db->sql_fetchfield('group_id');
 					$this->db->sql_freeresult($res);
 
 					if ($target_id > 0)
 					{
-						$this->id_mapper->set($run_id, $source_system, 'group', $source_id, $target_id, 'mapped', '', [
+						$this->id_mapper->set($run_id, $source_system, 'group', $source_id, $target_id, 'reused', '', [
 							'builtin'        => true,
+							'ownership'      => 'reused',
 							'canonical_name' => $canonical,
 						]);
 
@@ -467,10 +476,15 @@ class phpbb_target_writer implements target_writer_interface
 				$this->db->sql_query($sql);
 				$target_id = (int)$this->db->sql_nextid();
 
-				$this->id_mapper->set($run_id, $source_system, 'group', $source_id, $target_id, 'mapped', '', [
+				$this->id_mapper->set($run_id, $source_system, 'group', $source_id, $target_id, 'created', '', [
 					'builtin'     => false,
+					'ownership'   => 'created',
 					'was_renamed' => $was_renamed,
 					'orig_name'   => $group->group_name,
+					'fingerprint' => [
+						'group_name' => $group_name,
+						'created_at' => time(),
+					],
 				]);
 
 				$results[$source_id] = [
@@ -1445,6 +1459,34 @@ class phpbb_target_writer implements target_writer_interface
 				$raw_txt = $post->post_text !== '' ? $post->post_text : (isset($post->message) ? $post->message : ($post->normalized_message ?: $post->raw_source_message));
 				$clean_text = $this->sanitize_utf8($raw_txt);
 
+				if (!function_exists('generate_text_for_storage'))
+				{
+					global $phpbb_root_path, $phpEx;
+					if (!empty($phpbb_root_path) && file_exists($phpbb_root_path . 'includes/functions_posting.' . ($phpEx ?: 'php')))
+					{
+						require_once $phpbb_root_path . 'includes/functions_posting.' . ($phpEx ?: 'php');
+					}
+				}
+
+				$bbcode_uid = (string)$post->bbcode_uid;
+				$bbcode_bitfield = (string)$post->bbcode_bitfield;
+
+				if (function_exists('generate_text_for_storage') && strpos($clean_text, '<r>') !== 0 && strpos($clean_text, '<t>') !== 0 && strpos($clean_text, '<m>') !== 0)
+				{
+					$storage_uid = '';
+					$storage_bitfield = '';
+					$flags = 0;
+					try
+					{
+						generate_text_for_storage($clean_text, $storage_uid, $storage_bitfield, $flags, true, true, true);
+						$bbcode_uid = $storage_uid;
+						$bbcode_bitfield = $storage_bitfield;
+					}
+					catch (\Throwable $e)
+					{
+					}
+				}
+
 				$post_row = [
 					'topic_id'            => $topic_target_id,
 					'forum_id'            => $forum_target_id,
@@ -1462,8 +1504,8 @@ class phpbb_target_writer implements target_writer_interface
 					'post_text'           => $clean_text,
 					'post_checksum'       => md5($clean_text),
 					'post_attachment'     => 0,
-					'bbcode_bitfield'     => (string)$post->bbcode_bitfield,
-					'bbcode_uid'          => (string)$post->bbcode_uid,
+					'bbcode_bitfield'     => $bbcode_bitfield,
+					'bbcode_uid'          => $bbcode_uid,
 					'post_postcount'      => 1,
 					'post_edit_time'      => (int)$post->post_edit_time,
 					'post_edit_reason'    => $this->sanitize_utf8($post->post_edit_reason),
@@ -3040,7 +3082,10 @@ class phpbb_target_writer implements target_writer_interface
 		$run_id = (string)($options['run_id'] ?? '');
 		$source_system = (string)($options['source_system'] ?? 'xenforo');
 
-		$converter = new \phpbbseo\migrationcenter\source\xenforo\content\xf_message_converter();
+		$is_vb = in_array($source_system, ['vbulletin', 'vbulletin3', 'vbulletin4', 'vb3', 'vb4'], true);
+		$converter = $is_vb
+			? new \phpbbseo\migrationcenter\source\vbulletin\content\vb_message_converter()
+			: new \phpbbseo\migrationcenter\source\xenforo\content\xf_message_converter();
 		$affected_user_ids = [];
 
 		foreach ($messages as $msg)

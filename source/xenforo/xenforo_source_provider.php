@@ -84,18 +84,21 @@ class xenforo_source_provider implements source_provider_interface
 	{
 		$result = new preflight_result_dto();
 
-		// Auto-detect config from local source path if DB credentials are empty
-		if (!empty($config->source_path) && empty($config->db_name))
+		// Auto-detect config from local source path only for missing defaults
+		if (!empty($config->source_path))
 		{
-			$detected = xf_config_detector::detect_from_path($config->source_path);
-			if ($detected)
+			if (empty($config->db_name) || empty($config->db_user) || empty($config->db_host) || empty($config->db_port))
 			{
-				$config->db_host = $detected->db_host;
-				$config->db_port = $detected->db_port;
-				$config->db_name = $detected->db_name;
-				$config->db_user = $detected->db_user;
-				$config->db_password = $detected->db_password;
-				$config->db_prefix = $detected->db_prefix;
+				$detected = xf_config_detector::detect_from_path($config->source_path);
+				if ($detected)
+				{
+					if (empty($config->db_host)) $config->db_host = $detected->db_host;
+					if (empty($config->db_port)) $config->db_port = $detected->db_port;
+					if (empty($config->db_name)) $config->db_name = $detected->db_name;
+					if (empty($config->db_user)) $config->db_user = $detected->db_user;
+					if (empty($config->db_password)) $config->db_password = $detected->db_password;
+					if (empty($config->db_prefix)) $config->db_prefix = $detected->db_prefix;
+				}
 			}
 		}
 

@@ -159,14 +159,15 @@ class rollback_manager
 		}
 
 		$lock_name = 'migration_' . $run->source_system;
-		if ($this->lock_manager->is_locked($lock_name) && $run->status === 'running')
+		$lock = $this->lock_manager->is_locked($lock_name);
+		if ($lock && ($lock['run_id'] ?? '') !== $run_id && $run->status === 'running')
 		{
-			$lock = $this->lock_manager->get_lock($lock_name);
-			if ($lock && (time() - $lock['heartbeat_at']) < 300)
+			if ((time() - (int)($lock['heartbeat_at'] ?? 0)) < 300)
 			{
-				throw new \RuntimeException("Cannot rollback while migration worker is actively running. Pause or cancel the run first.");
+				throw new \RuntimeException("Cannot rollback while migration worker is actively running on another run. Pause or cancel that run first.");
 			}
 		}
+		$this->lock_manager->release($lock_name, $run_id);
 
 		$this->state_manager->update_run_status($run_id, 'rolling_back');
 
@@ -263,42 +264,183 @@ class rollback_manager
 				$audit['deleted']['avatars'] = count($avatar_target_ids);
 			}
 
-			// 11. Migrated users (STRICT SAFETY: Never delete Anonymous=1 or Founders=2)
-			$user_target_ids = $this->get_mapped_target_ids($run_id, 'user');
-			$safe_user_ids = [];
-			foreach ($user_target_ids as $uid)
+			// 11. Migrated users (POSITIVE OWNERSHIP, FAIL-CLOSED, FINGERPRINT VERIFIED & NEVER DELETE ANONYMOUS/FOUNDERS/BOTS)
+			$sql = 'SELECT target_id, metadata_json FROM ' . $this->table_prefix . "migration_id_map 
+					WHERE run_id = '" . $this->db->sql_escape($run_id) . "' 
+					AND content_type = 'user'";
+			$res = $this->db->sql_query($sql);
+			$candidate_user_map = [];
+			while ($row = $this->db->sql_fetchrow($res))
 			{
-				$uid = (int)$uid;
-				if ($uid > 2)
+				$uid = (int)$row['target_id'];
+				if ($uid <= 2)
 				{
+					continue;
+				}
+
+				if (empty($row['metadata_json']))
+				{
+					$audit['errors'][] = "Rollback skipped target user {$uid}: missing metadata";
+					continue;
+				}
+
+				$meta = json_decode($row['metadata_json'], true);
+				if (!is_array($meta))
+				{
+					$audit['errors'][] = "Rollback skipped target user {$uid}: malformed JSON metadata";
+					continue;
+				}
+
+				// POSITIVE OWNERSHIP ASSERTION
+				if (($meta['ownership'] ?? '') !== 'created')
+				{
+					continue;
+				}
+
+				$candidate_user_map[$uid] = $meta;
+			}
+			$this->db->sql_freeresult($res);
+
+			$safe_user_ids = [];
+			if (!empty($candidate_user_map))
+			{
+				$uids = array_keys($candidate_user_map);
+				$sql = 'SELECT user_id, username_clean, user_email, user_type FROM ' . $this->table_prefix . 'users 
+						WHERE ' . $this->db->sql_in_set('user_id', $uids);
+				$res = $this->db->sql_query($sql);
+				while ($u_row = $this->db->sql_fetchrow($res))
+				{
+					$uid = (int)$u_row['user_id'];
+					$meta = $candidate_user_map[$uid];
+
+					// Protection: never delete founders (user_type=3) or bots (user_type=2)
+					if ((int)$u_row['user_type'] === 3 || (int)$u_row['user_type'] === 2)
+					{
+						$audit['errors'][] = "Rollback preserved user {$uid}: account has founder/bot status";
+						continue;
+					}
+
+					// Fingerprint check: username_clean AND email must match
+					$fp = $meta['fingerprint'] ?? [];
+					if (!empty($fp))
+					{
+						$expected_clean = $fp['username_clean'] ?? '';
+						if ($expected_clean !== '' && $u_row['username_clean'] !== $expected_clean)
+						{
+							$audit['errors'][] = "Rollback preserved user {$uid}: target username_clean ('{$u_row['username_clean']}') does not match migration fingerprint ('{$expected_clean}')";
+							continue;
+						}
+
+						$expected_email = $fp['user_email'] ?? '';
+						if ($expected_email !== '' && strtolower($u_row['user_email']) !== strtolower($expected_email))
+						{
+							$audit['errors'][] = "Rollback preserved user {$uid}: target user_email ('{$u_row['user_email']}') does not match migration fingerprint ('{$expected_email}')";
+							continue;
+						}
+					}
+
 					$safe_user_ids[] = $uid;
 				}
-			}
+				$this->db->sql_freeresult($res);
 
-			if (!empty($safe_user_ids))
-			{
-				$this->db->sql_query('DELETE FROM ' . $this->table_prefix . 'user_group WHERE ' . $this->db->sql_in_set('user_id', $safe_user_ids));
-				$this->db->sql_query('DELETE FROM ' . $this->table_prefix . 'profile_fields_data WHERE ' . $this->db->sql_in_set('user_id', $safe_user_ids));
-				$this->db->sql_query('DELETE FROM ' . $this->table_prefix . 'users WHERE ' . $this->db->sql_in_set('user_id', $safe_user_ids));
-				$audit['deleted']['users'] = count($safe_user_ids);
-			}
-
-			// 12. Custom groups (STRICT SAFETY: Never delete core groups <= 7)
-			$group_target_ids = $this->get_mapped_target_ids($run_id, 'group');
-			$safe_group_ids = [];
-			foreach ($group_target_ids as $gid)
-			{
-				$gid = (int)$gid;
-				if ($gid > 7)
+				if (!empty($safe_user_ids))
 				{
-					$safe_group_ids[] = $gid;
+					$this->db->sql_query('DELETE FROM ' . $this->table_prefix . 'user_group WHERE ' . $this->db->sql_in_set('user_id', $safe_user_ids));
+					$this->db->sql_query('DELETE FROM ' . $this->table_prefix . 'profile_fields_data WHERE ' . $this->db->sql_in_set('user_id', $safe_user_ids));
+					$this->db->sql_query('DELETE FROM ' . $this->table_prefix . 'users WHERE ' . $this->db->sql_in_set('user_id', $safe_user_ids));
+					$audit['deleted']['users'] = count($safe_user_ids);
 				}
 			}
 
-			if (!empty($safe_group_ids))
+			// 12. Custom groups created by this migration run (POSITIVE OWNERSHIP, FAIL-CLOSED & FINGERPRINT VERIFIED)
+			$sql = 'SELECT target_id, metadata_json FROM ' . $this->table_prefix . "migration_id_map 
+					WHERE run_id = '" . $this->db->sql_escape($run_id) . "' 
+					AND content_type = 'group'";
+			$res = $this->db->sql_query($sql);
+			$candidate_group_map = [];
+			while ($row = $this->db->sql_fetchrow($res))
 			{
-				$this->db->sql_query('DELETE FROM ' . $this->table_prefix . 'groups WHERE ' . $this->db->sql_in_set('group_id', $safe_group_ids));
-				$audit['deleted']['groups'] = count($safe_group_ids);
+				$gid = (int)$row['target_id'];
+				if ($gid <= 0)
+				{
+					continue;
+				}
+
+				// FAIL-CLOSED: metadata must be non-empty and parse cleanly
+				if (empty($row['metadata_json']))
+				{
+					$audit['errors'][] = "Rollback skipped target group {$gid}: missing metadata";
+					continue;
+				}
+
+				$meta = json_decode($row['metadata_json'], true);
+				if (!is_array($meta))
+				{
+					$audit['errors'][] = "Rollback skipped target group {$gid}: malformed JSON metadata";
+					continue;
+				}
+
+				// POSITIVE OWNERSHIP ASSERTION: metadata.ownership must strictly equal 'created'
+				if (($meta['ownership'] ?? '') !== 'created')
+				{
+					continue;
+				}
+
+				// Extra safeguard: cannot be marked builtin
+				if (!empty($meta['builtin']))
+				{
+					continue;
+				}
+
+				$candidate_group_map[$gid] = $meta;
+			}
+			$this->db->sql_freeresult($res);
+
+			if (!empty($candidate_group_map))
+			{
+				$created_group_ids = array_keys($candidate_group_map);
+				// Canonical protection: never delete special/canonical phpBB groups
+				$canonical_names = ['GUESTS', 'REGISTERED', 'REGISTERED_COPPA', 'GLOBAL_MODERATORS', 'ADMINISTRATORS', 'BOTS', 'NEWLY_REGISTERED'];
+				$sql = 'SELECT group_id FROM ' . $this->table_prefix . 'groups 
+						WHERE ' . $this->db->sql_in_set('group_id', $created_group_ids) . ' 
+						AND (group_type = 3 OR ' . $this->db->sql_in_set('group_name', $canonical_names) . ')';
+				$res = $this->db->sql_query($sql);
+				$protected_gids = [];
+				while ($p_row = $this->db->sql_fetchrow($res))
+				{
+					$protected_gids[] = (int)$p_row['group_id'];
+				}
+				$this->db->sql_freeresult($res);
+
+				$safe_group_ids = array_values(array_diff($created_group_ids, $protected_gids));
+
+				if (!empty($safe_group_ids))
+				{
+					// Target Group Fingerprint Check
+					$sql = 'SELECT group_id, group_name FROM ' . $this->table_prefix . 'groups 
+							WHERE ' . $this->db->sql_in_set('group_id', $safe_group_ids);
+					$res = $this->db->sql_query($sql);
+					$final_group_ids = [];
+					while ($g_row = $this->db->sql_fetchrow($res))
+					{
+						$gid = (int)$g_row['group_id'];
+						$meta = $candidate_group_map[$gid] ?? [];
+						$fp = $meta['fingerprint'] ?? [];
+						if (!empty($fp['group_name']) && $g_row['group_name'] !== $fp['group_name'])
+						{
+							$audit['errors'][] = "Rollback preserved group {$gid}: target group_name ('{$g_row['group_name']}') does not match migration fingerprint ('{$fp['group_name']}')";
+							continue;
+						}
+						$final_group_ids[] = $gid;
+					}
+					$this->db->sql_freeresult($res);
+
+					if (!empty($final_group_ids))
+					{
+						$this->db->sql_query('DELETE FROM ' . $this->table_prefix . 'groups WHERE ' . $this->db->sql_in_set('group_id', $final_group_ids));
+						$audit['deleted']['groups'] = count($final_group_ids);
+					}
+				}
 			}
 
 			// 13. Bans

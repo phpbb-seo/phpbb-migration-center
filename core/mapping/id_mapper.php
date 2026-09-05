@@ -72,11 +72,12 @@ class id_mapper implements id_mapper_interface
 		];
 
 		// Check if mapping already exists for this source system + content_type + source_id
+		$candidates = $this->get_source_system_candidates($source_system);
 		$sql = 'SELECT id FROM ' . $this->table_name . '
-			WHERE source_system = ' . "'" . $this->db->sql_escape($source_system) . "'" . '
+			WHERE ' . $this->db->sql_in_set('source_system', $candidates) . '
 				AND content_type = ' . "'" . $this->db->sql_escape($content_type) . "'" . '
 				AND source_id = ' . "'" . $this->db->sql_escape($source_id_str) . "'";
-		$result = $this->db->sql_query($sql);
+		$result = $this->db->sql_query_limit($sql, 1);
 		$existing_id = (int)$this->db->sql_fetchfield('id');
 		$this->db->sql_freeresult($result);
 
@@ -169,23 +170,49 @@ class id_mapper implements id_mapper_interface
 	public function get_target_id(string $source_system, string $content_type, $source_id)
 	{
 		$source_id_str = (string)$source_id;
+		$candidates = $this->get_source_system_candidates($source_system);
 
-		if (isset($this->cache_by_source[$source_system][$content_type][$source_id_str]))
+		foreach ($candidates as $candidate)
 		{
-			return $this->cache_by_source[$source_system][$content_type][$source_id_str];
+			if (isset($this->cache_by_source[$candidate][$content_type][$source_id_str]))
+			{
+				$cached_val = $this->cache_by_source[$candidate][$content_type][$source_id_str];
+				if ($candidate !== $source_system)
+				{
+					$this->cache_by_source[$source_system][$content_type][$source_id_str] = $cached_val;
+				}
+				return $cached_val;
+			}
 		}
 
-		$sql = 'SELECT target_id FROM ' . $this->table_name . '
-			WHERE source_system = ' . "'" . $this->db->sql_escape($source_system) . "'" . '
+		$sql = 'SELECT source_system, target_id FROM ' . $this->table_name . '
+			WHERE ' . $this->db->sql_in_set('source_system', $candidates) . '
 				AND content_type = ' . "'" . $this->db->sql_escape($content_type) . "'" . '
 				AND source_id = ' . "'" . $this->db->sql_escape($source_id_str) . "'";
 		$result = $this->db->sql_query($sql);
-		$target_id = $this->db->sql_fetchfield('target_id');
+		$rows = $this->db->sql_fetchrowset($result);
 		$this->db->sql_freeresult($result);
 
-		if ($target_id !== false && $target_id !== null)
+		if (!empty($rows))
 		{
+			$chosen_row = null;
+			foreach ($rows as $row)
+			{
+				if (strcasecmp($row['source_system'], $source_system) === 0)
+				{
+					$chosen_row = $row;
+					break;
+				}
+			}
+			if ($chosen_row === null)
+			{
+				$chosen_row = reset($rows);
+			}
+
+			$target_id = $chosen_row['target_id'];
 			$this->cache_by_source[$source_system][$content_type][$source_id_str] = (string)$target_id;
+			$matched_system = (string)$chosen_row['source_system'];
+			$this->cache_by_source[$matched_system][$content_type][$source_id_str] = (string)$target_id;
 			return $target_id;
 		}
 
@@ -203,23 +230,49 @@ class id_mapper implements id_mapper_interface
 	public function get_source_id(string $source_system, string $content_type, $target_id)
 	{
 		$target_id_str = (string)$target_id;
+		$candidates = $this->get_source_system_candidates($source_system);
 
-		if (isset($this->cache_by_target[$source_system][$content_type][$target_id_str]))
+		foreach ($candidates as $candidate)
 		{
-			return $this->cache_by_target[$source_system][$content_type][$target_id_str];
+			if (isset($this->cache_by_target[$candidate][$content_type][$target_id_str]))
+			{
+				$cached_val = $this->cache_by_target[$candidate][$content_type][$target_id_str];
+				if ($candidate !== $source_system)
+				{
+					$this->cache_by_target[$source_system][$content_type][$target_id_str] = $cached_val;
+				}
+				return $cached_val;
+			}
 		}
 
-		$sql = 'SELECT source_id FROM ' . $this->table_name . '
-			WHERE source_system = ' . "'" . $this->db->sql_escape($source_system) . "'" . '
+		$sql = 'SELECT source_system, source_id FROM ' . $this->table_name . '
+			WHERE ' . $this->db->sql_in_set('source_system', $candidates) . '
 				AND content_type = ' . "'" . $this->db->sql_escape($content_type) . "'" . '
 				AND target_id = ' . "'" . $this->db->sql_escape($target_id_str) . "'";
 		$result = $this->db->sql_query($sql);
-		$source_id = $this->db->sql_fetchfield('source_id');
+		$rows = $this->db->sql_fetchrowset($result);
 		$this->db->sql_freeresult($result);
 
-		if ($source_id !== false && $source_id !== null)
+		if (!empty($rows))
 		{
+			$chosen_row = null;
+			foreach ($rows as $row)
+			{
+				if (strcasecmp($row['source_system'], $source_system) === 0)
+				{
+					$chosen_row = $row;
+					break;
+				}
+			}
+			if ($chosen_row === null)
+			{
+				$chosen_row = reset($rows);
+			}
+
+			$source_id = $chosen_row['source_id'];
 			$this->cache_by_target[$source_system][$content_type][$target_id_str] = (string)$source_id;
+			$matched_system = (string)$chosen_row['source_system'];
+			$this->cache_by_target[$matched_system][$content_type][$target_id_str] = (string)$source_id;
 			return $source_id;
 		}
 
@@ -238,15 +291,22 @@ class id_mapper implements id_mapper_interface
 	{
 		$results = [];
 		$missing_ids = [];
+		$candidates = $this->get_source_system_candidates($source_system);
 
 		foreach ($source_ids as $source_id)
 		{
 			$id_str = (string)$source_id;
-			if (isset($this->cache_by_source[$source_system][$content_type][$id_str]))
+			$found = false;
+			foreach ($candidates as $candidate)
 			{
-				$results[$id_str] = $this->cache_by_source[$source_system][$content_type][$id_str];
+				if (isset($this->cache_by_source[$candidate][$content_type][$id_str]))
+				{
+					$results[$id_str] = $this->cache_by_source[$candidate][$content_type][$id_str];
+					$found = true;
+					break;
+				}
 			}
-			else
+			if (!$found)
 			{
 				$missing_ids[] = $id_str;
 			}
@@ -260,8 +320,8 @@ class id_mapper implements id_mapper_interface
 
 			foreach ($chunks as $chunk)
 			{
-				$sql = 'SELECT source_id, target_id FROM ' . $this->table_name . '
-					WHERE source_system = ' . "'" . $this->db->sql_escape($source_system) . "'" . '
+				$sql = 'SELECT source_system, source_id, target_id FROM ' . $this->table_name . '
+					WHERE ' . $this->db->sql_in_set('source_system', $candidates) . '
 						AND content_type = ' . "'" . $this->db->sql_escape($content_type) . "'" . '
 						AND ' . $this->db->sql_in_set('source_id', $chunk);
 				$query_result = $this->db->sql_query($sql);
@@ -270,8 +330,10 @@ class id_mapper implements id_mapper_interface
 				{
 					$src = (string)$row['source_id'];
 					$tgt = (string)$row['target_id'];
+					$sys = (string)$row['source_system'];
+					$this->cache_by_source[$sys][$content_type][$src] = $tgt;
 					$this->cache_by_source[$source_system][$content_type][$src] = $tgt;
-					$this->cache_by_target[$source_system][$content_type][$tgt] = $src;
+					$this->cache_by_target[$sys][$content_type][$tgt] = $src;
 					$results[$src] = $tgt;
 				}
 				$this->db->sql_freeresult($query_result);
@@ -292,22 +354,81 @@ class id_mapper implements id_mapper_interface
 	public function get_metadata(string $source_system, string $content_type, $source_id): array
 	{
 		$source_id_str = (string)$source_id;
+		$candidates = $this->get_source_system_candidates($source_system);
 
-		$sql = 'SELECT metadata_json FROM ' . $this->table_name . '
-			WHERE source_system = ' . "'" . $this->db->sql_escape($source_system) . "'" . '
+		$sql = 'SELECT source_system, metadata_json FROM ' . $this->table_name . '
+			WHERE ' . $this->db->sql_in_set('source_system', $candidates) . '
 				AND content_type = ' . "'" . $this->db->sql_escape($content_type) . "'" . '
 				AND source_id = ' . "'" . $this->db->sql_escape($source_id_str) . "'";
 		$result = $this->db->sql_query($sql);
-		$json = $this->db->sql_fetchfield('metadata_json');
+		$rows = $this->db->sql_fetchrowset($result);
 		$this->db->sql_freeresult($result);
 
-		if (!empty($json))
+		if (!empty($rows))
 		{
-			$decoded = json_decode($json, true);
-			return is_array($decoded) ? $decoded : [];
+			$chosen_row = null;
+			foreach ($rows as $row)
+			{
+				if (strcasecmp($row['source_system'], $source_system) === 0)
+				{
+					$chosen_row = $row;
+					break;
+				}
+			}
+			if ($chosen_row === null)
+			{
+				$chosen_row = reset($rows);
+			}
+
+			$json = $chosen_row['metadata_json'] ?? '';
+			if (!empty($json))
+			{
+				$decoded = json_decode($json, true);
+				return is_array($decoded) ? $decoded : [];
+			}
 		}
 
 		return [];
+	}
+
+	/**
+	 * Get list of source system candidates/aliases for lookup resilience
+	 *
+	 * @param string $source_system
+	 * @return array
+	 */
+	public function get_source_system_candidates(string $source_system): array
+	{
+		$vb_aliases = ['vbulletin', 'vbulletin3', 'vbulletin4', 'vb3', 'vb4'];
+		$lower = strtolower($source_system);
+		if (in_array($lower, $vb_aliases, true))
+		{
+			$result = [$source_system];
+			foreach ($vb_aliases as $alias)
+			{
+				if (strcasecmp($alias, $source_system) !== 0)
+				{
+					$result[] = $alias;
+				}
+			}
+			return $result;
+		}
+
+		$xf_aliases = ['xenforo', 'xenforo2', 'xf', 'xf2'];
+		if (in_array($lower, $xf_aliases, true))
+		{
+			$result = [$source_system];
+			foreach ($xf_aliases as $alias)
+			{
+				if (strcasecmp($alias, $source_system) !== 0)
+				{
+					$result[] = $alias;
+				}
+			}
+			return $result;
+		}
+
+		return [$source_system];
 	}
 
 	/**

@@ -11,7 +11,7 @@ namespace phpbbseo\migrationcenter\core\dto;
 /**
  * Migration Configuration DTO
  */
-class migration_config_dto
+class migration_config_dto implements \JsonSerializable
 {
 	/** @var string */
 	public $source_system = 'xenforo';
@@ -93,13 +93,7 @@ class migration_config_dto
 	}
 
 	/**
-	 * Convert to array (never expose db_password!)
-	 *
-	 * @param bool $include_password
-	 * @return array
-	 */
-	/**
-	 * Convert to array (never expose db_password!)
+	 * Convert to array (never expose db_password by default!)
 	 *
 	 * @param bool $include_password
 	 * @return array
@@ -111,6 +105,28 @@ class migration_config_dto
 		{
 			unset($data['db_password']);
 		}
+		return $data;
+	}
+
+	/**
+	 * JSON serialization implementation
+	 *
+	 * @return array
+	 */
+	public function jsonSerialize(): array
+	{
+		return $this->to_array(false);
+	}
+
+	/**
+	 * Debug info redaction for var_dump and print_r
+	 *
+	 * @return array
+	 */
+	public function __debugInfo(): array
+	{
+		$data = $this->to_array(false);
+		$data['db_password'] = '[REDACTED]';
 		return $data;
 	}
 

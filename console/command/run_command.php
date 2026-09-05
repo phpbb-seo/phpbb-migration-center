@@ -50,7 +50,8 @@ class run_command extends Command
 			->addOption('db-port', null, InputOption::VALUE_OPTIONAL, 'Database port', 3306)
 			->addOption('db-name', null, InputOption::VALUE_OPTIONAL, 'Database name', '')
 			->addOption('db-user', null, InputOption::VALUE_OPTIONAL, 'Database username', '')
-			->addOption('db-pass', null, InputOption::VALUE_OPTIONAL, 'Database password', '')
+			->addOption('db-pass', null, InputOption::VALUE_OPTIONAL, 'Database password (discouraged, prefer --db-pass-env)')
+			->addOption('db-pass-env', null, InputOption::VALUE_OPTIONAL, 'Environment variable name holding database password')
 			->addOption('db-prefix', null, InputOption::VALUE_OPTIONAL, 'Database prefix', 'xf_')
 			->addOption('batch-size', null, InputOption::VALUE_REQUIRED, 'Batch size for processing', 500)
 			->addOption('step', null, InputOption::VALUE_IS_ARRAY | InputOption::VALUE_REQUIRED, 'Select specific steps to run')
@@ -59,7 +60,8 @@ class run_command extends Command
 			->addOption('min-id', null, InputOption::VALUE_OPTIONAL, 'Minimum source ID to process')
 			->addOption('max-id', null, InputOption::VALUE_OPTIONAL, 'Maximum source ID to process')
 			->addOption('dup-user', null, InputOption::VALUE_OPTIONAL, 'Duplicate username policy (rename, skip, merge, stop)', 'rename')
-			->addOption('dup-email', null, InputOption::VALUE_OPTIONAL, 'Duplicate email policy (keep, replace_placeholder, skip, stop)', 'keep');
+			->addOption('dup-email', null, InputOption::VALUE_OPTIONAL, 'Duplicate email policy (keep, replace_placeholder, skip, stop)', 'keep')
+			->addOption('auto-approve', null, InputOption::VALUE_NONE, 'Automatically approve stage transitions and run all stages to completion');
 	}
 
 	/**
@@ -86,24 +88,51 @@ class run_command extends Command
 		$config->db_port = (int)$input->getOption('db-port');
 		$config->db_name = (string)$input->getOption('db-name');
 		$config->db_user = (string)$input->getOption('db-user');
-		$config->db_password = (string)$input->getOption('db-pass');
-		$config->db_prefix = (string)$input->getOption('db-prefix');
 		$config->batch_size = $batch_size;
-		$config->dry_run = $dry_run;
+		$is_vb = in_array(strtolower($source), ['vbulletin', 'vbulletin3', 'vbulletin4', 'vb3', 'vb4'], true);
+		$config->db_prefix = ($is_vb && $input->getOption('db-prefix') === 'xf_') ? '' : (string)$input->getOption('db-prefix');
+		$config->dry_run   = (bool)$input->getOption('dry-run');
 		$config->duplicate_username_policy = (string)$input->getOption('dup-user');
 		$config->duplicate_email_policy = (string)$input->getOption('dup-email');
 
-		if (!empty($config->source_path) && empty($config->db_name))
+		// Resolve database password securely
+		$pass_env = (string)$input->getOption('db-pass-env');
+		$raw_pass = (string)$input->getOption('db-pass');
+
+		if (!empty($pass_env))
 		{
-			$detected = \phpbbseo\migrationcenter\source\xenforo\config\xf_config_detector::detect_from_path($config->source_path);
+			$env_val = getenv($pass_env);
+			if ($env_val === false || $env_val === '')
+			{
+				$io->error("Environment variable '{$pass_env}' is not set or empty.");
+				return 1;
+			}
+			$config->db_password = $env_val;
+		}
+		else if (!empty($raw_pass))
+		{
+			$config->db_password = $raw_pass;
+			$io->warning('Passing plaintext passwords directly via --db-pass is discouraged as command line arguments may be logged in shell history. Prefer using --db-pass-env=VARIABLE_NAME or automatic configuration detection.');
+		}
+		else if (!empty($config->source_path) && empty($config->db_password))
+		{
+			if ($is_vb)
+			{
+				$detected = \phpbbseo\migrationcenter\source\vbulletin\config\vb_config_detector::detect_from_path($config->source_path);
+			}
+			else
+			{
+				$detected = \phpbbseo\migrationcenter\source\xenforo\config\xf_config_detector::detect_from_path($config->source_path);
+			}
+
 			if ($detected)
 			{
-				$config->db_host = $detected->db_host;
-				$config->db_port = $detected->db_port;
-				$config->db_name = $detected->db_name;
-				$config->db_user = $detected->db_user;
-				$config->db_password = $detected->db_password;
-				$config->db_prefix = $detected->db_prefix;
+				if (empty($config->db_host)) $config->db_host = $detected->db_host;
+				if (empty($config->db_port) || $config->db_port === 3306) $config->db_port = $detected->db_port;
+				if (empty($config->db_name)) $config->db_name = $detected->db_name;
+				if (empty($config->db_user)) $config->db_user = $detected->db_user;
+				if (empty($config->db_password)) $config->db_password = $detected->db_password;
+				if (empty($config->db_prefix) || $config->db_prefix === 'xf_') $config->db_prefix = $detected->db_prefix;
 			}
 		}
 
@@ -119,33 +148,59 @@ class run_command extends Command
 
 			// Process continuous batches
 			$is_complete = false;
-			$total_imported = 0;
-			$total_skipped = 0;
-			$total_failed = 0;
+			$total_processed = 0;
+			$worker_token = 'cli_' . getmypid() . '_' . substr(md5(uniqid('', true)), 0, 8);
 
 			while (!$is_complete)
 			{
-				$batch_res = $this->engine->execute_next_batch($run->run_id, $batch_size);
-				if ($batch_res['completed'])
+				$batch_res = $this->engine->execute_next_batch($run->run_id, 'cli', $batch_size, $worker_token);
+
+				if (!$batch_res['success'])
+				{
+					$io->error("Batch execution error: " . ($batch_res['error'] ?? 'Unknown error'));
+					return 1;
+				}
+
+				$total_processed = $batch_res['processed'] ?? 0;
+				$stage_name = ucfirst(str_replace('_', ' ', $batch_res['stage_key'] ?? $batch_res['step_name'] ?? 'groups'));
+
+				$io->writeln(sprintf(
+					"[%s] Processed: %d / %d | Created: %d | Reused: %d | Skipped: %d | Failed: %d",
+					$stage_name,
+					$total_processed,
+					$batch_res['total'] ?? $total_processed,
+					$batch_res['created'] ?? 0,
+					$batch_res['reused'] ?? 0,
+					$batch_res['skipped'] ?? 0,
+					$batch_res['failed'] ?? 0
+				));
+
+				if (!empty($batch_res['completed']))
 				{
 					$is_complete = true;
-					$io->success($batch_res['message'] ?? 'Migration completed.');
+					$io->success("Migration run {$run->run_id} completed successfully.");
 				}
-				else
+				else if (!empty($batch_res['stage_completed']) || !empty($batch_res['awaiting_approval']))
 				{
-					$total_imported += $batch_res['imported_count'];
-					$total_skipped += $batch_res['skipped_count'];
-					$total_failed += $batch_res['failed_count'];
+					$next_stage = $batch_res['next_stage'] ?? null;
+					$auto_approve = (bool)$input->getOption('auto-approve');
 
-					$io->writeln(sprintf(
-						"Step [%s]: Read %d, Imported %d, Skipped %d, Failed %d (Cursor: %s)",
-						$batch_res['step_name'],
-						$batch_res['read_count'],
-						$batch_res['imported_count'],
-						$batch_res['skipped_count'],
-						$batch_res['failed_count'],
-						$batch_res['next_cursor']
-					));
+					if ($auto_approve && !empty($next_stage))
+					{
+						$io->success("Stage [{$stage_name}] completed successfully.");
+						$this->engine->approve_stage_continuation($run->run_id, $next_stage);
+						$io->section("Starting stage: " . ucfirst(str_replace('_', ' ', $next_stage)));
+					}
+					else if (empty($next_stage))
+					{
+						$is_complete = true;
+						$io->success("All stages completed successfully.");
+					}
+					else
+					{
+						$is_complete = true;
+						$io->success("Stage [{$stage_name}] completed successfully. Run state: awaiting_approval.");
+					}
 				}
 			}
 

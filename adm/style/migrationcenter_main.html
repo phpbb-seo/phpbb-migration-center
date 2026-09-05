@@ -1221,18 +1221,36 @@
 						<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 16px; margin-bottom: 20px;">
 							<div>
 								<label for="source_system" style="display: block; font-weight: 600; margin-bottom: 4px;">{L_SOURCE_SYSTEM}</label>
-								<select id="source_system" name="source_system" class="inputbox" style="width: 100%; padding: 6px 10px;">
+								<select id="source_system" name="source_system" class="inputbox" style="width: 100%; padding: 6px 10px;" onchange="
+									var p = document.getElementById('source_path');
+									var prf = document.getElementById('table_prefix') || document.getElementById('db_prefix');
+									var val = this.value;
+									var isVb = (val === 'vbulletin3' || val === 'vb3' || val === 'vbulletin4' || val === 'vb4');
+									if (isVb) {
+										if (prf && prf.value === 'xf_') { prf.value = ''; }
+										if (p && (p.value.indexOf('xen') !== -1 || p.value.indexOf('xf') !== -1)) { p.value = ''; }
+										if (p && !p.value) { p.placeholder = 'e.g. /var/www/vbulletin or ../vb'; }
+									} else {
+										if (prf && prf.value === '') { prf.value = 'xf_'; }
+										if (p && p.value.indexOf('vb') !== -1) { p.value = ''; }
+										if (p && !p.value) { p.placeholder = 'e.g. /var/www/xenforo or ../xenforo'; }
+									}
+								">
 									<option value="xenforo" <!-- IF SOURCE_SYSTEM == 'xenforo' -->selected="selected"<!-- ENDIF -->>XenForo 2.x</option>
+									<option value="vbulletin3" <!-- IF SOURCE_SYSTEM == 'vbulletin3' || SOURCE_SYSTEM == 'vb3' -->selected="selected"<!-- ENDIF -->>vBulletin 3.8.x</option>
+									<option value="vbulletin4" <!-- IF SOURCE_SYSTEM == 'vbulletin4' || SOURCE_SYSTEM == 'vb4' -->selected="selected"<!-- ENDIF -->>vBulletin 4.2.x</option>
 								</select>
 							</div>
 
 							<div>
 								<label for="source_path" style="display: block; font-weight: 600; margin-bottom: 4px;">{L_SOURCE_ROOT_PATH}</label>
 								<div style="display: flex; gap: 8px;">
-									<input type="text" id="source_path" name="source_path" value="{SOURCE_PATH}" class="inputbox" style="flex: 1; padding: 6px 10px;" />
-									<button type="submit" formaction="{U_WIZARD_ACTION}&amp;step=2&amp;action=autodetect" class="mc-btn mc-btn-secondary" style="padding: 6px 12px; font-size: 12px;">{L_AUTODETECT_CONFIG}</button>
+									<input type="text" id="source_path" name="source_path" value="{SOURCE_PATH}" class="inputbox" style="flex: 1; padding: 6px 10px;" placeholder="e.g. /var/www/forum or ../forum" />
+									<button type="submit" name="autodetect_btn" value="1" formaction="{U_WIZARD_ACTION}&amp;step=2&amp;action=autodetect" class="mc-btn mc-btn-secondary" style="padding: 6px 12px; font-size: 12px;">{L_AUTODETECT_CONFIG}</button>
 								</div>
-								<span style="font-size: 11px; color: var(--mc-text-muted);">{L_SOURCE_ROOT_PATH_EXPLAIN}</span>
+								<div style="margin-top: 4px; font-size: 11px; color: var(--mc-text-muted);">
+									{L_SOURCE_ROOT_PATH_EXPLAIN}
+								</div>
 							</div>
 
 							<div>
@@ -1497,7 +1515,7 @@
 						<span class="mc-hero-counts" id="overall-counts-text">&mdash; {TOTAL_IMPORTED} of {TOTAL_RECORDS} {L_RECORDS}</span>
 					</div>
 					<div>
-						<span style="font-size: 13px; color: var(--mc-text-muted);">{L_CURRENT_STAGE}: <strong style="color: var(--mc-primary); font-size: 14px;" id="curr-stage-text">{CURRENT_STEP_LABEL}</strong> ({CURRENT_STEP})</span>
+						<span style="font-size: 13px; color: var(--mc-text-muted);">{L_CURRENT_STAGE}: <strong style="color: var(--mc-primary); font-size: 14px;" id="curr-stage-text">{CURRENT_STEP_LABEL}</strong> (<span id="curr-stage-progress">Stage {CURRENT_STAGE_NUM} of {TOTAL_STAGES_COUNT}</span> &bull; {CURRENT_STEP})</span>
 					</div>
 				</div>
 
@@ -1787,7 +1805,12 @@
 						<div class="mc-destructive-group">
 							<form action="{U_PROGRESS_ACTION}" method="post" style="display: inline; margin: 0;">
 								{S_FORM_TOKEN}
-								<button type="submit" name="confirm_cancel" value="1" class="mc-btn mc-btn-destructive-ghost" onclick="return confirm('Cancel this migration?');">{L_MIGRATION_CANCEL_BUTTON}</button>
+								<!-- IF CAN_CANCEL -->
+									<button type="submit" name="confirm_cancel" value="1" class="mc-btn mc-btn-destructive-ghost" onclick="return confirm('Cancel this migration? Already imported data will be preserved.');">{L_MIGRATION_CANCEL_BUTTON}</button>
+								<!-- ENDIF -->
+								<!-- IF CAN_FAST_RESET -->
+									<button type="submit" name="confirm_fast_reset" value="1" class="mc-btn mc-btn-destructive-ghost" onclick="return confirm('Abandon this zero-import run and start over?');">{L_MIGRATION_FAST_RESET_BUTTON}</button>
+								<!-- ENDIF -->
 							</form>
 						</div>
 					</div>
@@ -1808,7 +1831,12 @@
 						<div class="mc-destructive-group">
 							<form action="{U_PROGRESS_ACTION}" method="post" style="display: inline; margin: 0;">
 								{S_FORM_TOKEN}
-								<button type="submit" name="confirm_cancel" value="1" class="mc-btn mc-btn-destructive-ghost" onclick="return confirm('Cancel this migration?');">{L_MIGRATION_CANCEL_BUTTON}</button>
+								<!-- IF CAN_CANCEL -->
+									<button type="submit" name="confirm_cancel" value="1" class="mc-btn mc-btn-destructive-ghost" onclick="return confirm('Cancel this migration? Already imported data will be preserved.');">{L_MIGRATION_CANCEL_BUTTON}</button>
+								<!-- ENDIF -->
+								<!-- IF CAN_FAST_RESET -->
+									<button type="submit" name="confirm_fast_reset" value="1" class="mc-btn mc-btn-destructive-ghost" onclick="return confirm('Abandon this zero-import run and start over?');">{L_MIGRATION_FAST_RESET_BUTTON}</button>
+								<!-- ENDIF -->
 							</form>
 						</div>
 					</div>
@@ -1849,7 +1877,67 @@
 						<div class="mc-destructive-group">
 							<form action="{U_PROGRESS_ACTION}" method="post" style="display: inline; margin: 0;">
 								{S_FORM_TOKEN}
-								<button type="submit" name="confirm_cancel" value="1" class="mc-btn mc-btn-destructive-ghost" onclick="return confirm('Cancel this migration?');">{L_MIGRATION_CANCEL_BUTTON}</button>
+								<!-- IF CAN_CANCEL -->
+									<button type="submit" name="confirm_cancel" value="1" class="mc-btn mc-btn-destructive-ghost" onclick="return confirm('Cancel this migration? Already imported data will be preserved.');">{L_MIGRATION_CANCEL_BUTTON}</button>
+								<!-- ENDIF -->
+								<!-- IF CAN_FAST_RESET -->
+									<button type="submit" name="confirm_fast_reset" value="1" class="mc-btn mc-btn-destructive-ghost" onclick="return confirm('Abandon this zero-import run and start over?');">{L_MIGRATION_FAST_RESET_BUTTON}</button>
+								<!-- ENDIF -->
+							</form>
+							<!-- IF CAN_ROLLBACK -->
+								<a href="{U_CONFIRM_ROLLBACK}" class="mc-btn mc-btn-destructive-ghost">{L_MIGRATION_ROLLBACK_BUTTON}</a>
+							<!-- ENDIF -->
+						</div>
+					</div>
+				</div>
+
+			<!-- ELSEIF RUN_STATUS == 'interrupted' or IS_STALE or RUN_STATUS == 'failed' -->
+				<div class="mc-hero-actions-card stage-warning" id="hero-action-panel">
+					<div class="mc-checkpoint-header">
+						<h3 class="mc-checkpoint-title">
+							<!-- IF RUN_STATUS == 'failed' -->
+								&#10060; {L_MIGRATION_STAGE_FAILED}: <code>{CURRENT_STEP_LABEL}</code>
+							<!-- ELSE -->
+								&#9888; {L_INTERRUPTED}: <code>{CURRENT_STEP_LABEL}</code>
+							<!-- ENDIF -->
+						</h3>
+						<span class="status-badge status-<!-- IF RUN_STATUS == 'failed' -->failed<!-- ELSE -->interrupted<!-- ENDIF -->">
+							<!-- IF RUN_STATUS == 'failed' -->Failed<!-- ELSE -->{L_INTERRUPTED}<!-- ENDIF -->
+						</span>
+					</div>
+					<p style="margin: 0 0 16px 0; font-size: 13px; color: var(--mc-text-muted);">
+						<!-- IF RUN_STATUS == 'failed' -->
+							An error occurred while processing this stage. You can retry processing, switch to CLI worker, or cancel the migration.
+						<!-- ELSE -->
+							The worker was interrupted or timed out. You can resume processing from where it left off, or cancel/abandon this migration.
+						<!-- ENDIF -->
+					</p>
+
+					<div class="mc-unified-toolbar">
+						<div class="mc-primary-group">
+							<!-- IF WORKER_MODE == 'ajax' -->
+								<button type="button" id="btn-start-ajax" class="mc-btn mc-btn-primary" style="font-size: 14px; padding: 10px 22px;" onclick="startAjaxRunner();">
+									&#9654; {L_MIGRATION_RESUME_BUTTON} &raquo;
+								</button>
+							<!-- ELSE -->
+								<form action="{U_PROGRESS_ACTION}" method="post" style="display: inline; margin: 0;">
+									{S_FORM_TOKEN}
+									<input type="hidden" name="expected_stage" value="{CURRENT_STEP}" />
+									<button type="submit" name="confirm_prepare_cli" value="1" class="mc-btn mc-btn-primary" style="font-size: 14px; padding: 10px 22px;">
+										{PREPARE_CLI_STAGE_LABEL} &raquo;
+									</button>
+								</form>
+							<!-- ENDIF -->
+						</div>
+						<div class="mc-destructive-group">
+							<form action="{U_PROGRESS_ACTION}" method="post" style="display: inline; margin: 0;">
+								{S_FORM_TOKEN}
+								<!-- IF CAN_CANCEL -->
+									<button type="submit" name="confirm_cancel" value="1" class="mc-btn mc-btn-destructive-ghost" onclick="return confirm('Cancel this migration? Already imported data will be preserved.');">{L_MIGRATION_CANCEL_BUTTON}</button>
+								<!-- ENDIF -->
+								<!-- IF CAN_FAST_RESET -->
+									<button type="submit" name="confirm_fast_reset" value="1" class="mc-btn mc-btn-destructive-ghost" onclick="return confirm('Abandon this zero-import run and start over?');">{L_MIGRATION_FAST_RESET_BUTTON}</button>
+								<!-- ENDIF -->
 							</form>
 							<!-- IF CAN_ROLLBACK -->
 								<a href="{U_CONFIRM_ROLLBACK}" class="mc-btn mc-btn-destructive-ghost">{L_MIGRATION_ROLLBACK_BUTTON}</a>
@@ -2536,6 +2624,13 @@ function updateProgressUi(data) {
 	if (data.current_step_lbl) {
 		var stg = document.getElementById('curr-stage-text');
 		if (stg) stg.textContent = data.current_step_lbl;
+	}
+
+	if (data.current_stage_num !== undefined && data.total_stages_count !== undefined) {
+		var stgProg = document.getElementById('curr-stage-progress');
+		if (stgProg) {
+			stgProg.textContent = 'Stage ' + data.current_stage_num + ' of ' + data.total_stages_count;
+		}
 	}
 
 	if (data.heartbeat_age !== undefined) {

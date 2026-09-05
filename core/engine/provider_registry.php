@@ -37,7 +37,27 @@ class provider_registry
 	 */
 	public function get(string $system_name): ?source_provider_interface
 	{
-		return $this->providers[$system_name] ?? null;
+		if (isset($this->providers[$system_name]))
+		{
+			return $this->providers[$system_name];
+		}
+		if (($system_name === 'vb3' || $system_name === 'vbulletin3') && isset($this->providers['vbulletin3']))
+		{
+			return $this->providers['vbulletin3'];
+		}
+		if (($system_name === 'vb4' || $system_name === 'vbulletin4') && isset($this->providers['vbulletin4']))
+		{
+			return $this->providers['vbulletin4'];
+		}
+		if ($system_name === 'vbulletin')
+		{
+			return $this->providers['vbulletin'] ?? $this->providers['vbulletin4'] ?? $this->providers['vbulletin3'] ?? null;
+		}
+		if (in_array($system_name, ['vb3', 'vb4', 'vbulletin3', 'vbulletin4'], true) && isset($this->providers['vbulletin']))
+		{
+			return $this->providers['vbulletin'];
+		}
+		return null;
 	}
 
 	/**
@@ -58,6 +78,14 @@ class provider_registry
 	 */
 	public function has(string $system_name): bool
 	{
-		return isset($this->providers[$system_name]);
+		if (isset($this->providers[$system_name]))
+		{
+			return true;
+		}
+		if (in_array($system_name, ['vbulletin', 'vb3', 'vb4', 'vbulletin3', 'vbulletin4'], true))
+		{
+			return isset($this->providers['vbulletin3']) || isset($this->providers['vbulletin4']) || isset($this->providers['vbulletin']);
+		}
+		return false;
 	}
 }

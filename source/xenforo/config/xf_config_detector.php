@@ -23,10 +23,22 @@ class xf_config_detector
 	 */
 	public static function detect_from_path(string $source_path): ?migration_config_dto
 	{
-		$source_path = rtrim(str_replace('\\', '/', $source_path), '/');
+		$clean_path = trim($source_path, " \t\n\r\0\x0B\"'");
+		$source_path = str_replace('\\', '/', $clean_path);
+
+		if (preg_match('#/src/config\.php$#i', $source_path))
+		{
+			$source_path = preg_replace('#/src/config\.php$#i', '', $source_path);
+		}
+		else if (preg_match('#/src/?$#i', $source_path))
+		{
+			$source_path = preg_replace('#/src/?$#i', '', $source_path);
+		}
+
+		$source_path = rtrim($source_path, '/');
 		$config_file = $source_path . '/src/config.php';
 
-		if (!file_exists($config_file) || !is_readable($config_file))
+		if (empty($source_path) || !file_exists($config_file) || !is_readable($config_file))
 		{
 			return null;
 		}

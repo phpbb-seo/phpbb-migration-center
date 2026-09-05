@@ -18,46 +18,124 @@ class step_registry
 	/** @var step_interface[] */
 	protected $steps = [];
 
+	/** @var array<string, array<string, step_interface>> */
+	protected $provider_steps = [];
+
 	/**
-	 * Register a step
+	 * Register a step (optionally scoped to a provider system name)
 	 *
 	 * @param step_interface $step
+	 * @param string $provider
 	 * @return void
 	 */
-	public function register(step_interface $step): void
+	public function register(step_interface $step, string $provider = ''): void
 	{
-		$this->steps[$step->get_name()] = $step;
+		if ($provider === '' || $provider === 'xenforo')
+		{
+			$this->steps[$step->get_name()] = $step;
+		}
+
+		if ($provider !== '')
+		{
+			$this->provider_steps[$provider][$step->get_name()] = $step;
+		}
 	}
 
 	/**
-	 * Get a step by name
+	 * Explicitly generic shared steps
+	 */
+	protected const GENERIC_SHARED_STEPS = [
+		'finalization',
+		'search_index',
+		'final_verification',
+	];
+
+	/**
+	 * Get a step by name (optionally provider-scoped)
 	 *
 	 * @param string $name
+	 * @param string|null $provider
 	 * @return step_interface|null
 	 */
-	public function get(string $name): ?step_interface
+	public function get(string $name, ?string $provider = null): ?step_interface
 	{
+		if ($provider !== null && $provider !== '')
+		{
+			if (isset($this->provider_steps[$provider][$name]))
+			{
+				return $this->provider_steps[$provider][$name];
+			}
+			// vBulletin aliases fallback to vbulletin provider steps
+			if (in_array($provider, ['vbulletin3', 'vbulletin4', 'vb3', 'vb4'], true) && isset($this->provider_steps['vbulletin'][$name]))
+			{
+				return $this->provider_steps['vbulletin'][$name];
+			}
+			// Generic fallback allowed ONLY for explicitly generic shared steps
+			if (in_array($name, self::GENERIC_SHARED_STEPS, true) && isset($this->steps[$name]))
+			{
+				return $this->steps[$name];
+			}
+			// XenForo legacy service fallback for registered XenForo steps
+			if ($provider === 'xenforo' && isset($this->steps[$name]))
+			{
+				return $this->steps[$name];
+			}
+			return null;
+		}
 		return $this->steps[$name] ?? null;
 	}
 
 	/**
 	 * Get all registered steps
 	 *
+	 * @param string|null $provider
 	 * @return step_interface[]
 	 */
-	public function get_all(): array
+	public function get_all(?string $provider = null): array
 	{
+		if ($provider !== null)
+		{
+			if (isset($this->provider_steps[$provider]))
+			{
+				return $this->provider_steps[$provider];
+			}
+			if (in_array($provider, ['vbulletin3', 'vbulletin4', 'vb3', 'vb4'], true) && isset($this->provider_steps['vbulletin']))
+			{
+				return $this->provider_steps['vbulletin'];
+			}
+		}
 		return $this->steps;
 	}
 
 	/**
-	 * Check if step exists
+	 * Check if step exists (optionally provider-scoped)
 	 *
 	 * @param string $name
+	 * @param string|null $provider
 	 * @return bool
 	 */
-	public function has(string $name): bool
+	public function has(string $name, ?string $provider = null): bool
 	{
+		if ($provider !== null && $provider !== '')
+		{
+			if (isset($this->provider_steps[$provider][$name]))
+			{
+				return true;
+			}
+			if (in_array($provider, ['vbulletin3', 'vbulletin4', 'vb3', 'vb4'], true) && isset($this->provider_steps['vbulletin'][$name]))
+			{
+				return true;
+			}
+			if (in_array($name, self::GENERIC_SHARED_STEPS, true) && isset($this->steps[$name]))
+			{
+				return true;
+			}
+			if ($provider === 'xenforo' && isset($this->steps[$name]))
+			{
+				return true;
+			}
+			return false;
+		}
 		return isset($this->steps[$name]);
 	}
 

@@ -315,7 +315,7 @@ class migration_engine
 		}
 
 		$step_name = $current_step_row['step_name'];
-		$step = $this->step_registry->get($step_name);
+		$step = $this->step_registry->get($step_name, $run->source_system);
 		if (!$step)
 		{
 			throw new \RuntimeException("Step handler not registered for: {$step_name}");
@@ -416,6 +416,11 @@ class migration_engine
 			];
 		}
 
+		$step_stats = !empty($updated_step['stats_json']) ? (json_decode($updated_step['stats_json'], true) ?: []) : [];
+		$reused_c = (int)($step_stats['reused'] ?? 0);
+		$created_c = isset($step_stats['created']) ? (int)$step_stats['created'] : max(0, $imp - $reused_c);
+		$updated_c = (int)($step_stats['updated'] ?? 0);
+
 		return [
 			'success'           => true,
 			'run_id'            => $run_id,
@@ -425,9 +430,9 @@ class migration_engine
 			'stage_status'      => 'running',
 			'cursor'            => (string)$result->next_cursor,
 			'processed'         => $proc,
-			'created'           => $imp,
-			'reused'            => 0,
-			'updated'           => 0,
+			'created'           => $created_c,
+			'reused'            => $reused_c,
+			'updated'           => $updated_c,
 			'skipped'           => $skp,
 			'failed'            => $fld,
 			'total'             => $tot,

@@ -69,6 +69,26 @@ class IdMapperTest
 			throw new \Exception("Metadata round trip failed: " . json_encode($retrieved_meta));
 		}
 
+		// Test 7: Source system candidate alias resolution (vbulletin4 -> vbulletin, vb4)
+		$mapper->set($test_run_id, 'vbulletin4', 'user', 88001, 77001, 'mapped');
+		// Clear memory cache to test SQL lookup with alias
+		$mapper->clear_cache();
+		$alias_target = $mapper->get_target_id('vbulletin', 'user', 88001);
+		if ((string)$alias_target !== '77001')
+		{
+			throw new \Exception("Alias get_target_id('vbulletin') failed. Got: " . var_export($alias_target, true));
+		}
+		$alias_target_vb3 = $mapper->get_target_id('vbulletin3', 'user', 88001);
+		if ((string)$alias_target_vb3 !== '77001')
+		{
+			throw new \Exception("Alias get_target_id('vbulletin3') failed. Got: " . var_export($alias_target_vb3, true));
+		}
+		$alias_source = $mapper->get_source_id('vbulletin', 'user', 77001);
+		if ((string)$alias_source !== '88001')
+		{
+			throw new \Exception("Alias get_source_id('vbulletin') failed. Got: " . var_export($alias_source, true));
+		}
+
 		// Clean up test records
 		$db->sql_query("DELETE FROM {$table_prefix}migration_id_map WHERE run_id = '{$test_run_id}'");
 

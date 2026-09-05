@@ -122,8 +122,12 @@ $lang = array_merge($lang, array(
 
 	'WIZARD_STEP_2_TITLE'          => 'Step 2: Source System & Database Configuration',
 	'SOURCE_SYSTEM'                => 'Source System',
+	'SOURCE_SYSTEM_XENFORO'        => 'XenForo 2.x',
+	'SOURCE_SYSTEM_VBULLETIN3'     => 'vBulletin 3.8.x',
+	'SOURCE_SYSTEM_VBULLETIN4'     => 'vBulletin 4.2.x',
+	'SOURCE_SYSTEM_VBULLETIN'      => 'vBulletin',
 	'SOURCE_ROOT_PATH'             => 'Source Root Directory Path',
-	'SOURCE_ROOT_PATH_EXPLAIN'     => 'Full server path to the source forum installation (e.g. C:\xampp\htdocs\xen).',
+	'SOURCE_ROOT_PATH_EXPLAIN'     => 'Full server path to the source forum installation (e.g. /var/www/forum or C:\forum).',
 	'AUTODETECT_CONFIG'            => 'Auto-Detect Configuration',
 	'AUTODETECT_SUCCESS'           => 'Source configuration successfully detected from local config file.',
 	'AUTODETECT_ERROR'             => 'Could not detect source configuration from the provided path.',

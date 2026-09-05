@@ -378,7 +378,18 @@ class state_manager
 		if (!empty($stats))
 		{
 			$existing_stats = !empty($step['stats_json']) ? (json_decode($step['stats_json'], true) ?: []) : [];
-			$data['stats_json'] = json_encode(array_merge($existing_stats, $stats), JSON_UNESCAPED_UNICODE);
+			foreach ($stats as $k => $v)
+			{
+				if (in_array($k, ['created', 'reused', 'updated', 'skipped', 'failed', 'permanently_failed', 'retryable_failures'], true) && is_numeric($v))
+				{
+					$existing_stats[$k] = (int)($existing_stats[$k] ?? 0) + (int)$v;
+				}
+				else
+				{
+					$existing_stats[$k] = $v;
+				}
+			}
+			$data['stats_json'] = json_encode($existing_stats, JSON_UNESCAPED_UNICODE);
 		}
 
 		$sql = 'UPDATE ' . $this->table_steps . '
@@ -511,12 +522,17 @@ class state_manager
 		$completed_at = time();
 		$elapsed = max(1, $completed_at - $started_at);
 
-		$reused = isset($extra_stats['reused']) ? (int)$extra_stats['reused'] : 0;
-		$created = isset($extra_stats['created']) ? (int)$extra_stats['created'] : max(0, $imported - $reused);
-		$updated = isset($extra_stats['updated']) ? (int)$extra_stats['updated'] : 0;
+		$step_stats = !empty($step['stats_json']) ? (json_decode($step['stats_json'], true) ?: []) : [];
+		$reused = isset($step_stats['reused']) ? (int)$step_stats['reused'] : (isset($extra_stats['reused']) ? (int)$extra_stats['reused'] : 0);
+		$created = isset($step_stats['created']) ? (int)$step_stats['created'] : (isset($extra_stats['created']) ? (int)$extra_stats['created'] : max(0, $imported - $reused));
+		$updated = isset($step_stats['updated']) ? (int)$step_stats['updated'] : (isset($extra_stats['updated']) ? (int)$extra_stats['updated'] : 0);
 		$permanently_failed = $failed;
-		$retryable_failures = isset($extra_stats['retryable_failures']) ? (int)$extra_stats['retryable_failures'] : 0;
+		$retryable_failures = isset($step_stats['retryable_failures']) ? (int)$step_stats['retryable_failures'] : (isset($extra_stats['retryable_failures']) ? (int)$extra_stats['retryable_failures'] : 0);
 
+		if (($created + $reused + $updated) !== $imported)
+		{
+			$created = max(0, $imported - $reused - $updated);
+		}
 		$processed = $created + $reused + $updated + $skipped + $permanently_failed;
 		$rate = round($processed / $elapsed, 2);
 

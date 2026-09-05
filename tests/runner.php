@@ -16,7 +16,7 @@ function clean_test_db($test_db, $test_prefix)
 	$test_db->sql_query("DELETE FROM {$test_prefix}migration_errors");
 	$test_db->sql_query("DELETE FROM {$test_prefix}migration_locks");
 	$test_db->sql_query("DELETE FROM {$test_prefix}groups WHERE group_id > 7");
-	$test_db->sql_query("DELETE FROM {$test_prefix}users WHERE user_id > 2 AND user_type = 0");
+	$test_db->sql_query("DELETE FROM {$test_prefix}users WHERE user_id > 2 AND user_type <> 2");
 	$test_db->sql_query("UPDATE {$test_prefix}users SET username = 'admin', username_clean = 'admin' WHERE user_id = 2");
 
 	if (!empty($phpbb_container) && $phpbb_container->has('phpbbseo.migrationcenter.id_mapper'))
@@ -763,6 +763,208 @@ catch (\Exception $e)
 	$failed++;
 	echo "FAILED: " . $e->getMessage() . "\n";
 }
+
+clean_test_db($test_db, $test_prefix);
+// Test 40: vBulletin Group Normalizer & Hex Color Extraction Test
+$total++;
+echo "[RUN] VbGroupNormalizerTest... ";
+try
+{
+	$test = new \phpbbseo\migrationcenter\tests\unit\source\vbulletin\vb_group_normalizer_test();
+	$res = $test->run();
+	foreach ($res as $chk => $ok) {
+		if (!$ok) throw new \Exception("Assertion {$chk} failed");
+	}
+	$passed++;
+	echo "PASSED\n";
+}
+catch (\Throwable $e)
+{
+	$failed++;
+	echo "FAILED: " . $e->getMessage() . "\n";
+}
+
+clean_test_db($test_db, $test_prefix);
+// Test 41: vBulletin Configuration Detector & Credential Containment Test
+$total++;
+echo "[RUN] VbConfigDetectorTest... ";
+try
+{
+	$test = new \phpbbseo\migrationcenter\tests\unit\source\vbulletin\vb_config_detector_test();
+	$res = $test->run();
+	foreach ($res as $chk => $ok) {
+		if (!$ok) throw new \Exception("Assertion {$chk} failed");
+	}
+	$passed++;
+	echo "PASSED\n";
+}
+catch (\Throwable $e)
+{
+	$failed++;
+	echo "FAILED: " . $e->getMessage() . "\n";
+}
+
+clean_test_db($test_db, $test_prefix);
+// Test 42: vBulletin Version Detector & Platform Classification Test
+$total++;
+echo "[RUN] VbVersionDetectorTest... ";
+try
+{
+	$test = new \phpbbseo\migrationcenter\tests\unit\source\vbulletin\vb_version_detector_test();
+	$res = $test->run();
+	foreach ($res as $chk => $ok) {
+		if (!$ok) throw new \Exception("Assertion {$chk} failed");
+	}
+	$passed++;
+	echo "PASSED\n";
+}
+catch (\Throwable $e)
+{
+	$failed++;
+	echo "FAILED: " . $e->getMessage() . "\n";
+}
+
+clean_test_db($test_db, $test_prefix);
+// Test 43: vBulletin DB Adapter & MySQL Engine-Level Read-Only Rejection Test
+$total++;
+echo "[RUN] VbDbAdapterAndPermissionsTest... ";
+try
+{
+	$test = new \phpbbseo\migrationcenter\tests\unit\source\vbulletin\vb_db_adapter_test();
+	$res = $test->run();
+	foreach ($res as $chk => $ok) {
+		if (!$ok) throw new \Exception("Assertion {$chk} failed");
+	}
+	$passed++;
+	echo "PASSED\n";
+}
+catch (\Throwable $e)
+{
+	$failed++;
+	echo "FAILED: " . $e->getMessage() . "\n";
+}
+
+clean_test_db($test_db, $test_prefix);
+// Test 44: vBulletin Preflight, Edge-Cases & Source Counts Integration Test
+$total++;
+echo "[RUN] VbPreflightAndCountsIntegrationTest... ";
+try
+{
+	$test = new \phpbbseo\migrationcenter\tests\integration\source\vbulletin\vb_preflight_and_counts_test();
+	$res = $test->run();
+	foreach ($res as $chk => $ok) {
+		if (!$ok) throw new \Exception("Assertion {$chk} failed");
+	}
+	$passed++;
+	echo "PASSED\n";
+}
+catch (\Throwable $e)
+{
+	$failed++;
+	echo "FAILED: " . $e->getMessage() . "\n";
+}
+
+clean_test_db($test_db, $test_prefix);
+// Test 45: vBulletin Groups Step, Pre-existing Groups Preservation & Rollback Integration Test
+$total++;
+echo "[RUN] VbGroupsStepAndRollbackIntegrationTest... ";
+try
+{
+	$test = new \phpbbseo\migrationcenter\tests\integration\source\vbulletin\vb_groups_step_test();
+	$res = $test->run();
+	foreach ($res as $chk => $ok) {
+		if (!$ok) throw new \Exception("Assertion {$chk} failed");
+	}
+	$passed++;
+	echo "PASSED\n";
+}
+catch (\Throwable $e)
+{
+	$failed++;
+	echo "FAILED: " . $e->getMessage() . "\n";
+}
+
+clean_test_db($test_db, $test_prefix);
+// Test 46: vBulletin Password Driver & Legacy Encoding Test
+$total++;
+echo "[RUN] VbPasswordDriverTest... ";
+try
+{
+	$test = new \phpbbseo\migrationcenter\tests\unit\source\vbulletin\VbPasswordDriverTest();
+	$res = $test->run();
+	foreach ($res as $chk => $ok) {
+		if (!$ok) throw new \Exception("Assertion {$chk} failed");
+	}
+	$passed++;
+	echo "PASSED\n";
+}
+catch (\Throwable $e)
+{
+	$failed++;
+	echo "FAILED: " . $e->getMessage() . "\n";
+}
+
+clean_test_db($test_db, $test_prefix);
+// Test 47: vBulletin User Normalizer Test
+$total++;
+echo "[RUN] VbUserNormalizerTest... ";
+try
+{
+	$test = new \phpbbseo\migrationcenter\tests\unit\source\vbulletin\VbUserNormalizerTest();
+	$res = $test->run();
+	foreach ($res as $chk => $ok) {
+		if (!$ok) throw new \Exception("Assertion {$chk} failed");
+	}
+	$passed++;
+	echo "PASSED\n";
+}
+catch (\Throwable $e)
+{
+	$failed++;
+	echo "FAILED: " . $e->getMessage() . "\n";
+}
+
+clean_test_db($test_db, $test_prefix);
+// Test 48: vBulletin Users Step, Keyset Pagination, Inactive States & Rollback Test
+$total++;
+echo "[RUN] VbUsersStepIntegrationTest... ";
+try
+{
+	$test = new \phpbbseo\migrationcenter\tests\integration\source\vbulletin\vb_users_step_test();
+	$res = $test->run();
+	foreach ($res as $chk => $ok) {
+		if (!$ok) throw new \Exception("Assertion {$chk} failed");
+	}
+	$passed++;
+	echo "PASSED\n";
+}
+catch (\Throwable $e)
+{
+	$failed++;
+	echo "FAILED: " . $e->getMessage() . "\n";
+}
+
+clean_test_db($test_db, $test_prefix);
+// Test 49: vBulletin 3.8 & 4.2 Full Migration Pipeline & Rollback Integration Test
+$total++;
+echo "[RUN] VbFullMigrationPipelineTest... ";
+try
+{
+	$test = new \phpbbseo\migrationcenter\tests\integration\source\vbulletin\vb_full_migration_test();
+	$res = $test->run();
+	foreach ($res as $chk => $ok) {
+		if (!$ok) throw new \Exception("Assertion {$chk} failed");
+	}
+	$passed++;
+	echo "PASSED\n";
+}
+catch (\Throwable $e)
+{
+	$failed++;
+	echo "FAILED: " . $e->getMessage() . "\n";
+}
+
+clean_test_db($test_db, $test_prefix);
 
 // Global Automated Test Teardown: ensure zero test fixtures remain in target DB
 $test_db->sql_query("DELETE FROM {$test_prefix}migration_runs");

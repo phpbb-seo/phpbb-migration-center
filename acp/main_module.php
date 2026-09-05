@@ -97,12 +97,19 @@ class main_module
 		if ($active_run)
 		{
 			$active_steps = $state_manager->get_steps($active_run->run_id);
+			$active_proc = 0;
 			foreach ($active_steps as $s)
 			{
 				$active_total_imported += (int)$s['imported_records'];
 				$active_total_records += (int)$s['total_records'];
+				$active_proc += ((int)$s['imported_records'] + (int)$s['skipped_records'] + (int)$s['failed_records']);
 			}
-			$active_overall_pct = ($active_total_records > 0) ? min(100, round(($active_total_imported / $active_total_records) * 100)) : ($active_run->status === 'completed' ? 100 : 0);
+			$active_is_done = in_array($active_run->status, ['completed', 'finalized'], true);
+			$active_overall_pct = ($active_total_records > 0) ? min(100, (int)floor(($active_proc / $active_total_records) * 100)) : ($active_is_done ? 100 : 0);
+			if ($active_overall_pct >= 100 && !$active_is_done)
+			{
+				$active_overall_pct = 99;
+			}
 		}
 
 		$status_labels = [
@@ -163,7 +170,7 @@ class main_module
 		$display_kpi_pct = $is_in_progress ? $active_overall_pct : ($completed_run ? $completed_pct : 0);
 		$display_kpi_imported = $is_in_progress ? $active_total_imported : ($completed_run ? $completed_imported : 0);
 		$display_kpi_total = $is_in_progress ? $active_total_records : ($completed_run ? $completed_total : 0);
-		$display_kpi_source = $is_in_progress ? (ucfirst($active_run->source_system) . ' ' . ($active_run->source_version ?: '2.3+')) : ($completed_run ? (ucfirst($completed_run->source_system) . ' ' . ($completed_run->source_version ?: '2.3+')) : '');
+		$display_kpi_source = $is_in_progress ? self::format_source_label($active_run->source_system, $active_run->source_version) : ($completed_run ? self::format_source_label($completed_run->source_system, $completed_run->source_version) : '');
 
 		$template->assign_vars([
 			'HAS_ACTIVE_IN_PROGRESS'      => $is_in_progress,
@@ -185,7 +192,7 @@ class main_module
 			'COMPLETED_RUN_SHORT_ID'      => $completed_run ? substr($completed_run->run_id, 0, 8) : '',
 			'COMPLETED_RUN_STATUS'        => $completed_run ? $completed_run->status : '',
 			'COMPLETED_RUN_STATUS_LABEL'  => $completed_run ? ($status_labels[$completed_run->status] ?? 'Completed') : '',
-			'COMPLETED_RUN_SOURCE'        => $completed_run ? (ucfirst($completed_run->source_system) . ' ' . ($completed_run->source_version ?: '2.3+')) : '',
+			'COMPLETED_RUN_SOURCE'        => $completed_run ? self::format_source_label($completed_run->source_system, $completed_run->source_version) : '',
 			'COMPLETED_RUN_STARTED'       => ($completed_run && $completed_run->started_at) ? date('Y-m-d H:i', $completed_run->started_at) : '-',
 			'COMPLETED_RUN_COMPLETED'     => ($completed_run && $completed_run->completed_at) ? date('Y-m-d H:i', $completed_run->completed_at) : '-',
 			'COMPLETED_RUN_IMPORTED'      => $completed_imported,
@@ -218,7 +225,7 @@ class main_module
 			$row_data = array(
 				'RUN_ID'         => $run['run_id'],
 				'RUN_ID_SHORT'   => substr($run['run_id'], 0, 8),
-				'SOURCE_SYSTEM'  => ucfirst($run['source_system']) . ' ' . ($run['source_version'] ?: '2.3+'),
+				'SOURCE_SYSTEM'  => self::format_source_label($run['source_system'], $run['source_version']),
 				'SOURCE_VERSION' => $run['source_version'],
 				'STATUS'         => $run['status'],
 				'STATUS_LABEL'   => $status_labels[$run['status']] ?? ucfirst(str_replace('_', ' ', $run['status'])),
@@ -241,7 +248,7 @@ class main_module
 	 */
 	protected function handle_wizard()
 	{
-		global $phpbb_container, $template, $request, $user;
+		global $phpbb_container, $template, $request, $user, $phpbb_root_path;
 
 		$state_manager = $phpbb_container->get('phpbbseo.migrationcenter.state_manager');
 		$active_run = $state_manager->get_active_non_terminal_run();
@@ -253,17 +260,25 @@ class main_module
 		$step = $request->variable('step', 1);
 		$submit = $request->is_set_post('submit');
 		$action = $request->variable('action', '');
+		$autodetect_btn = $request->is_set_post('autodetect_btn') || $request->variable('autodetect_btn', 0);
+		$is_autodetect = ($action === 'autodetect' || $autodetect_btn);
+		if ($is_autodetect)
+		{
+			$step = 2;
+		}
 
 		// Retrieve or initialize config from session / post
 		$source_system = $request->variable('source_system', 'xenforo');
-		$source_path   = $request->variable('source_path', 'C:\\xampp\\htdocs\\xen');
+		$source_path   = $request->variable('source_path', '');
 		$db_host       = $request->variable('db_host', 'localhost');
 		$db_port       = (int)$request->variable('db_port', 3306);
 		$db_name       = $request->variable('db_name', '');
 		$db_user       = $request->variable('db_user', '');
 		$db_pass       = $request->variable('db_pass', $request->variable('db_password', ''));
-		$db_prefix     = $request->variable('table_prefix', $request->variable('db_prefix', 'xf_'));
-		if (empty($db_prefix))
+		$is_vb = in_array($source_system, ['vbulletin', 'vbulletin3', 'vbulletin4', 'vb3', 'vb4'], true);
+		$default_prefix = $is_vb ? '' : 'xf_';
+		$db_prefix     = $request->variable('table_prefix', $request->variable('db_prefix', $default_prefix));
+		if (empty($db_prefix) && !$is_vb)
 		{
 			$db_prefix = 'xf_';
 		}
@@ -289,21 +304,141 @@ class main_module
 
 		$target_not_empty = ($target_users > 2 || $target_topics > 0 || $target_posts > 0);
 
-		// Auto-detect config from source path if db_name is empty or autodetect action requested
-		if (!empty($source_path) && (empty($db_name) || ($step === 2 && $action === 'autodetect')))
+		// Auto-detect config from source path if requested or db_name is empty
+		if ($is_autodetect || (!empty($source_path) && empty($db_name)))
 		{
-			$detected = \phpbbseo\migrationcenter\source\xenforo\config\xf_config_detector::detect_from_path($source_path);
+			$detected = null;
+
+			// 1. Primary detection with entered source path (if not empty)
+			if (!empty($source_path))
+			{
+				if ($is_vb)
+				{
+					$detected = \phpbbseo\migrationcenter\source\vbulletin\config\vb_config_detector::detect_from_path($source_path);
+				}
+				else
+				{
+					$detected = \phpbbseo\migrationcenter\source\xenforo\config\xf_config_detector::detect_from_path($source_path);
+				}
+			}
+
+			// 3. Fallback search across standard directories if not detected yet
+			if (!$detected && ($is_autodetect || empty($source_path)))
+			{
+				$rel_base = rtrim($phpbb_root_path ?: (__DIR__ . '/../../../../..'), '/\\');
+				if ($source_system === 'vbulletin3' || $source_system === 'vb3')
+				{
+					$fallbacks = [
+						'C:/vb-migration-lab/vb3',
+						'C:/xampp/htdocs/vb3',
+						'C:/xampp/htdocs/vb',
+						$rel_base . '/../vb3',
+						$rel_base . '/../vb',
+						$rel_base . '/../vbulletin3',
+						$rel_base . '/../vbulletin',
+						$rel_base . '/vb3',
+						$rel_base . '/vb',
+					];
+				}
+				else if ($source_system === 'vbulletin4' || $source_system === 'vb4')
+				{
+					$fallbacks = [
+						'C:/vb-migration-lab/vb4',
+						'C:/xampp/htdocs/vb4',
+						'C:/xampp/htdocs/vb',
+						$rel_base . '/../vb4',
+						$rel_base . '/../vb',
+						$rel_base . '/../vbulletin4',
+						$rel_base . '/../vbulletin',
+						$rel_base . '/vb4',
+						$rel_base . '/vb',
+					];
+				}
+				else if ($is_vb)
+				{
+					$fallbacks = [
+						'C:/vb-migration-lab/vb3',
+						'C:/vb-migration-lab/vb4',
+						'C:/xampp/htdocs/vb3',
+						'C:/xampp/htdocs/vb4',
+						'C:/xampp/htdocs/vb',
+						$rel_base . '/../vb',
+						$rel_base . '/../vbulletin',
+						$rel_base . '/../vb3',
+						$rel_base . '/../vb4',
+					];
+				}
+				else
+				{
+					$fallbacks = [
+						'C:/xampp/htdocs/xen',
+						'C:/xampp/htdocs/xenforo',
+						'C:/Users/MeisaM/Documents/xenforo',
+						$rel_base . '/../xen',
+						$rel_base . '/../xenforo',
+						$rel_base . '/../xf',
+						$rel_base . '/xen',
+						$rel_base . '/xenforo',
+					];
+				}
+
+				foreach ($fallbacks as $fb_path)
+				{
+					if (!@is_dir($fb_path))
+					{
+						continue;
+					}
+					if ($is_vb)
+					{
+						$detected = \phpbbseo\migrationcenter\source\vbulletin\config\vb_config_detector::detect_from_path($fb_path);
+					}
+					else
+					{
+						$detected = \phpbbseo\migrationcenter\source\xenforo\config\xf_config_detector::detect_from_path($fb_path);
+					}
+
+					if ($detected)
+					{
+						break;
+					}
+				}
+			}
+
 			if ($detected)
 			{
-				$db_host   = $detected->db_host;
-				$db_port   = $detected->db_port;
-				$db_name   = $detected->db_name;
-				$db_user   = $detected->db_user;
-				$db_pass   = $detected->db_password;
-				$db_prefix = !empty($detected->db_prefix) ? $detected->db_prefix : 'xf_';
+				$source_path = str_replace('/', DIRECTORY_SEPARATOR, $detected->source_path);
+				$db_host     = $detected->db_host;
+				$db_port     = (int)$detected->db_port;
+				$db_name     = $detected->db_name;
+				$db_user     = $detected->db_user;
+				$db_pass     = $detected->db_password;
+				$db_prefix   = (string)$detected->db_prefix;
+
+				// Map forwarded ports for local lab instances
+				if ($db_name === 'vb3_test' && ($db_port === 3306 || $db_port <= 0))
+				{
+					$db_port = 3307;
+				}
+				else if ($db_name === 'vb4_test' && ($db_port === 3306 || $db_port <= 0))
+				{
+					$db_port = 3308;
+				}
+
+				// If vBulletin was detected, ensure accurate sub-version alignment (vB3 vs vB4)
+				if ($is_vb)
+				{
+					if (is_dir($detected->source_path . '/packages') || file_exists($detected->source_path . '/forum.php') || strpos($db_name, 'vb4') !== false)
+					{
+						$source_system = 'vbulletin4';
+					}
+					else if (strpos($db_name, 'vb3') !== false)
+					{
+						$source_system = 'vbulletin3';
+					}
+				}
 				$template->assign_var('DETECT_SUCCESS', true);
 			}
-			else if ($step === 2 && $action === 'autodetect')
+			else if ($is_autodetect)
 			{
 				$template->assign_var('DETECT_ERROR', true);
 			}
@@ -997,7 +1132,27 @@ class main_module
 			]);
 		}
 
-		$overall_pct = ($total_source_records > 0) ? min(100, round(($total_processed_records / $total_source_records) * 100)) : ($run->status === 'completed' ? 100 : 0);
+		$total_steps_count = count($steps);
+		$current_step_num = 1;
+		if ($current_step_row)
+		{
+			$current_step_num = (int)($current_step_row['step_order'] ?? 1);
+		}
+		else if ($run->status === 'completed' || $run->status === 'finalized')
+		{
+			$current_step_num = $total_steps_count;
+		}
+		else
+		{
+			$current_step_num = min($total_steps_count, $completed_steps + 1);
+		}
+
+		$is_run_completed = ($run->status === 'completed' || $run->status === 'finalized');
+		$overall_pct = ($total_source_records > 0) ? min(100, (int)floor(($total_processed_records / $total_source_records) * 100)) : ($is_run_completed ? 100 : 0);
+		if ($overall_pct >= 100 && !$is_run_completed)
+		{
+			$overall_pct = 99;
+		}
 
 		if ($is_abandoned)
 		{
@@ -1232,6 +1387,8 @@ class main_module
 				'current_step'        => $run->current_step,
 				'current_step_lbl'    => $curr_label,
 				'current_step_pct'    => $curr_pct,
+				'current_stage_num'   => $current_step_num,
+				'total_stages_count'  => $total_steps_count,
 				'overall_percent'     => $overall_pct,
 				'total_imported'      => $total_imported,
 				'total_skipped'       => $total_skipped,
@@ -1290,6 +1447,8 @@ class main_module
 
 				// Query fresh step stats to populate real-time UI counters after each batch
 				$fresh_steps = $state_manager->get_steps($run_id);
+				$f_stages_count = count($fresh_steps);
+				$f_stage_num = 1;
 				$f_imp = 0; $f_skp = 0; $f_fld = 0; $f_tot = 0; $f_proc = 0;
 				$f_curr_pct = 0; $f_curr_lbl = '';
 				foreach ($fresh_steps as $fs)
@@ -1307,12 +1466,18 @@ class main_module
 					if ($fs['step_name'] === ($batch_res['stage_key'] ?? ''))
 					{
 						$step_done = $fs_imp + $fs_skp + $fs_fld;
-						$f_curr_pct = ($fs_tot > 0) ? min(100, round(($step_done / $fs_tot) * 100)) : ($fs['status'] === 'completed' ? 100 : 0);
+						$f_curr_pct = ($fs_tot > 0) ? min(100, (int)floor(($step_done / $fs_tot) * 100)) : ($fs['status'] === 'completed' ? 100 : 0);
 						$f_curr_lbl = !empty($user->lang['STEP_' . strtoupper($fs['step_name'])]) ? $user->lang['STEP_' . strtoupper($fs['step_name'])] : ucfirst(str_replace('_', ' ', $fs['step_name']));
+						$f_stage_num = (int)($fs['step_order'] ?? 1);
 					}
 				}
 
-				$f_overall_pct = ($f_tot > 0) ? min(100, round(($f_proc / $f_tot) * 100)) : ($batch_res['run_status'] === 'completed' ? 100 : 0);
+				$f_is_done = in_array($batch_res['run_status'] ?? '', ['completed', 'finalized'], true);
+				$f_overall_pct = ($f_tot > 0) ? min(100, (int)floor(($f_proc / $f_tot) * 100)) : ($f_is_done ? 100 : 0);
+				if ($f_overall_pct >= 100 && !$f_is_done)
+				{
+					$f_overall_pct = 99;
+				}
 				$fresh_run = $state_manager->get_run($run_id);
 				$f_elapsed = ($fresh_run && $fresh_run->started_at > 0) ? max(0, time() - $fresh_run->started_at) : 0;
 				$f_rate = ($f_elapsed > 0 && $f_imp > 0) ? round($f_imp / $f_elapsed, 1) : 0;
@@ -1327,6 +1492,8 @@ class main_module
 				$batch_res['current_step']      = $batch_res['stage_key'] ?? '';
 				$batch_res['current_step_lbl']  = $f_curr_lbl;
 				$batch_res['current_step_pct']  = $f_curr_pct;
+				$batch_res['current_stage_num'] = $f_stage_num;
+				$batch_res['total_stages_count'] = $f_stages_count;
 				$batch_res['elapsed_seconds']   = $f_elapsed;
 				$batch_res['elapsed_formatted'] = sprintf('%02d:%02d:%02d', ($f_elapsed/3600), ($f_elapsed/60%60), $f_elapsed%60);
 				$batch_res['processing_rate']   = $f_rate;
@@ -1389,7 +1556,7 @@ class main_module
 			'HAS_ACTIVE_RUN'             => true,
 			'ACTIVE_RUN_ID'              => $run_id,
 			'ACTIVE_RUN_SHORT_ID'        => substr($run_id, 0, 8),
-			'SOURCE_PLATFORM_LABEL'      => ucfirst($run->source_system) . ' ' . ($run->source_version ?: '2.3+'),
+			'SOURCE_PLATFORM_LABEL'      => self::format_source_label($run->source_system, $run->source_version),
 			'RUN_STATUS'                 => $display_status,
 			'RUN_STATUS_LABEL'           => $run_status_label,
 			'ACTIVE_RUN_STATUS'          => $display_status,
@@ -1415,6 +1582,8 @@ class main_module
 			'HEARTBEAT_AGE'              => $heartbeat_age,
 			'CURRENT_STEP'               => $run->current_step,
 			'CURRENT_STEP_LABEL'         => $curr_label,
+			'CURRENT_STAGE_NUM'          => $current_step_num,
+			'TOTAL_STAGES_COUNT'         => $total_steps_count,
 			'CURRENT_STEP_IMPORTED'      => $curr_imported,
 			'CURRENT_STEP_SKIPPED'       => $curr_skipped,
 			'CURRENT_STEP_FAILED'        => $curr_failed,
@@ -1457,9 +1626,9 @@ class main_module
 			'U_ACKNOWLEDGE_WARNINGS' => $this->u_action . '&amp;mode=progress&amp;action=acknowledge_warnings&amp;run_id=' . urlencode($run_id),
 			'CAN_PAUSE'              => ($run->status === 'running' && !$is_stale && !$is_cli_active),
 			'CAN_RESUME'             => in_array($run->status, ['paused', 'failed', 'ready', 'running', 'interrupted'], true) && !$is_abandoned && !$is_cli_active,
-			'CAN_CANCEL'             => in_array($run->status, ['running', 'paused', 'failed', 'ready', 'awaiting_approval', 'stage_completed', 'stage_completed_with_warnings', 'stage_failed'], true) && !$is_abandoned,
+			'CAN_CANCEL'             => (in_array($run->status, ['running', 'paused', 'failed', 'ready', 'awaiting_approval', 'stage_completed', 'stage_completed_with_warnings', 'stage_failed', 'interrupted'], true) || in_array($display_status, ['running', 'paused', 'failed', 'ready', 'interrupted'], true)) && !$is_abandoned,
 			'CAN_FAST_RESET'         => $can_fast_reset,
-			'CAN_ROLLBACK'           => in_array($run->status, ['paused', 'failed', 'cancelled', 'completed', 'finalized', 'awaiting_approval', 'stage_completed', 'stage_completed_with_warnings', 'stage_failed'], true) && !$can_fast_reset && !$is_abandoned,
+			'CAN_ROLLBACK'           => (in_array($run->status, ['paused', 'failed', 'cancelled', 'completed', 'finalized', 'awaiting_approval', 'stage_completed', 'stage_completed_with_warnings', 'stage_failed', 'interrupted'], true) || in_array($display_status, ['paused', 'failed', 'cancelled', 'interrupted'], true)) && !$can_fast_reset && !$is_abandoned,
 			'CAN_FINALIZE'           => ($run->status === 'completed' || $run->status === 'finalized' || $completed_steps === count($steps)) && !$is_abandoned,
 			'FINALIZATION_DONE'      => !empty($run->stats['finalized_at']),
 			'SEARCH_INDEX_DONE'      => !empty($run->stats['search_indexed_at']),
@@ -1659,5 +1828,34 @@ class main_module
 			'CLI_SEARCH_CMD'          => "php bin/phpbbcli.php migrationcenter:search-index {$run_id} --batch-size=500",
 			'CLI_VERIFY_CMD'          => "php bin/phpbbcli.php migrationcenter:verify {$run_id}",
 		]);
+	}
+
+	/**
+	 * Format user-friendly source system and version label
+	 *
+	 * @param string $system
+	 * @param string $version
+	 * @return string
+	 */
+	public static function format_source_label(string $system, string $version = ''): string
+	{
+		$sys = strtolower($system);
+		if ($sys === 'vbulletin3' || $sys === 'vb3')
+		{
+			return 'vBulletin 3.8' . ($version ? " ({$version})" : '');
+		}
+		if ($sys === 'vbulletin4' || $sys === 'vb4')
+		{
+			return 'vBulletin 4.2' . ($version ? " ({$version})" : '');
+		}
+		if ($sys === 'vbulletin')
+		{
+			return 'vBulletin' . ($version ? " ({$version})" : ' 3.8 / 4.2');
+		}
+		if ($sys === 'xenforo')
+		{
+			return 'XenForo' . ($version ? " ({$version})" : ' 2.x');
+		}
+		return ucfirst($system) . ($version ? " ({$version})" : '');
 	}
 }

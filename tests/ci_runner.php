@@ -24,6 +24,17 @@ spl_autoload_register(function ($class) {
     }
 });
 
+// Autoloader for core phpbb classes if present
+spl_autoload_register(function ($class) {
+    if (strncmp('phpbb\\', $class, 6) === 0) {
+        $root = dirname(dirname(dirname(dirname(__DIR__))));
+        $file = $root . '/' . str_replace('\\', '/', $class) . '.php';
+        if (file_exists($file)) {
+            require_once $file;
+        }
+    }
+});
+
 // Mock minimal phpBB constants if needed
 if (!defined('IN_PHPBB')) {
     define('IN_PHPBB', true);
@@ -45,6 +56,13 @@ $standalone_tests = [
     'XfPermissionTranslatorTest' => \phpbbseo\migrationcenter\tests\unit\XfPermissionTranslatorTest::class,
     'XfTopicNormalizerTest'      => \phpbbseo\migrationcenter\tests\unit\XfTopicNormalizerTest::class,
     'XfUserNormalizationTest'   => \phpbbseo\migrationcenter\tests\unit\XfUserNormalizationTest::class,
+    'VbGroupNormalizerTest'      => \phpbbseo\migrationcenter\tests\unit\source\vbulletin\vb_group_normalizer_test::class,
+    'VbPasswordDriverTest'       => \phpbbseo\migrationcenter\tests\unit\source\vbulletin\VbPasswordDriverTest::class,
+    'VbUserNormalizerTest'       => \phpbbseo\migrationcenter\tests\unit\source\vbulletin\VbUserNormalizerTest::class,
+    'VbMessageConverterTest'     => \phpbbseo\migrationcenter\tests\unit\source\vbulletin\VbMessageConverterTest::class,
+    'VbCredentialPrecedenceRegressionTest' => \phpbbseo\migrationcenter\tests\unit\source\vbulletin\VbCredentialPrecedenceRegressionTest::class,
+    'VbProviderSeparationTest'   => \phpbbseo\migrationcenter\tests\unit\source\vbulletin\VbProviderSeparationTest::class,
+    'VbConfigDetectorTest'       => \phpbbseo\migrationcenter\tests\unit\source\vbulletin\vb_config_detector_test::class,
 ];
 
 $passed = 0;
@@ -59,7 +77,14 @@ foreach ($standalone_tests as $name => $class) {
         }
         
         $test = new $class();
-        $test->run();
+        $res = $test->run();
+        if (is_array($res)) {
+            foreach ($res as $check => $ok) {
+                if (!$ok) {
+                    throw new \Exception("Assertion {$check} failed");
+                }
+            }
+        }
         echo "PASSED\n";
         $passed++;
     } catch (\Throwable $e) {
