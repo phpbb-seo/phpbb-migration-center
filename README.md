@@ -1,6 +1,6 @@
 # 🚀 phpBB Migration Center
 
-[![Version](https://img.shields.io/badge/version-0.1.0--beta.2-blue.svg?style=flat-square)](https://github.com/phpbb-seo/phpbb-migration-center)
+[![Version](https://img.shields.io/badge/version-1.0.0--beta.1-blue.svg?style=flat-square)](https://github.com/phpbb-seo/phpbb-migration-center)
 [![phpBB](https://img.shields.io/badge/phpBB-3.3.x-green.svg?style=flat-square)](https://www.phpbb.com)
 [![PHP](https://img.shields.io/badge/PHP-%3E%3D%207.4-purple.svg?style=flat-square)](https://php.net)
 [![License](https://img.shields.io/badge/license-GPL--2.0-yellow.svg?style=flat-square)](LICENSE)
@@ -80,13 +80,14 @@ phpBB Migration Center is currently under active development and community testi
 | **Stage checkpoints** | Beta testing |
 | **Rollback and recovery** | Beta testing |
 | **Final verification suite** | Beta testing |
-| **XenForo connector** | **Beta — Under active testing** |
-| **vBulletin connector** | Planned |
+| **XenForo connector (XF 1.x & 2.x)** | **Beta — Under active testing** |
+| **vBulletin 3.8 connector** | **Beta — Under active testing** |
+| **vBulletin 4.2 connector** | **Beta — Under active testing** |
 | **MyBB connector** | Planned |
 | **SMF connector** | Planned |
 | **Invision Community connector** | Planned |
 
-A platform is supported only after its connector has been implemented, tested, and officially released. At present, the repository contains the XenForo source connector. Other platforms listed above are part of the planned connector roadmap and are not yet available.
+A platform is supported only after its connector has been implemented, tested, and officially released. The repository currently contains fully functional connectors for **XenForo** and **vBulletin (3.8 and 4.2)**. Other platforms listed above are part of the planned connector roadmap.
 
 ---
 
@@ -117,27 +118,44 @@ This architecture allows future converters to reuse the same migration workflow 
 
 ---
 
-## 📦 Current Connector: XenForo to phpBB
+## 📦 Supported Source Connectors
 
-The current development connector targets migration from **XenForo to phpBB**. Its intended migration domains include:
-
-- User groups
-- Users and supported password hashes
+### 1. XenForo to phpBB (XF 1.x & 2.x)
+Targets migration from XenForo 1.x and 2.x forums to phpBB:
+- User groups and custom titles
+- Users, email addresses, and supported XenForo password hashes (with auto-upgrade on login)
 - Primary and secondary group memberships
-- Global permissions
-- Forums and categories
-- Forum-specific permissions
-- Topics and posts
-- BBCode and supported content
-- Post attachments
-- User avatars
-- Private conversations
-- Private messages
-- Private-message attachments
-- Polls and votes
+- Global administrator and moderator permissions
+- Categories, forums, links, and forum-specific permission ACLs
+- Topics, posts, and post edit history
+- XenForo BBCode and rich-text normalization
+- Post attachments (with content hash and existence validation)
+- User custom avatars
+- Private conversations and conversation messages
+- Private-message attachments (`in_message` mapping)
+- Topic polls, options, and multi-choice voter records
 - User, email, and IP bans
 
-*Compatibility must be verified against the exact source version and test data before any production migration.*
+### 2. vBulletin to phpBB (vB 3.8.x & 4.2.x)
+Targets migration from vBulletin 3.8 and vBulletin 4.2 forums to phpBB:
+- User groups and secondary group memberships
+- Users, profiles, signatures, and vBulletin password hashing (`md5(md5(pass) . salt)` via native authentication handler)
+- Forums, categories, thread prefixes, and forum permissions
+- Topics, posts, polls, options, and votes
+- BBCode parser & converter:
+  - Standardizes nested quotes (`[QUOTE="User"]`, `[QUOTE=User;123]`, `[QUOTE]`) and compiles to phpBB native `s9e\TextFormatter` XML storage (`<r><QUOTE author="...">...`) with `bbcode_uid` and `bbcode_bitfield` calculation
+  - Mapped numeric font sizes (`[size=1]` through `[size=7]` to percentage sizes `85%` to `240%`)
+  - Code blocks (`[CODE]`, `[PHP]`) and embedded media (`[VIDEO]`)
+  - Strips non-standard font declarations while preserving text formatting
+- Post attachments:
+  - Full support for vBulletin 3.8 single `attachment` table blob/file storage
+  - Full support for vBulletin 4.2 normalized `attachment` + `filedata` multi-attachment storage
+- Custom user avatars (both database binary blob and filesystem storage modes)
+- Private Messages (vBulletin PM system to phpBB PMs)
+- Banlists: User bans and IP address bans
+- Automatic configuration detection from `includes/config.php`
+
+*Compatibility should always be verified against the exact source version and database backup on a staging environment before running a production migration.*
 
 ---
 
@@ -342,7 +360,12 @@ After data migration, the framework can perform controlled post-migration operat
 
 ## 🧪 Testing
 
-The repository includes automated test suites for migration components and lifecycle behavior.
+The repository includes an automated test suite covering units, normalizers, config detectors, and provider separations.
+
+```bash
+# Run the automated CI test suite
+php tests/ci_runner.php
+```
 
 Automated tests do not replace real migration testing against representative source data. Before deploying migrated data, verify:
 - Real ACP wizard workflow
@@ -409,17 +432,14 @@ Before contributing:
 
 ## 🗺️ Roadmap
 
-Planned development areas include:
-- Continued XenForo connector testing and version compatibility
-- vBulletin connector
-- MyBB connector
-- SMF connector
-- Invision Community connector
-- Expanded password handlers
-- Additional BBCode mappings
-- Extended migration fixtures
-- Broader multilingual and RTL testing
-- Improved documentation and packaging
+- [x] Core migration engine with Browser AJAX & CLI workers
+- [x] XenForo 1.x & 2.x connector (passwords, forums, posts, attachments, conversations)
+- [x] vBulletin 3.8 & 4.2 connectors (credentials, attachments, PMs, BBCode/quotes)
+- [ ] MyBB connector
+- [ ] SMF connector
+- [ ] Invision Community (IPB) connector
+- [ ] Expanded custom BBCode mappings
+- [ ] Additional localized language packs
 
 *Roadmap items are development goals and do not represent current compatibility guarantees.*
 
