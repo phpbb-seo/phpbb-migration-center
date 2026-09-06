@@ -1,4 +1,7 @@
 <?php
+if (!defined('IN_PHPBB')) {
+    define('IN_PHPBB', true);
+}
 $zip_file = 'C:/xampp/htdocs/bb/phpbbseo_migrationcenter_v1.0.0.zip';
 $test_ext_dir = 'C:/xampp/htdocs/bb_e2e/ext/phpbbseo/migrationcenter_zip_test';
 

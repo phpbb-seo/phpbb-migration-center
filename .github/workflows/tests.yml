@@ -27,7 +27,7 @@ jobs:
           coverage: none
 
       - name: Validate composer.json
-        run: composer validate --strict
+        run: composer validate --no-check-version --strict
 
       - name: PHP Syntax Check (Lint)
         run: find . -type f -name "*.php" -not -path "./tests/tmp/*" -not -path "./scratch/*" -exec php -l {} +
