@@ -970,7 +970,40 @@ class phpbb_target_writer implements target_writer_interface
 			}
 		}
 
+		// Recalculate nested sets so phpBB forum hierarchy and index display correctly
+		$this->rebuild_forum_tree();
+
 		return $results;
+	}
+
+	/**
+	 * Rebuild phpBB nested sets for forums table
+	 */
+	public function rebuild_forum_tree(): void
+	{
+		global $phpbb_root_path, $phpEx, $cache;
+
+		if (!function_exists('recalc_nested_sets'))
+		{
+			$root = $phpbb_root_path ?: dirname(dirname(dirname(dirname(__DIR__)))) . '/';
+			$inc_admin = $root . 'includes/functions_admin.' . ($phpEx ?: 'php');
+			if (file_exists($inc_admin))
+			{
+				require_once $inc_admin;
+			}
+		}
+
+		if (function_exists('recalc_nested_sets'))
+		{
+			$new_id = 1;
+			$table = $this->table_prefix . 'forums';
+			recalc_nested_sets($new_id, 'forum_id', $table);
+
+			if (is_object($cache))
+			{
+				$cache->destroy('sql', $table);
+			}
+		}
 	}
 
 	/**

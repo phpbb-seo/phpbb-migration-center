@@ -251,6 +251,31 @@ class phpbb_finalizer
 		}
 		$this->db->sql_freeresult($result);
 
+		// Rebuild nested-set tree boundaries (left_id, right_id) for all forums
+		if (!$dry_run)
+		{
+			global $phpbb_root_path, $phpEx;
+			if (!function_exists('recalc_nested_sets'))
+			{
+				$root = $phpbb_root_path ?: dirname(dirname(dirname(dirname(dirname(__DIR__))))) . '/';
+				if (file_exists($root . 'includes/functions_admin.php'))
+				{
+					require_once $root . 'includes/functions_admin.php';
+				}
+			}
+
+			if (function_exists('recalc_nested_sets'))
+			{
+				$new_id = 1;
+				recalc_nested_sets($new_id, 'forum_id', $this->table_prefix . 'forums');
+			}
+
+			if (is_object($this->cache))
+			{
+				$this->cache->destroy('sql', $this->table_prefix . 'forums');
+			}
+		}
+
 		return [
 			'status' => 'success',
 			'forums_finalized' => $forums_finalized,

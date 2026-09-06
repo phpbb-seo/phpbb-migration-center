@@ -104,6 +104,23 @@ class forums_step implements step_interface
 			$forum_dtos[] = $dto;
 		}
 
+		// Sort parent categories and forums first so hierarchy is resolved cleanly
+		usort($forum_dtos, function (forum_dto $a, forum_dto $b) {
+			if ($a->parent_source_id === 0 && $b->parent_source_id !== 0)
+			{
+				return -1;
+			}
+			if ($a->parent_source_id !== 0 && $b->parent_source_id === 0)
+			{
+				return 1;
+			}
+			if ($a->display_order !== $b->display_order)
+			{
+				return $a->display_order <=> $b->display_order;
+			}
+			return $a->source_id <=> $b->source_id;
+		});
+
 		$writer_res = $writer->write_forums($forum_dtos, [
 			'run_id'        => $run_id,
 			'source_system' => 'mybb',
