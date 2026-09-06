@@ -40,6 +40,35 @@ if (!defined('IN_PHPBB')) {
     define('IN_PHPBB', true);
 }
 
+// Mock minimal phpBB classes for standalone CI environments
+if (!interface_exists('phpbb\passwords\driver\driver_interface', false)) {
+    eval('
+    namespace phpbb\passwords\driver {
+        interface driver_interface {}
+        interface rehashable_driver_interface extends driver_interface {}
+        abstract class base implements rehashable_driver_interface {
+            protected $config;
+            protected $helper;
+            public function __construct($config = null, $helper = null) {
+                $this->config = $config;
+                $this->helper = $helper;
+            }
+            public function is_supported() { return true; }
+            public function is_legacy() { return false; }
+            public function needs_rehash($hash) { return false; }
+        }
+        class helper {
+            public function __construct($config = null) {}
+        }
+    }
+    namespace phpbb\config {
+        class config {
+            public function __construct(array $config = []) {}
+        }
+    }
+    ');
+}
+
 echo "===========================================\n";
 echo " phpBB Migration Center - CI Test Runner\n";
 echo "===========================================\n\n";
