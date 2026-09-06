@@ -1,6 +1,6 @@
 # 🚀 phpBB Migration Center
 
-[![Version](https://img.shields.io/badge/version-1.0.0--beta.1-blue.svg?style=flat-square)](https://github.com/phpbb-seo/phpbb-migration-center)
+[![Version](https://img.shields.io/badge/version-1.0.0--beta.3-blue.svg?style=flat-square)](https://github.com/phpbb-seo/phpbb-migration-center)
 [![phpBB](https://img.shields.io/badge/phpBB-3.3.x-green.svg?style=flat-square)](https://www.phpbb.com)
 [![PHP](https://img.shields.io/badge/PHP-%3E%3D%207.4-purple.svg?style=flat-square)](https://php.net)
 [![License](https://img.shields.io/badge/license-GPL--2.0-yellow.svg?style=flat-square)](LICENSE)
