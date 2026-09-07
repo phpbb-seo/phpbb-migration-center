@@ -107,7 +107,7 @@ class phpbb_target_writer implements target_writer_interface
 				}
 
 				// 2. Resolve username and detect collisions
-				$username = $user->username;
+				$username = $this->sanitize_utf8((string)$user->username);
 				$username_clean = $user->username_clean ?: (function_exists('utf8_clean_string') ? utf8_clean_string($username) : mb_strtolower($username, 'UTF-8'));
 
 				// Check existing user by clean username
@@ -261,7 +261,7 @@ class phpbb_target_writer implements target_writer_interface
 					'user_avatar_type'      => $user->avatar_type ?: '',
 					'user_avatar_width'     => 0,
 					'user_avatar_height'    => 0,
-					'user_sig'                 => $user->signature ?: '',
+					'user_sig'                 => $this->sanitize_utf8((string)$user->signature),
 					'user_sig_bbcode_uid'      => $user->sig_bbcode_uid ?: '',
 					'user_sig_bbcode_bitfield' => $user->sig_bbcode_bitfield ?: '',
 					'user_jabber'           => '',
@@ -533,6 +533,23 @@ class phpbb_target_writer implements target_writer_interface
 		$mod_gid   = $canonical_groups['GLOBAL_MODERATORS'] ?? 4;
 		$reg_gid   = $canonical_groups['REGISTERED'] ?? 2;
 
+		// Ensure canonical ADMINISTRATORS group has ROLE_ADMIN_FULL in phpbb_acl_groups
+		$sql = 'SELECT role_id FROM ' . $this->table_prefix . "acl_roles WHERE role_name = 'ROLE_ADMIN_FULL'";
+		$res = $this->db->sql_query($sql);
+		$role_admin_full = (int)$this->db->sql_fetchfield('role_id');
+		$this->db->sql_freeresult($res);
+		if ($role_admin_full > 0)
+		{
+			$sql = 'SELECT 1 FROM ' . $this->table_prefix . 'acl_groups WHERE group_id = ' . $admin_gid . ' AND forum_id = 0 AND auth_role_id = ' . $role_admin_full;
+			$res = $this->db->sql_query($sql);
+			$has_full = $this->db->sql_fetchfield('1');
+			$this->db->sql_freeresult($res);
+			if (!$has_full)
+			{
+				$this->db->sql_query('UPDATE ' . $this->table_prefix . 'acl_groups SET auth_role_id = ' . $role_admin_full . ' WHERE group_id = ' . $admin_gid . ' AND forum_id = 0 AND auth_role_id > 0');
+			}
+		}
+
 		foreach ($memberships as $item)
 		{
 			$user_source_id = $item['user_source_id'];
@@ -626,6 +643,26 @@ class phpbb_target_writer implements target_writer_interface
 					}
 				}
 
+				// Security: If verified admin, ensure ADMINISTRATORS and GLOBAL_MODERATORS are present
+				if (!empty($item['is_admin']))
+				{
+					if (!in_array($admin_gid, $target_group_ids, true))
+					{
+						$target_group_ids[] = $admin_gid;
+					}
+					if (!in_array($mod_gid, $target_group_ids, true))
+					{
+						$target_group_ids[] = $mod_gid;
+					}
+				}
+				else if (!empty($item['is_moderator']))
+				{
+					if (!in_array($mod_gid, $target_group_ids, true))
+					{
+						$target_group_ids[] = $mod_gid;
+					}
+				}
+
 				// Always ensure REGISTERED group is present
 				if (!in_array($reg_gid, $target_group_ids, true))
 				{
@@ -654,16 +691,39 @@ class phpbb_target_writer implements target_writer_interface
 					}
 				}
 
-				// Update primary group_id in phpbb_users if source primary group mapped
-				$primary_target_gid = null;
-				if (!empty($item['primary_group_source_id']))
+				// Update primary group_id, styling, and reset permissions cache in phpbb_users
+				$user_update = [];
+				if (!empty($item['is_admin']))
 				{
-					$primary_target_gid = $this->id_mapper->get_target_id($source_system, 'group', $item['primary_group_source_id']);
+					$user_update['user_type'] = 0; // Standard active user (non-founder) with full admin role
+					$user_update['group_id'] = $admin_gid;
+					$user_update['user_colour'] = 'AA0000';
+					$user_update['user_permissions'] = '';
+				}
+				else if (!empty($item['is_moderator']))
+				{
+					$user_update['group_id'] = $mod_gid;
+					$user_update['user_colour'] = '00AA00';
+					$user_update['user_permissions'] = '';
+				}
+				else
+				{
+					$primary_target_gid = null;
+					if (!empty($item['primary_group_source_id']))
+					{
+						$primary_target_gid = $this->id_mapper->get_target_id($source_system, 'group', $item['primary_group_source_id']);
+					}
+
+					if ($primary_target_gid && in_array((int)$primary_target_gid, $target_group_ids, true))
+					{
+						$user_update['group_id'] = (int)$primary_target_gid;
+						$user_update['user_permissions'] = '';
+					}
 				}
 
-				if ($primary_target_gid && in_array((int)$primary_target_gid, $target_group_ids, true))
+				if (!empty($user_update))
 				{
-					$sql = 'UPDATE ' . $this->table_prefix . 'users SET group_id = ' . (int)$primary_target_gid . ' WHERE user_id = ' . $target_user_id;
+					$sql = 'UPDATE ' . $this->table_prefix . 'users SET ' . $this->db->sql_build_array('UPDATE', $user_update) . ' WHERE user_id = ' . $target_user_id;
 					$this->db->sql_query($sql);
 				}
 
@@ -1220,13 +1280,34 @@ class phpbb_target_writer implements target_writer_interface
 				$existing_target_id = $this->id_mapper->get_target_id($source_system, 'topic', $source_id);
 				if ($existing_target_id !== null)
 				{
-					$sql = 'SELECT topic_id FROM ' . $this->table_prefix . 'topics WHERE topic_id = ' . (int)$existing_target_id;
+					$sql = 'SELECT topic_id, topic_poster FROM ' . $this->table_prefix . 'topics WHERE topic_id = ' . (int)$existing_target_id;
 					$res = $this->db->sql_query($sql);
-					$still_exists = $this->db->sql_fetchfield('topic_id');
+					$existing_row = $this->db->sql_fetchrow($res);
 					$this->db->sql_freeresult($res);
 
-					if ($still_exists)
+					if ($existing_row)
 					{
+						// If previously mapped as anonymous (or poster 0/1) but author user mapping now exists, update it
+						$user_target_id = 1;
+						if (!empty($topic->user_source_id))
+						{
+							$mapped_user_id = $this->id_mapper->get_target_id($source_system, 'user', $topic->user_source_id);
+							if ($mapped_user_id)
+							{
+								$user_target_id = (int)$mapped_user_id;
+							}
+						}
+
+						if ($user_target_id > 1 && (int)$existing_row['topic_poster'] <= 1)
+						{
+							$author_name = $this->sanitize_utf8($topic->source_username ?: 'Guest');
+							$sql_up = 'UPDATE ' . $this->table_prefix . 'topics SET 
+										topic_poster = ' . $user_target_id . ",
+										topic_first_poster_name = '" . $this->db->sql_escape($author_name) . "'
+									   WHERE topic_id = " . (int)$existing_target_id;
+							$this->db->sql_query($sql_up);
+						}
+
 						$results[$source_id] = [
 							'target_id' => (int)$existing_target_id,
 							'status'    => 'success',
@@ -1379,6 +1460,8 @@ class phpbb_target_writer implements target_writer_interface
 		$run_id = (string)($options['run_id'] ?? '');
 		$source_system = (string)($options['source_system'] ?? 'xenforo');
 
+		$this->ensure_custom_bbcodes();
+
 		// Cache topic forum IDs and titles to avoid duplicate queries
 		$topic_info_cache = [];
 
@@ -1392,13 +1475,33 @@ class phpbb_target_writer implements target_writer_interface
 				$existing_target_id = $this->id_mapper->get_target_id($source_system, 'post', $source_id);
 				if ($existing_target_id !== null)
 				{
-					$sql = 'SELECT post_id FROM ' . $this->table_prefix . 'posts WHERE post_id = ' . (int)$existing_target_id;
+					$sql = 'SELECT post_id, poster_id FROM ' . $this->table_prefix . 'posts WHERE post_id = ' . (int)$existing_target_id;
 					$res = $this->db->sql_query($sql);
-					$still_exists = $this->db->sql_fetchfield('post_id');
+					$existing_post = $this->db->sql_fetchrow($res);
 					$this->db->sql_freeresult($res);
 
-					if ($still_exists)
+					if ($existing_post)
 					{
+						// If previously mapped as anonymous (poster_id <= 1) but author user mapping now exists, update it
+						$user_target_id = 1;
+						if (!empty($post->user_source_id))
+						{
+							$mapped_user = $this->id_mapper->get_target_id($source_system, 'user', $post->user_source_id);
+							if ($mapped_user)
+							{
+								$user_target_id = (int)$mapped_user;
+							}
+						}
+
+						if ($user_target_id > 1 && (int)$existing_post['poster_id'] <= 1)
+						{
+							$sql_up = 'UPDATE ' . $this->table_prefix . 'posts SET 
+										poster_id = ' . $user_target_id . ",
+										post_username = ''
+									   WHERE post_id = " . (int)$existing_target_id;
+							$this->db->sql_query($sql_up);
+						}
+
 						$results[$source_id] = [
 							'target_id' => (int)$existing_target_id,
 							'status'    => 'success',
@@ -1532,7 +1635,7 @@ class phpbb_target_writer implements target_writer_interface
 					'enable_smilies'      => 1,
 					'enable_magic_url'    => 1,
 					'enable_sig'          => 1,
-					'post_username'       => $clean_username,
+					'post_username'       => ($user_target_id == 1) ? $clean_username : '',
 					'post_subject'        => $clean_subject,
 					'post_text'           => $clean_text,
 					'post_checksum'       => md5($clean_text),
@@ -1597,10 +1700,11 @@ class phpbb_target_writer implements target_writer_interface
 				continue;
 			}
 
-			$sql = 'SELECT post_id, poster_id, post_username, post_subject, post_time, post_visibility 
-					FROM ' . $this->table_prefix . 'posts 
-					WHERE topic_id = ' . $topic_id . ' 
-					ORDER BY post_time ASC, post_id ASC';
+			$sql = 'SELECT p.post_id, p.poster_id, p.post_username, p.post_subject, p.post_time, p.post_visibility, u.username 
+					FROM ' . $this->table_prefix . 'posts p 
+					LEFT JOIN ' . $this->table_prefix . 'users u ON (u.user_id = p.poster_id)
+					WHERE p.topic_id = ' . $topic_id . ' 
+					ORDER BY p.post_time ASC, p.post_id ASC';
 			$res = $this->db->sql_query($sql);
 			$posts = [];
 			while ($row = $this->db->sql_fetchrow($res))
@@ -1616,6 +1720,9 @@ class phpbb_target_writer implements target_writer_interface
 
 			$first_post = $posts[0];
 			$last_post = $posts[count($posts) - 1];
+
+			$first_poster_name = ((int)$first_post['poster_id'] > 1) ? (string)($first_post['username'] ?? '') : (string)$first_post['post_username'];
+			$last_poster_name  = ((int)$last_post['poster_id'] > 1) ? (string)($last_post['username'] ?? '') : (string)$last_post['post_username'];
 
 			$approved_count = 0;
 			$unapproved_count = 0;
@@ -1640,10 +1747,10 @@ class phpbb_target_writer implements target_writer_interface
 
 			$update_data = [
 				'topic_first_post_id'       => (int)$first_post['post_id'],
-				'topic_first_poster_name'   => (string)$first_post['post_username'],
+				'topic_first_poster_name'   => $first_poster_name,
 				'topic_last_post_id'        => (int)$last_post['post_id'],
 				'topic_last_poster_id'      => (int)$last_post['poster_id'],
-				'topic_last_poster_name'    => (string)$last_post['post_username'],
+				'topic_last_poster_name'    => $last_poster_name,
 				'topic_last_post_subject'   => (string)$last_post['post_subject'],
 				'topic_last_post_time'      => (int)$last_post['post_time'],
 				'topic_posts_approved'      => max(0, $approved_count - 1),
@@ -1703,13 +1810,16 @@ class phpbb_target_writer implements target_writer_interface
 			$this->db->sql_freeresult($res);
 
 			// 3. Latest post pointer in forum
-			$sql = 'SELECT post_id, poster_id, post_username, post_subject, post_time 
-					FROM ' . $this->table_prefix . 'posts 
-					WHERE forum_id = ' . $forum_id . ' AND post_visibility = 1 
-					ORDER BY post_time DESC, post_id DESC';
+			$sql = 'SELECT p.post_id, p.poster_id, p.post_username, p.post_subject, p.post_time, u.username 
+					FROM ' . $this->table_prefix . 'posts p 
+					LEFT JOIN ' . $this->table_prefix . 'users u ON (u.user_id = p.poster_id)
+					WHERE p.forum_id = ' . $forum_id . ' AND p.post_visibility = 1 
+					ORDER BY p.post_time DESC, p.post_id DESC';
 			$res = $this->db->sql_query_limit($sql, 1);
 			$last_post = $this->db->sql_fetchrow($res);
 			$this->db->sql_freeresult($res);
+
+			$forum_last_poster_name = ((int)($last_post['poster_id'] ?? 0) > 1) ? (string)($last_post['username'] ?? '') : (string)($last_post['post_username'] ?? '');
 
 			$update_data = [
 				'forum_topics_approved'     => (int)($topic_counts['topics_approved'] ?? 0),
@@ -1720,7 +1830,7 @@ class phpbb_target_writer implements target_writer_interface
 				'forum_posts_softdeleted'   => (int)($post_counts['posts_softdeleted'] ?? 0),
 				'forum_last_post_id'        => (int)($last_post['post_id'] ?? 0),
 				'forum_last_poster_id'      => (int)($last_post['poster_id'] ?? 0),
-				'forum_last_poster_name'    => (string)($last_post['post_username'] ?? ''),
+				'forum_last_poster_name'    => $forum_last_poster_name,
 				'forum_last_post_subject'   => (string)($last_post['post_subject'] ?? ''),
 				'forum_last_post_time'      => (int)($last_post['post_time'] ?? 0),
 			];
@@ -2565,7 +2675,7 @@ class phpbb_target_writer implements target_writer_interface
 	 */
 	public function reconcile_newest_user_config(): void
 	{
-		$sql = 'SELECT user_id, username, user_colour FROM ' . $this->table_prefix . 'users WHERE user_type <> 2 AND user_id > 2 ORDER BY user_regdate DESC, user_id DESC';
+		$sql = 'SELECT user_id, username, user_colour FROM ' . $this->table_prefix . 'users WHERE user_type <> 2 AND user_id > 2 ORDER BY user_id DESC';
 		$res = $this->db->sql_query_limit($sql, 1);
 		$newest = $this->db->sql_fetchrow($res);
 		$this->db->sql_freeresult($res);
@@ -2633,7 +2743,7 @@ class phpbb_target_writer implements target_writer_interface
 			$bb_bitfield = $conv->bbcode_bitfield;
 
 			$sql_up = 'UPDATE ' . $this->table_prefix . "users SET 
-						user_sig = '" . $this->db->sql_escape($parsed) . "',
+						user_sig = '" . $this->db->sql_escape($this->sanitize_utf8((string)$parsed)) . "',
 						user_sig_bbcode_uid = '" . $this->db->sql_escape($bb_uid) . "',
 						user_sig_bbcode_bitfield = '" . $this->db->sql_escape($bb_bitfield) . "'
 					   WHERE user_id = " . $uid;
@@ -3115,10 +3225,22 @@ class phpbb_target_writer implements target_writer_interface
 		$run_id = (string)($options['run_id'] ?? '');
 		$source_system = (string)($options['source_system'] ?? 'xenforo');
 
-		$is_vb = in_array($source_system, ['vbulletin', 'vbulletin3', 'vbulletin4', 'vb3', 'vb4'], true);
-		$converter = $is_vb
-			? new \phpbbseo\migrationcenter\source\vbulletin\content\vb_message_converter()
-			: new \phpbbseo\migrationcenter\source\xenforo\content\xf_message_converter();
+		if ($source_system === 'smf')
+		{
+			$converter = new \phpbbseo\migrationcenter\source\smf\content\smf_message_converter();
+		}
+		else if ($source_system === 'mybb')
+		{
+			$converter = new \phpbbseo\migrationcenter\source\mybb\content\mybb_message_converter();
+		}
+		else if (in_array($source_system, ['vbulletin', 'vbulletin3', 'vbulletin4', 'vbulletin6', 'vb3', 'vb4', 'vb6'], true))
+		{
+			$converter = new \phpbbseo\migrationcenter\source\vbulletin\content\vb_message_converter();
+		}
+		else
+		{
+			$converter = new \phpbbseo\migrationcenter\source\xenforo\content\xf_message_converter();
+		}
 		$affected_user_ids = [];
 
 		foreach ($messages as $msg)
@@ -3239,7 +3361,7 @@ class phpbb_target_writer implements target_writer_interface
 					'enable_magic_url'    => 1,
 					'enable_sig'          => 1,
 					'message_subject'     => $clean_subject,
-					'message_text'        => $conv_res->storage_text,
+					'message_text'        => $this->sanitize_utf8((string)$conv_res->storage_text),
 					'message_edit_reason' => '',
 					'message_edit_user'   => 0,
 					'message_attachment'  => 0,
@@ -3909,14 +4031,157 @@ class phpbb_target_writer implements target_writer_interface
 	/**
 	 * Sanitize UTF-8 text, safely encoding 4-byte astral emojis as HTML numeric character references
 	 *
-	 * @param string $str
+	 * @param string|null $str
 	 * @return string
 	 */
-	public function sanitize_utf8(string $str): string
+	public function sanitize_utf8(?string $str): string
 	{
+		if ($str === null || $str === '')
+		{
+			return '';
+		}
+
 		$str = (string)mb_convert_encoding($str, 'UTF-8', 'UTF-8');
 		return (string)preg_replace_callback('/[\x{10000}-\x{10FFFF}]/u', function ($m) {
 			return '&#x' . dechex(mb_ord($m[0], 'UTF-8')) . ';';
 		}, $str);
+	}
+
+	/**
+	 * Ensure common custom BBCodes (hr, s, center, sub, sup, tt) exist in phpbb_bbcodes
+	 */
+	public function ensure_custom_bbcodes(): void
+	{
+		static $checked = false;
+		if ($checked)
+		{
+			return;
+		}
+		$checked = true;
+
+		$customs = [
+			'hr' => [
+				'match'    => '[hr]',
+				'tpl'      => '<hr>',
+				'helpline' => 'Horizontal rule: [hr]',
+			],
+			's' => [
+				'match'    => '[s]{TEXT}[/s]',
+				'tpl'      => '<s>{TEXT}</s>',
+				'helpline' => 'Strikethrough: [s]text[/s]',
+			],
+			'center' => [
+				'match'    => '[center]{TEXT}[/center]',
+				'tpl'      => '<div style="text-align: center;">{TEXT}</div>',
+				'helpline' => 'Center align: [center]text[/center]',
+			],
+			'sub' => [
+				'match'    => '[sub]{TEXT}[/sub]',
+				'tpl'      => '<sub>{TEXT}</sub>',
+				'helpline' => 'Subscript: [sub]text[/sub]',
+			],
+			'sup' => [
+				'match'    => '[sup]{TEXT}[/sup]',
+				'tpl'      => '<sup>{TEXT}</sup>',
+				'helpline' => 'Superscript: [sup]text[/sup]',
+			],
+			'tt' => [
+				'match'    => '[tt]{TEXT}[/tt]',
+				'tpl'      => '<code style="font-family: monospace;">{TEXT}</code>',
+				'helpline' => 'Monospace: [tt]text[/tt]',
+			],
+		];
+
+		try
+		{
+			$existing = [];
+			$sql = 'SELECT bbcode_id, bbcode_tag FROM ' . $this->table_prefix . 'bbcodes';
+			$res = $this->db->sql_query($sql);
+			$max_id = 12;
+			while ($row = $this->db->sql_fetchrow($res))
+			{
+				$existing[$row['bbcode_tag']] = (int)$row['bbcode_id'];
+				if ((int)$row['bbcode_id'] > $max_id)
+				{
+					$max_id = (int)$row['bbcode_id'];
+				}
+			}
+			$this->db->sql_freeresult($res);
+
+			global $phpbb_root_path, $phpEx;
+			$acp_bbcodes = null;
+			if (!empty($phpbb_root_path) && file_exists($phpbb_root_path . 'includes/acp/acp_bbcodes.' . ($phpEx ?: 'php')))
+			{
+				require_once $phpbb_root_path . 'includes/acp/acp_bbcodes.' . ($phpEx ?: 'php');
+				if (class_exists('acp_bbcodes'))
+				{
+					$acp_bbcodes = new \acp_bbcodes();
+				}
+			}
+
+			$added = 0;
+			foreach ($customs as $tag => $def)
+			{
+				if (isset($existing[$tag]))
+				{
+					continue;
+				}
+
+				$max_id++;
+				$first_pass_match = '!(?!)!';
+				$first_pass_replace = '';
+				$second_pass_match = '!(?!)!';
+				$second_pass_replace = '';
+
+				if ($acp_bbcodes)
+				{
+					try
+					{
+						$compiled = $acp_bbcodes->build_regexp($def['match'], $def['tpl']);
+						$first_pass_match = $compiled['first_pass_match'] ?? $first_pass_match;
+						$first_pass_replace = $compiled['first_pass_replace'] ?? $first_pass_replace;
+						$second_pass_match = $compiled['second_pass_match'] ?? $second_pass_match;
+						$second_pass_replace = $compiled['second_pass_replace'] ?? $second_pass_replace;
+					}
+					catch (\Throwable $e)
+					{
+					}
+				}
+
+				$sql_ary = [
+					'bbcode_id'          => $max_id,
+					'bbcode_tag'         => $tag,
+					'bbcode_match'       => $def['match'],
+					'bbcode_tpl'         => $def['tpl'],
+					'display_on_posting' => 1,
+					'bbcode_helpline'    => $def['helpline'],
+					'first_pass_match'   => $first_pass_match,
+					'first_pass_replace' => $first_pass_replace,
+					'second_pass_match'  => $second_pass_match,
+					'second_pass_replace'=> $second_pass_replace,
+				];
+
+				$this->db->sql_query('INSERT INTO ' . $this->table_prefix . 'bbcodes ' . $this->db->sql_build_array('INSERT', $sql_ary));
+				$added++;
+			}
+
+			if ($added > 0)
+			{
+				global $cache, $phpbb_container;
+				if (!empty($cache) && method_exists($cache, 'destroy'))
+				{
+					$cache->destroy('sql', $this->table_prefix . 'bbcodes');
+					$cache->purge();
+				}
+				if (!empty($phpbb_container) && $phpbb_container->has('text_formatter.cache'))
+				{
+					$phpbb_container->get('text_formatter.cache')->invalidate();
+				}
+			}
+		}
+		catch (\Throwable $e)
+		{
+			// Non-fatal if table not present or DB error
+		}
 	}
 }

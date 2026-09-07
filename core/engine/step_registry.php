@@ -66,7 +66,7 @@ class step_registry
 				return $this->provider_steps[$provider][$name];
 			}
 			// vBulletin aliases fallback to vbulletin provider steps
-			if (in_array($provider, ['vbulletin3', 'vbulletin4', 'vb3', 'vb4'], true) && isset($this->provider_steps['vbulletin'][$name]))
+			if (in_array($provider, ['vbulletin3', 'vbulletin4', 'vb3', 'vb4', 'vbulletin6', 'vb6'], true) && isset($this->provider_steps['vbulletin'][$name]))
 			{
 				return $this->provider_steps['vbulletin'][$name];
 			}
@@ -100,6 +100,10 @@ class step_registry
 	{
 		if ($provider !== null)
 		{
+			if (in_array($provider, ['vbulletin6', 'vb6'], true))
+			{
+				return array_merge($this->provider_steps['vbulletin'] ?? [], $this->provider_steps['vbulletin6'] ?? []);
+			}
 			if (isset($this->provider_steps[$provider]))
 			{
 				return $this->provider_steps[$provider];
@@ -131,7 +135,7 @@ class step_registry
 			{
 				return true;
 			}
-			if (in_array($provider, ['vbulletin3', 'vbulletin4', 'vb3', 'vb4'], true) && isset($this->provider_steps['vbulletin'][$name]))
+			if (in_array($provider, ['vbulletin3', 'vbulletin4', 'vb3', 'vb4', 'vbulletin6', 'vb6'], true) && isset($this->provider_steps['vbulletin'][$name]))
 			{
 				return true;
 			}
@@ -182,7 +186,7 @@ class step_registry
 	 * @param array $requested_steps
 	 * @return array Ordered step names
 	 */
-	public function resolve_order(array $requested_steps): array
+	public function resolve_order(array $requested_steps, ?string $provider = null): array
 	{
 		// 1. Expand all transitive dependencies
 		$expanded_steps = $requested_steps;
@@ -190,7 +194,7 @@ class step_registry
 		while (!empty($queue))
 		{
 			$current = array_shift($queue);
-			$step = $this->get($current);
+			$step = $this->get($current, $provider);
 			if ($step)
 			{
 				foreach ($step->get_dependencies() as $dep)
@@ -216,7 +220,7 @@ class step_registry
 		$visited = [];
 		$visiting = [];
 
-		$visit = function($step_name) use (&$visit, &$resolved, &$visited, &$visiting) {
+		$visit = function($step_name) use (&$visit, &$resolved, &$visited, &$visiting, $provider) {
 			if (isset($visited[$step_name]))
 			{
 				return;
@@ -227,7 +231,7 @@ class step_registry
 			}
 			$visiting[$step_name] = true;
 
-			$step = $this->get($step_name);
+			$step = $this->get($step_name, $provider);
 			if ($step)
 			{
 				$deps = $step->get_dependencies();
@@ -240,7 +244,7 @@ class step_registry
 
 				foreach ($deps as $dep)
 				{
-					if ($this->has($dep))
+					if ($this->has($dep, $provider))
 					{
 						$visit($dep);
 					}

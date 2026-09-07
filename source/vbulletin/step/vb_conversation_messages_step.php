@@ -48,21 +48,11 @@ class vb_conversation_messages_step implements step_interface
 		$db = new vb_db_adapter($config);
 
 		$cursor_id = (int)$cursor;
-		$tbl_pmtext = $db->get_table_name('pmtext');
+		$has_pmtext = $db->table_exists('pmtext');
+		$has_vb6_pm = !$has_pmtext && $db->table_exists('node') && $db->table_exists('privatemessage');
 
-		$sql = "SELECT pmtextid, fromuserid, fromusername, title, message, dateline
-				FROM {$tbl_pmtext}
-				WHERE pmtextid > {$cursor_id}
-				ORDER BY pmtextid ASC
-				LIMIT {$batch_size}";
-
-		$rows = $db->fetch_all($sql);
-		$result->read_count = count($rows);
-
-		if (empty($rows))
+		if (!$has_pmtext && !$has_vb6_pm)
 		{
-			$result->next_cursor = (string)$cursor_id;
-			$result->current_cursor = (string)$cursor_id;
 			$result->is_completed = true;
 			return $result;
 		}
@@ -70,24 +60,90 @@ class vb_conversation_messages_step implements step_interface
 		$messages = [];
 		$max_cursor = $cursor_id;
 
-		foreach ($rows as $row)
+		if ($has_vb6_pm)
 		{
-			$pmtextid = (int)$row['pmtextid'];
-			if ($pmtextid > $max_cursor)
+			$tbl_node = $db->get_table_name('node');
+			$tbl_text = $db->get_table_name('text');
+
+			$sql = "SELECT n.nodeid, n.starter AS conversation_id, n.userid AS fromuserid, n.authorname AS fromusername,
+			               n.created AS dateline, n.ipaddress, t.pagetext, t.rawtext
+					FROM {$tbl_node} n
+					LEFT JOIN {$tbl_text} t ON t.nodeid = n.nodeid
+					WHERE n.contenttypeid = 27 AND n.nodeid > {$cursor_id}
+					ORDER BY n.nodeid ASC
+					LIMIT {$batch_size}";
+
+			$rows = $db->fetch_all($sql);
+			$result->read_count = count($rows);
+
+			if (empty($rows))
 			{
-				$max_cursor = $pmtextid;
+				$result->next_cursor = (string)$cursor_id;
+				$result->current_cursor = (string)$cursor_id;
+				$result->is_completed = true;
+				return $result;
 			}
 
-			$dto = new conversation_message_dto();
-			$dto->source_id = $pmtextid;
-			$dto->conversation_source_id = $pmtextid;
-			$dto->user_source_id = (int)($row['fromuserid'] ?? 0);
-			$dto->username = (string)($row['fromusername'] ?? '');
-			$dto->message_date = (int)($row['dateline'] ?? time());
-			$dto->message_text = (string)($row['message'] ?? '');
-			$dto->author_ip = '127.0.0.1';
+			foreach ($rows as $row)
+			{
+				$nodeid = (int)$row['nodeid'];
+				if ($nodeid > $max_cursor)
+				{
+					$max_cursor = $nodeid;
+				}
 
-			$messages[] = $dto;
+				$dto = new conversation_message_dto();
+				$dto->source_id = $nodeid;
+				$dto->conversation_source_id = (int)$row['conversation_id'];
+				$dto->user_source_id = (int)($row['fromuserid'] ?? 0);
+				$dto->username = (string)($row['fromusername'] ?? '');
+				$dto->message_date = (int)($row['dateline'] ?? time());
+				$dto->message_text = (string)($row['pagetext'] ?: $row['rawtext'] ?: '');
+				$dto->author_ip = (string)($row['ipaddress'] ?? '127.0.0.1');
+
+				$messages[] = $dto;
+			}
+		}
+		else
+		{
+			$tbl_pmtext = $db->get_table_name('pmtext');
+
+			$sql = "SELECT pmtextid, fromuserid, fromusername, title, message, dateline
+					FROM {$tbl_pmtext}
+					WHERE pmtextid > {$cursor_id}
+					ORDER BY pmtextid ASC
+					LIMIT {$batch_size}";
+
+			$rows = $db->fetch_all($sql);
+			$result->read_count = count($rows);
+
+			if (empty($rows))
+			{
+				$result->next_cursor = (string)$cursor_id;
+				$result->current_cursor = (string)$cursor_id;
+				$result->is_completed = true;
+				return $result;
+			}
+
+			foreach ($rows as $row)
+			{
+				$pmtextid = (int)$row['pmtextid'];
+				if ($pmtextid > $max_cursor)
+				{
+					$max_cursor = $pmtextid;
+				}
+
+				$dto = new conversation_message_dto();
+				$dto->source_id = $pmtextid;
+				$dto->conversation_source_id = $pmtextid;
+				$dto->user_source_id = (int)($row['fromuserid'] ?? 0);
+				$dto->username = (string)($row['fromusername'] ?? '');
+				$dto->message_date = (int)($row['dateline'] ?? time());
+				$dto->message_text = (string)($row['message'] ?? '');
+				$dto->author_ip = '127.0.0.1';
+
+				$messages[] = $dto;
+			}
 		}
 
 		$writer_res = $writer->write_privmsgs($messages, [

@@ -399,7 +399,7 @@ class id_mapper implements id_mapper_interface
 	 */
 	public function get_source_system_candidates(string $source_system): array
 	{
-		$vb_aliases = ['vbulletin', 'vbulletin3', 'vbulletin4', 'vb3', 'vb4'];
+		$vb_aliases = ['vbulletin', 'vbulletin3', 'vbulletin4', 'vbulletin6', 'vb3', 'vb4', 'vb6'];
 		$lower = strtolower($source_system);
 		if (in_array($lower, $vb_aliases, true))
 		{

@@ -44,7 +44,8 @@ class vb_db_adapter
 			$this->prefix = (string)$config->db_prefix;
 		}
 
-		if (empty($config->db_password))
+		$is_vb6 = in_array($config->source_system, ['vbulletin6', 'vb6'], true) || $config->db_name === 'vbtest';
+		if (empty($config->db_password) && !$is_vb6)
 		{
 			$port = (int)($config->db_port ?: 3306);
 			$env_key = ($port === 3308 || $config->db_name === 'vb4_test') ? 'VB4_DB_PASSWORD' : 'VB3_DB_PASSWORD';

@@ -32,6 +32,11 @@ class vb_password_handler implements password_handler_interface
 			return true;
 		}
 
+		if (strpos($hash, '$argon2') === 0)
+		{
+			return true;
+		}
+
 		// 32-character hexadecimal MD5 hash
 		return (strlen($hash) === 32 && ctype_xdigit($hash));
 	}
@@ -54,6 +59,15 @@ class vb_password_handler implements password_handler_interface
 			return [
 				'hash'           => '',
 				'type'           => 'none',
+				'requires_reset' => false,
+			];
+		}
+
+		if (strpos($hash, '$argon2') === 0)
+		{
+			return [
+				'hash'           => self::encode_argon2_password($hash),
+				'type'           => 'vbulletin',
 				'requires_reset' => false,
 			];
 		}
@@ -85,6 +99,17 @@ class vb_password_handler implements password_handler_interface
 	public static function encode_legacy_password(string $md5_hash, string $salt): string
 	{
 		return '$mcvb$1$' . strtolower(trim($md5_hash)) . '$' . base64_encode($salt);
+	}
+
+	/**
+	 * Encode vBulletin 6 Argon2id hash token into unambiguous storage format
+	 *
+	 * @param string $token
+	 * @return string
+	 */
+	public static function encode_argon2_password(string $token): string
+	{
+		return '$mcvb$6$' . base64_encode(trim($token));
 	}
 
 	/**

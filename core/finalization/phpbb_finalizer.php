@@ -364,8 +364,8 @@ class phpbb_finalizer
 		$sql = 'SELECT COUNT(*) as cnt FROM ' . $this->table_prefix . 'users WHERE user_type IN (0, 3)';
 		$num_users = (int)$this->db->sql_fetchfield('cnt', 0, $this->db->sql_query($sql));
 
-		// 4. Newest user
-		$sql = 'SELECT user_id, username, user_colour FROM ' . $this->table_prefix . 'users WHERE user_type IN (0, 3) ORDER BY user_regdate DESC, user_id DESC';
+		// 4. Newest user (highest registered user_id)
+		$sql = 'SELECT user_id, username, user_colour FROM ' . $this->table_prefix . 'users WHERE user_type IN (0, 3) AND user_id > 2 ORDER BY user_id DESC';
 		$newest_user = $this->db->sql_fetchrow($this->db->sql_query_limit($sql, 1));
 
 		if (!$dry_run)

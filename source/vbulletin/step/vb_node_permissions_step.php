@@ -47,19 +47,33 @@ class vb_node_permissions_step implements step_interface
 		$db = new vb_db_adapter($config);
 
 		$cursor_id = (int)$cursor;
-		$tbl_perm = $db->get_table_name('forumpermission');
+		$has_vB6_perm = $db->table_exists('permission');
+		$has_vB3_perm = $db->table_exists('forumpermission');
 
-		if (!$db->table_exists('forumpermission'))
+		if (!$has_vB6_perm && !$has_vB3_perm)
 		{
 			$result->is_completed = true;
 			return $result;
 		}
 
-		$sql = "SELECT forumpermissionid, forumid, usergroupid, forumpermissions
-				FROM {$tbl_perm}
-				WHERE forumpermissionid > {$cursor_id}
-				ORDER BY forumpermissionid ASC
-				LIMIT {$batch_size}";
+		if ($has_vB6_perm)
+		{
+			$tbl_perm = $db->get_table_name('permission');
+			$sql = "SELECT permissionid AS forumpermissionid, nodeid AS forumid, groupid AS usergroupid, forumpermissions
+					FROM {$tbl_perm}
+					WHERE permissionid > {$cursor_id}
+					ORDER BY permissionid ASC
+					LIMIT {$batch_size}";
+		}
+		else
+		{
+			$tbl_perm = $db->get_table_name('forumpermission');
+			$sql = "SELECT forumpermissionid, forumid, usergroupid, forumpermissions
+					FROM {$tbl_perm}
+					WHERE forumpermissionid > {$cursor_id}
+					ORDER BY forumpermissionid ASC
+					LIMIT {$batch_size}";
+		}
 
 		$rows = $db->fetch_all($sql);
 		$result->read_count = count($rows);

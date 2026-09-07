@@ -33,13 +33,21 @@ class vb_config_detector
 		$normalized_path = str_replace('\\', '/', $clean_path);
 
 		// If path directly points to config.php or includes folder, resolve root
-		if (preg_match('#/includes/config\.php$#i', $normalized_path))
+		if (preg_match('#/core/includes/config\.php$#i', $normalized_path))
+		{
+			$normalized_path = preg_replace('#/core/includes/config\.php$#i', '', $normalized_path);
+		}
+		else if (preg_match('#/includes/config\.php$#i', $normalized_path))
 		{
 			$normalized_path = preg_replace('#/includes/config\.php$#i', '', $normalized_path);
 		}
 		else if (preg_match('#/config\.php$#i', $normalized_path))
 		{
 			$normalized_path = preg_replace('#/config\.php$#i', '', $normalized_path);
+		}
+		else if (preg_match('#/core/includes/?$#i', $normalized_path))
+		{
+			$normalized_path = preg_replace('#/core/includes/?$#i', '', $normalized_path);
 		}
 		else if (preg_match('#/includes/?$#i', $normalized_path))
 		{
@@ -53,18 +61,30 @@ class vb_config_detector
 			return null;
 		}
 
-		$config_file = $normalized_path . '/includes/config.php';
-		if (!file_exists($config_file) || !is_readable($config_file))
+		$config_file = null;
+		$candidate_paths = [
+			$normalized_path . '/core/includes/config.php',
+			$normalized_path . '/includes/config.php',
+			$normalized_path . '/config.php',
+		];
+		// Also handle if user passed path pointing inside core directory
+		if (basename($normalized_path) === 'core')
 		{
-			// Fallback: check config.php in root
-			if (file_exists($normalized_path . '/config.php') && is_readable($normalized_path . '/config.php'))
+			array_unshift($candidate_paths, $normalized_path . '/includes/config.php');
+		}
+
+		foreach ($candidate_paths as $candidate)
+		{
+			if (file_exists($candidate) && is_readable($candidate))
 			{
-				$config_file = $normalized_path . '/config.php';
+				$config_file = $candidate;
+				break;
 			}
-			else
-			{
-				return null;
-			}
+		}
+
+		if (!$config_file)
+		{
+			return null;
 		}
 
 		// 2. Parse config.php in isolated scope

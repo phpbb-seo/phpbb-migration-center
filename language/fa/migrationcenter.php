@@ -121,6 +121,7 @@ $lang = array_merge($lang, array(
 	'SOURCE_SYSTEM_XENFORO'             => 'زنفورو (XenForo 2.x)',
 	'SOURCE_SYSTEM_VBULLETIN3'          => 'وی‌بولتین (vBulletin 3.8.x)',
 	'SOURCE_SYSTEM_VBULLETIN4'          => 'وی‌بولتین (vBulletin 4.2.x)',
+	'SOURCE_SYSTEM_VBULLETIN6'          => 'وی‌بولتین (vBulletin 6.x)',
 	'SOURCE_SYSTEM_VBULLETIN'           => 'وی‌بولتین (vBulletin)',
 	'SOURCE_ROOT_PATH'                  => 'مسیر دایرکتوری ریشه مبدأ',
 	'SOURCE_ROOT_PATH_EXPLAIN'          => 'مسیر کامل در سرور به فایل‌های انجمن مبدأ (برای دسترسی به فایل‌های پیوست و آواتارها).',

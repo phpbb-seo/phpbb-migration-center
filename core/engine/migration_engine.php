@@ -123,7 +123,7 @@ class migration_engine
 
 		// Resolve ordered steps
 		$requested_steps = !empty($config->selected_steps) ? $config->selected_steps : $provider->get_supported_steps();
-		$ordered_steps = $this->step_registry->resolve_order($requested_steps);
+		$ordered_steps = $this->step_registry->resolve_order($requested_steps, $source_system);
 
 		$steps_init = [];
 		foreach ($ordered_steps as $order => $step_name)

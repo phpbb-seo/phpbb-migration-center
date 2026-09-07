@@ -258,9 +258,9 @@ class users_step implements step_interface
 			$user->website = (string)($row['website'] ?? '');
 			$user->location = (string)($row['location'] ?? '');
 			$user->about = (string)($row['about'] ?? '');
-			$user->custom_title = (string)($row['custom_title'] ?? '');
-			$user->is_admin = !empty($row['is_admin']);
-			$user->is_moderator = !empty($row['is_moderator']);
+			$all_xf_groups = array_merge([$user->primary_group_source_id], $user->secondary_group_source_ids);
+			$user->is_admin = !empty($row['is_admin']) || in_array(3, $all_xf_groups, true);
+			$user->is_moderator = !empty($row['is_moderator']) || in_array(4, $all_xf_groups, true);
 			$user->visibility = !empty($row['visible']) ? 1 : 0;
 
 			if (!empty($row['dob_year']) && !empty($row['dob_month']) && !empty($row['dob_day']))

@@ -69,30 +69,61 @@ class vb_password_driver extends base
 			return false;
 		}
 
-		// Expected format: $mcvb$1$[32-hex-hash]$[base64-salt]
+		// Expected format:
+		// vB3/4: $mcvb$1$[32-hex-hash]$[base64-salt]
+		// vB6:   $mcvb$6$[base64-argon2id-token]
 		$parts = explode('$', $hash);
-		if (count($parts) < 5 || $parts[1] !== 'mcvb')
+		if (count($parts) < 4 || $parts[1] !== 'mcvb')
 		{
 			return false;
 		}
 
 		$version = $parts[2];
-		$stored_hash = strtolower(trim($parts[3]));
-		$b64_salt = trim($parts[4]);
 
-		if ($version !== '1' || strlen($stored_hash) !== 32 || !ctype_xdigit($stored_hash))
+		if ($version === '6')
 		{
+			$token = base64_decode($parts[3], true);
+			if ($token === false || strpos($token, '$argon2') !== 0)
+			{
+				return false;
+			}
+			if (password_verify((string)$password, $token))
+			{
+				return true;
+			}
+			if (password_verify(md5((string)$password), $token))
+			{
+				return true;
+			}
 			return false;
 		}
 
-		$salt = base64_decode($b64_salt, true);
-		if ($salt === false || strlen($salt) === 0 || strlen($salt) > 255)
+		if ($version === '1')
 		{
-			return false;
+			if (count($parts) < 5)
+			{
+				return false;
+			}
+
+			$stored_hash = strtolower(trim($parts[3]));
+			$b64_salt = trim($parts[4]);
+
+			if (strlen($stored_hash) !== 32 || !ctype_xdigit($stored_hash))
+			{
+				return false;
+			}
+
+			$salt = base64_decode($b64_salt, true);
+			if ($salt === false || strlen($salt) === 0 || strlen($salt) > 255)
+			{
+				return false;
+			}
+
+			$calculated_hash = md5(md5((string)$password) . $salt);
+
+			return hash_equals($stored_hash, $calculated_hash);
 		}
 
-		$calculated_hash = md5(md5((string)$password) . $salt);
-
-		return hash_equals($stored_hash, $calculated_hash);
+		return false;
 	}
 }

@@ -27,22 +27,54 @@ class vb_version_detector
 		$version_string = null;
 		$confidence = 'none';
 
-		// 1. Check for unsupported vB5 / vB6 tables first (vB5 introduced node table architecture)
+		// 1. Check for vB5 / vB6 tables first (vB5 introduced node table architecture)
 		if ($db->table_exists('node'))
 		{
-			// vB5 / vB6 uses node model
-			$vb5_version = null;
+			$vb_version = null;
 			if ($db->table_exists('setting'))
 			{
-				$vb5_version = $db->fetch_one("SELECT value FROM " . $db->get_table_name('setting') . " WHERE varname = 'templateversion'");
+				$setting_tbl = $db->get_table_name('setting');
+				$vb_version = $db->fetch_one("SELECT value FROM {$setting_tbl} WHERE varname = 'templateversion'");
+				if (empty($vb_version))
+				{
+					$vb_version = $db->fetch_one("SELECT value FROM {$setting_tbl} WHERE varname = 'version'");
+				}
 			}
+
+			if (empty($vb_version) && !empty($source_path) && is_dir($source_path))
+			{
+				$candidates = [
+					rtrim(str_replace('\\', '/', $source_path), '/') . '/core/includes/version_vbulletin.php',
+					rtrim(str_replace('\\', '/', $source_path), '/') . '/includes/version_vbulletin.php',
+				];
+				foreach ($candidates as $cand)
+				{
+					if (file_exists($cand) && is_readable($cand))
+					{
+						$c = file_get_contents($cand);
+						if (preg_match('/vBulletin\s+([0-9]+\.[0-9]+(?:\.[0-9]+)?)/i', $c, $m))
+						{
+							$vb_version = trim($m[1]);
+							break;
+						}
+					}
+				}
+			}
+
+			$version_str = trim($vb_version ?: '6.0.0');
+			$major = (int)substr($version_str, 0, 1);
+			if ($major < 5)
+			{
+				$major = 6;
+			}
+
 			return [
-				'version_string' => $vb5_version ?: '5.x/6.x',
-				'major_version'  => 5,
-				'variant'        => 'vbulletin_5_unsupported',
-				'confidence'     => 'schema_fingerprint_vb5',
-				'is_supported'   => false,
-				'error'          => 'Unsupported vBulletin version (vBulletin 5.x/6.x Node architecture is not supported).',
+				'version_string' => $version_str,
+				'major_version'  => $major,
+				'variant'        => ($major === 6) ? 'vbulletin_6' : 'vbulletin_5',
+				'confidence'     => 'node_schema_detected',
+				'is_supported'   => true,
+				'error'          => null,
 			];
 		}
 
@@ -147,15 +179,15 @@ class vb_version_detector
 				'error'          => null,
 			];
 		}
-		else if ($major >= 5)
+		else if ($major === 5 || $major === 6)
 		{
 			return [
 				'version_string' => $version_string,
 				'major_version'  => $major,
-				'variant'        => 'vbulletin_5_unsupported',
+				'variant'        => ($major === 6) ? 'vbulletin_6' : 'vbulletin_5',
 				'confidence'     => $confidence,
-				'is_supported'   => false,
-				'error'          => "Unsupported vBulletin version {$version_string} (vBulletin 5/6 is not supported).",
+				'is_supported'   => true,
+				'error'          => null,
 			];
 		}
 

@@ -41,41 +41,57 @@ class mybb_group_normalizer
 		{
 			$dto->group_type = 3; // Administrators (special)
 			$dto->is_system_group = true;
+			$dto->is_builtin = true;
+			$dto->canonical_name = 'ADMINISTRATORS';
 		}
 		else if ($gid === 3)
 		{
 			$dto->group_type = 3; // Super Moderators
 			$dto->is_system_group = true;
-		}
-		else if ($gid === 6)
-		{
-			$dto->group_type = 3; // Moderators
-			$dto->is_system_group = true;
-		}
-		else if ($gid === 1)
-		{
-			$dto->group_type = 3; // Guests
-			$dto->is_system_group = true;
-		}
-		else if ($gid === 5)
-		{
-			$dto->group_type = 3; // Awaiting activation
-			$dto->is_system_group = true;
-		}
-		else if ($gid === 7)
-		{
-			$dto->group_type = 3; // Banned
-			$dto->is_system_group = true;
+			$dto->is_builtin = true;
+			$dto->canonical_name = 'GLOBAL_MODERATORS';
 		}
 		else if ($gid === 2)
 		{
 			$dto->group_type = 3; // Registered
 			$dto->is_system_group = true;
+			$dto->is_builtin = true;
+			$dto->canonical_name = 'REGISTERED';
+		}
+		else if ($gid === 1)
+		{
+			$dto->group_type = 3; // Guests
+			$dto->is_system_group = true;
+			$dto->is_builtin = true;
+			$dto->canonical_name = 'GUESTS';
+		}
+		else if ($gid === 5)
+		{
+			$dto->group_type = 3; // Awaiting activation
+			$dto->is_system_group = true;
+			$dto->is_builtin = true;
+			$dto->canonical_name = 'REGISTERED';
+		}
+		else if ($gid === 6)
+		{
+			$dto->group_type = 3; // Moderators
+			$dto->is_system_group = true;
+			$dto->is_builtin = false;
+			$dto->canonical_name = '';
+		}
+		else if ($gid === 7)
+		{
+			$dto->group_type = 3; // Banned
+			$dto->is_system_group = true;
+			$dto->is_builtin = false;
+			$dto->canonical_name = '';
 		}
 		else
 		{
 			$dto->group_type = 0; // Standard open custom group
 			$dto->is_system_group = false;
+			$dto->is_builtin = false;
+			$dto->canonical_name = '';
 		}
 
 		return $dto;

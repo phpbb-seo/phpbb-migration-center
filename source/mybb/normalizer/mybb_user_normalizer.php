@@ -129,6 +129,11 @@ class mybb_user_normalizer
 			$dto->user_type = 0; // USER_NORMAL
 		}
 
+		$all_groups = array_merge([$primary_gid], $dto->secondary_group_source_ids);
+		$dto->is_admin = in_array(4, $all_groups, true); // MyBB 4 = Administrators
+		$dto->is_moderator = in_array(3, $all_groups, true) || in_array(6, $all_groups, true); // 3 = Super Mods, 6 = Mods
+		$dto->group_id = 2; // Default phpBB Registered Users
+
 		// Signature
 		if (!empty($row['signature']))
 		{

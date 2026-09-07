@@ -116,12 +116,17 @@ class group_memberships_step implements step_interface
 				$secondary_ids = array_filter(array_map('intval', explode(',', $row['secondary_group_ids'])));
 			}
 
+			$primary_gid = (int)($row['user_group_id'] ?? 2);
+			$all_groups = array_merge([$primary_gid], $secondary_ids);
+			$is_admin = !empty($row['is_admin']) || in_array(3, $all_groups, true);
+			$is_mod = !empty($row['is_moderator']) || in_array(4, $all_groups, true);
+
 			$memberships[] = [
 				'user_source_id'             => $source_id,
-				'primary_group_source_id'    => (int)($row['user_group_id'] ?? 2),
+				'primary_group_source_id'    => $primary_gid,
 				'secondary_group_source_ids' => $secondary_ids,
-				'is_admin'                   => !empty($row['is_admin']),
-				'is_moderator'               => !empty($row['is_moderator']),
+				'is_admin'                   => $is_admin,
+				'is_moderator'               => $is_mod,
 			];
 		}
 

@@ -125,6 +125,7 @@ $lang = array_merge($lang, array(
 	'SOURCE_SYSTEM_XENFORO'        => 'XenForo 2.x',
 	'SOURCE_SYSTEM_VBULLETIN3'     => 'vBulletin 3.8.x',
 	'SOURCE_SYSTEM_VBULLETIN4'     => 'vBulletin 4.2.x',
+	'SOURCE_SYSTEM_VBULLETIN6'     => 'vBulletin 6.x',
 	'SOURCE_SYSTEM_VBULLETIN'      => 'vBulletin',
 	'SOURCE_ROOT_PATH'             => 'Source Root Directory Path',
 	'SOURCE_ROOT_PATH_EXPLAIN'     => 'Full server path to the source forum installation (e.g. /var/www/forum or C:\forum).',

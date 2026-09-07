@@ -92,12 +92,16 @@ class vb_group_memberships_step implements step_interface
 				}
 			}
 
+			$all_groups = array_merge([$primary_group], $secondary_groups);
+			$is_admin = in_array(6, $all_groups, true); // vB Group 6 = Administrators
+			$is_mod = in_array(5, $all_groups, true) || in_array(7, $all_groups, true); // 5 = Super Mods, 7 = Mods
+
 			$memberships[] = [
 				'user_source_id'              => $uid,
 				'primary_group_source_id'    => $primary_group,
 				'secondary_group_source_ids' => array_unique($secondary_groups),
-				'is_admin'                   => false,
-				'is_moderator'               => false,
+				'is_admin'                   => $is_admin,
+				'is_moderator'               => $is_mod,
 			];
 		}
 

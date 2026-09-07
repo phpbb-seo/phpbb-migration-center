@@ -275,13 +275,14 @@ class main_module
 		$db_name       = $request->variable('db_name', '');
 		$db_user       = $request->variable('db_user', '');
 		$db_pass       = $request->variable('db_pass', $request->variable('db_password', ''));
-		$is_vb = in_array($source_system, ['vbulletin', 'vbulletin3', 'vbulletin4', 'vb3', 'vb4'], true);
+		$is_vb = in_array($source_system, ['vbulletin', 'vbulletin3', 'vbulletin4', 'vbulletin6', 'vb3', 'vb4', 'vb6'], true);
 		$is_mybb = in_array($source_system, ['mybb', 'mybb18'], true);
-		$default_prefix = $is_vb ? '' : ($is_mybb ? 'mybb_' : 'xf_');
+		$is_smf = in_array($source_system, ['smf', 'smf2', 'smf20', 'smf21'], true);
+		$default_prefix = $is_vb ? '' : ($is_mybb ? 'mybb_' : ($is_smf ? 'smf_' : 'xf_'));
 		$db_prefix     = $request->variable('table_prefix', $request->variable('db_prefix', $default_prefix));
 		if (empty($db_prefix) && !$is_vb)
 		{
-			$db_prefix = $is_mybb ? 'mybb_' : 'xf_';
+			$db_prefix = $is_mybb ? 'mybb_' : ($is_smf ? 'smf_' : 'xf_');
 		}
 
 		$db = $phpbb_container->get('dbal.conn');
@@ -321,6 +322,10 @@ class main_module
 				{
 					$detected = \phpbbseo\migrationcenter\source\mybb\config\mybb_config_detector::detect_from_path($source_path);
 				}
+				else if ($is_smf)
+				{
+					$detected = \phpbbseo\migrationcenter\source\smf\config\smf_config_detector::detect_from_path($source_path);
+				}
 				else
 				{
 					$detected = \phpbbseo\migrationcenter\source\xenforo\config\xf_config_detector::detect_from_path($source_path);
@@ -359,14 +364,30 @@ class main_module
 						$rel_base . '/vb',
 					];
 				}
+				else if ($source_system === 'vbulletin6' || $source_system === 'vb6')
+				{
+					$fallbacks = [
+						'C:/xampp/htdocs/vbtest',
+						'C:/xampp/htdocs/vb6',
+						'C:/xampp/htdocs/vbulletin6',
+						'C:/vb-migration-lab/vb6',
+						$rel_base . '/../vbtest',
+						$rel_base . '/../vb6',
+						$rel_base . '/../vbulletin6',
+						$rel_base . '/vbtest',
+						$rel_base . '/vb6',
+					];
+				}
 				else if ($is_vb)
 				{
 					$fallbacks = [
+						'C:/xampp/htdocs/vbtest',
 						'C:/vb-migration-lab/vb3',
 						'C:/vb-migration-lab/vb4',
 						'C:/xampp/htdocs/vb3',
 						'C:/xampp/htdocs/vb4',
 						'C:/xampp/htdocs/vb',
+						$rel_base . '/../vbtest',
 						$rel_base . '/../vb',
 						$rel_base . '/../vbulletin',
 						$rel_base . '/../vb3',
@@ -379,6 +400,14 @@ class main_module
 						'C:/xampp/htdocs/mybb',
 						$rel_base . '/../mybb',
 						$rel_base . '/mybb',
+					];
+				}
+				else if ($is_smf)
+				{
+					$fallbacks = [
+						'C:/xampp/htdocs/smf',
+						$rel_base . '/../smf',
+						$rel_base . '/smf',
 					];
 				}
 				else
@@ -408,6 +437,10 @@ class main_module
 					else if ($is_mybb)
 					{
 						$detected = \phpbbseo\migrationcenter\source\mybb\config\mybb_config_detector::detect_from_path($fb_path);
+					}
+					else if ($is_smf)
+					{
+						$detected = \phpbbseo\migrationcenter\source\smf\config\smf_config_detector::detect_from_path($fb_path);
 					}
 					else
 					{
@@ -441,10 +474,14 @@ class main_module
 					$db_port = 3308;
 				}
 
-				// If vBulletin was detected, ensure accurate sub-version alignment (vB3 vs vB4)
+				// If vBulletin was detected, ensure accurate sub-version alignment (vB3 vs vB4 vs vB6)
 				if ($is_vb)
 				{
-					if (is_dir($detected->source_path . '/packages') || file_exists($detected->source_path . '/forum.php') || strpos($db_name, 'vb4') !== false)
+					if (file_exists($detected->source_path . '/core/vb/vb.php') || is_dir($detected->source_path . '/core/vb') || strpos($db_name, 'vb6') !== false || strpos($db_name, 'vbtest') !== false)
+					{
+						$source_system = 'vbulletin6';
+					}
+					else if (is_dir($detected->source_path . '/packages') || file_exists($detected->source_path . '/forum.php') || strpos($db_name, 'vb4') !== false)
 					{
 						$source_system = 'vbulletin4';
 					}
@@ -587,6 +624,8 @@ class main_module
 				$pm_attachments_count = $provider->get_total_records('conversation_attachments', $cfg) ?: 0;
 				$polls_count = $provider->get_total_records('polls', $cfg) ?: 0;
 				$bans_count = $provider->get_total_records('bans', $cfg) ?: 0;
+				$global_perms_count = $provider->get_total_records('global_permissions', $cfg) ?: 0;
+				$node_perms_count = $provider->get_total_records('node_permissions', $cfg) ?: 0;
 
 				try
 				{
@@ -654,10 +693,10 @@ class main_module
 			'groups'                   => $groups_count,
 			'users'                    => $users_count,
 			'group_memberships'        => $users_count,
-			'global_permissions'       => $perm_stats['total'] ?? 0,
+			'global_permissions'       => ($perm_stats['total'] ?? 0) ?: ($global_perms_count ?? 0),
 			'avatars'                  => $avatars_count,
 			'forums'                   => $forums_count,
-			'node_permissions'         => $perm_stats['deferred_node'] ?? 0,
+			'node_permissions'         => ($perm_stats['deferred_node'] ?? 0) ?: ($node_perms_count ?? 0),
 			'topics'                   => $topics_count,
 			'posts'                    => $posts_count,
 			'attachments'              => $attachments_count,
@@ -1865,6 +1904,10 @@ class main_module
 		{
 			return 'vBulletin 4.2' . ($version ? " ({$version})" : '');
 		}
+		if ($sys === 'vbulletin6' || $sys === 'vb6')
+		{
+			return 'vBulletin 6.x' . ($version ? " ({$version})" : '');
+		}
 		if ($sys === 'vbulletin')
 		{
 			return 'vBulletin' . ($version ? " ({$version})" : ' 3.8 / 4.2');
@@ -1876,6 +1919,10 @@ class main_module
 		if ($sys === 'mybb' || $sys === 'mybb18')
 		{
 			return 'MyBB' . ($version ? " ({$version})" : ' 1.8.x');
+		}
+		if ($sys === 'smf' || $sys === 'smf2' || $sys === 'smf20' || $sys === 'smf21')
+		{
+			return 'Simple Machines Forum' . ($version ? " ({$version})" : ' (SMF 2.x)');
 		}
 		return ucfirst($system) . ($version ? " ({$version})" : '');
 	}

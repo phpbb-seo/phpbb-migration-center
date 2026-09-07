@@ -48,12 +48,26 @@ class vb_attachments_step implements step_interface
 		$db = new vb_db_adapter($config);
 
 		$cursor_id = (int)$cursor;
+		$is_vb6 = $db->table_exists('attach');
 		$is_vb4 = $db->table_exists('filedata');
 
-		$tbl_attach = $db->get_table_name('attachment');
+		$tbl_attach = $db->get_table_name($is_vb6 ? 'attach' : 'attachment');
 		$tbl_fd = $db->get_table_name('filedata');
+		$tbl_node = $db->get_table_name('node');
 
-		if ($is_vb4)
+		if ($is_vb6)
+		{
+			$sql = "SELECT a.nodeid AS attachmentid, n.parentid AS postid, n.userid, a.filename, n.publishdate AS dateline,
+					       fd.filedata, fd.filesize, fd.filehash
+					FROM {$tbl_attach} a
+					JOIN {$tbl_node} n ON n.nodeid = a.nodeid
+					JOIN {$tbl_node} p ON p.nodeid = n.parentid
+					JOIN {$tbl_fd} fd ON a.filedataid = fd.filedataid
+					WHERE p.contenttypeid != 27 AND a.nodeid > {$cursor_id}
+					ORDER BY a.nodeid ASC
+					LIMIT {$batch_size}";
+		}
+		else if ($is_vb4)
 		{
 			$sql = "SELECT a.attachmentid, a.contentid AS postid, a.userid, a.filename, a.dateline, fd.filedata, fd.filesize, fd.filehash
 					FROM {$tbl_attach} a

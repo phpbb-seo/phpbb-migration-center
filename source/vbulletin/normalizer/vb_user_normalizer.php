@@ -63,13 +63,17 @@ class vb_user_normalizer
 
 		// 3. Password and Authentication
 		$raw_pass = (string)($row['password'] ?? '');
+		if (empty($raw_pass) && !empty($row['token']))
+		{
+			$raw_pass = (string)$row['token'];
+		}
 		$raw_salt = (string)($row['salt'] ?? '');
 		$auth_result = $this->password_handler->convert_password('vbulletin', [
 			'password' => $raw_pass,
 			'salt'     => $raw_salt,
 		]);
 
-		$dto->source_auth_scheme = 'vbulletin_md5';
+		$dto->source_auth_scheme = (strpos($raw_pass, '$argon2') === 0) ? 'vbulletin_argon2' : 'vbulletin_md5';
 		$dto->password_hash = $auth_result['hash'];
 		$dto->password_type = $auth_result['type'];
 		$dto->requires_password_reset = (bool)($auth_result['requires_reset'] ?? false);

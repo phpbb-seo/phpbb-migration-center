@@ -38,8 +38,18 @@ services:
         arguments:
             - '%core.root_path%'
 
+    phpbbseo.migrationcenter.source.vbulletin6:
+        class: phpbbseo\migrationcenter\source\vbulletin\vb6_source_provider
+        arguments:
+            - '%core.root_path%'
+
     phpbbseo.migrationcenter.source.mybb:
         class: phpbbseo\migrationcenter\source\mybb\mybb_source_provider
+        arguments:
+            - '%core.root_path%'
+
+    phpbbseo.migrationcenter.source.smf:
+        class: phpbbseo\migrationcenter\source\smf\smf_source_provider
         arguments:
             - '%core.root_path%'
 
@@ -49,7 +59,9 @@ services:
             - [register, ['@phpbbseo.migrationcenter.source.xenforo']]
             - [register, ['@phpbbseo.migrationcenter.source.vbulletin3']]
             - [register, ['@phpbbseo.migrationcenter.source.vbulletin4']]
+            - [register, ['@phpbbseo.migrationcenter.source.vbulletin6']]
             - [register, ['@phpbbseo.migrationcenter.source.mybb']]
+            - [register, ['@phpbbseo.migrationcenter.source.smf']]
 
     phpbbseo.migrationcenter.step.groups:
         class: phpbbseo\migrationcenter\source\xenforo\step\groups_step
@@ -141,6 +153,15 @@ services:
     phpbbseo.migrationcenter.step.vb_bans:
         class: phpbbseo\migrationcenter\source\vbulletin\step\vb_bans_step
 
+    phpbbseo.migrationcenter.step.vb6_forums:
+        class: phpbbseo\migrationcenter\source\vbulletin\step\vb6_forums_step
+
+    phpbbseo.migrationcenter.step.vb6_topics:
+        class: phpbbseo\migrationcenter\source\vbulletin\step\vb6_topics_step
+
+    phpbbseo.migrationcenter.step.vb6_posts:
+        class: phpbbseo\migrationcenter\source\vbulletin\step\vb6_posts_step
+
     phpbbseo.migrationcenter.passwords.driver.vbulletin:
         class: phpbbseo\migrationcenter\source\vbulletin\password\vb_password_driver
         arguments:
@@ -202,6 +223,59 @@ services:
     phpbbseo.migrationcenter.step.mybb_bans:
         class: phpbbseo\migrationcenter\source\mybb\step\bans_step
 
+    phpbbseo.migrationcenter.passwords.driver.smf:
+        class: phpbbseo\migrationcenter\source\smf\password\smf_password_driver
+        arguments:
+            - '@config'
+            - '@passwords.driver_helper'
+        tags:
+            - { name: passwords.driver }
+
+    phpbbseo.migrationcenter.step.smf_groups:
+        class: phpbbseo\migrationcenter\source\smf\step\groups_step
+
+    phpbbseo.migrationcenter.step.smf_users:
+        class: phpbbseo\migrationcenter\source\smf\step\users_step
+
+    phpbbseo.migrationcenter.step.smf_group_memberships:
+        class: phpbbseo\migrationcenter\source\smf\step\group_memberships_step
+
+    phpbbseo.migrationcenter.step.smf_global_permissions:
+        class: phpbbseo\migrationcenter\source\smf\step\global_permissions_step
+
+    phpbbseo.migrationcenter.step.smf_forums:
+        class: phpbbseo\migrationcenter\source\smf\step\forums_step
+
+    phpbbseo.migrationcenter.step.smf_node_permissions:
+        class: phpbbseo\migrationcenter\source\smf\step\node_permissions_step
+
+    phpbbseo.migrationcenter.step.smf_topics:
+        class: phpbbseo\migrationcenter\source\smf\step\topics_step
+
+    phpbbseo.migrationcenter.step.smf_posts:
+        class: phpbbseo\migrationcenter\source\smf\step\posts_step
+
+    phpbbseo.migrationcenter.step.smf_attachments:
+        class: phpbbseo\migrationcenter\source\smf\step\attachments_step
+
+    phpbbseo.migrationcenter.step.smf_avatars:
+        class: phpbbseo\migrationcenter\source\smf\step\avatars_step
+
+    phpbbseo.migrationcenter.step.smf_conversations:
+        class: phpbbseo\migrationcenter\source\smf\step\conversations_step
+
+    phpbbseo.migrationcenter.step.smf_conversation_messages:
+        class: phpbbseo\migrationcenter\source\smf\step\conversation_messages_step
+
+    phpbbseo.migrationcenter.step.smf_conversation_attachments:
+        class: phpbbseo\migrationcenter\source\smf\step\conversation_attachments_step
+
+    phpbbseo.migrationcenter.step.smf_polls:
+        class: phpbbseo\migrationcenter\source\smf\step\polls_step
+
+    phpbbseo.migrationcenter.step.smf_bans:
+        class: phpbbseo\migrationcenter\source\smf\step\bans_step
+
     phpbbseo.migrationcenter.step_registry:
         class: phpbbseo\migrationcenter\core\engine\step_registry
         calls:
@@ -235,6 +309,9 @@ services:
             - [register, ['@phpbbseo.migrationcenter.step.vb_conversation_attachments', 'vbulletin']]
             - [register, ['@phpbbseo.migrationcenter.step.vb_polls', 'vbulletin']]
             - [register, ['@phpbbseo.migrationcenter.step.vb_bans', 'vbulletin']]
+            - [register, ['@phpbbseo.migrationcenter.step.vb6_forums', 'vbulletin6']]
+            - [register, ['@phpbbseo.migrationcenter.step.vb6_topics', 'vbulletin6']]
+            - [register, ['@phpbbseo.migrationcenter.step.vb6_posts', 'vbulletin6']]
             - [register, ['@phpbbseo.migrationcenter.step.mybb_groups', 'mybb']]
             - [register, ['@phpbbseo.migrationcenter.step.mybb_users', 'mybb']]
             - [register, ['@phpbbseo.migrationcenter.step.mybb_group_memberships', 'mybb']]
@@ -250,6 +327,21 @@ services:
             - [register, ['@phpbbseo.migrationcenter.step.mybb_conversation_attachments', 'mybb']]
             - [register, ['@phpbbseo.migrationcenter.step.mybb_polls', 'mybb']]
             - [register, ['@phpbbseo.migrationcenter.step.mybb_bans', 'mybb']]
+            - [register, ['@phpbbseo.migrationcenter.step.smf_groups', 'smf']]
+            - [register, ['@phpbbseo.migrationcenter.step.smf_users', 'smf']]
+            - [register, ['@phpbbseo.migrationcenter.step.smf_group_memberships', 'smf']]
+            - [register, ['@phpbbseo.migrationcenter.step.smf_global_permissions', 'smf']]
+            - [register, ['@phpbbseo.migrationcenter.step.smf_forums', 'smf']]
+            - [register, ['@phpbbseo.migrationcenter.step.smf_node_permissions', 'smf']]
+            - [register, ['@phpbbseo.migrationcenter.step.smf_topics', 'smf']]
+            - [register, ['@phpbbseo.migrationcenter.step.smf_posts', 'smf']]
+            - [register, ['@phpbbseo.migrationcenter.step.smf_attachments', 'smf']]
+            - [register, ['@phpbbseo.migrationcenter.step.smf_avatars', 'smf']]
+            - [register, ['@phpbbseo.migrationcenter.step.smf_conversations', 'smf']]
+            - [register, ['@phpbbseo.migrationcenter.step.smf_conversation_messages', 'smf']]
+            - [register, ['@phpbbseo.migrationcenter.step.smf_conversation_attachments', 'smf']]
+            - [register, ['@phpbbseo.migrationcenter.step.smf_polls', 'smf']]
+            - [register, ['@phpbbseo.migrationcenter.step.smf_bans', 'smf']]
 
     phpbbseo.migrationcenter.target_writer:
         class: phpbbseo\migrationcenter\core\writer\phpbb_target_writer

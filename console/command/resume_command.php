@@ -11,6 +11,7 @@ namespace phpbbseo\migrationcenter\console\command;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
+use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
 use phpbbseo\migrationcenter\core\engine\migration_engine;
@@ -42,7 +43,8 @@ class resume_command extends Command
 		$this
 			->setName('migrationcenter:resume')
 			->setDescription('Resume a paused or interrupted migration run')
-			->addArgument('run-id', InputArgument::REQUIRED, 'Migration Run ID');
+			->addArgument('run-id', InputArgument::REQUIRED, 'Migration Run ID')
+			->addOption('auto-approve', null, InputOption::VALUE_NONE, 'Automatically approve stage transitions and run all stages to completion');
 	}
 
 	/**
@@ -85,19 +87,30 @@ class resume_command extends Command
 				return 1;
 			}
 
-			if (in_array($run->status, ['awaiting_approval', 'stage_completed', 'stage_completed_with_warnings', 'stage_failed'], true))
+			$auto_approve = (bool)$input->getOption('auto-approve');
+
+			if (in_array($run->status, ['awaiting_approval', 'stage_completed', 'stage_completed_with_warnings'], true))
 			{
 				$stage_report = $state_manager->get_stage_report($run_id);
-				$next_stage = $stage_report['next_stage'] ?? 'next stage';
-				$next_stage_title = ucfirst(str_replace('_', ' ', $next_stage));
-				$errMsg = sprintf(
-					"Migration %s is currently awaiting administrator approval before starting %s.\nPlease approve the stage transition in the ACP interface before running CLI.",
-					$run_id,
-					$next_stage_title
-				);
-				$state_manager->set_startup_error($run_id, $errMsg, 'AWAITING_APPROVAL');
-				$io->warning($errMsg);
-				return 0;
+				$next_stage = $stage_report['next_stage'] ?? null;
+				if ($auto_approve && !empty($next_stage))
+				{
+					$this->engine->approve_stage_continuation($run_id, $next_stage);
+					$run = $state_manager->get_run($run_id);
+					$current_stage = $next_stage;
+				}
+				else
+				{
+					$next_stage_title = ucfirst(str_replace('_', ' ', $next_stage ?: 'next stage'));
+					$errMsg = sprintf(
+						"Migration %s is currently awaiting administrator approval before starting %s.\nPlease approve the stage transition in the ACP interface before running CLI.",
+						$run_id,
+						$next_stage_title
+					);
+					$state_manager->set_startup_error($run_id, $errMsg, 'AWAITING_APPROVAL');
+					$io->warning($errMsg);
+					return 0;
+				}
 			}
 
 			$lock_name = 'migration_' . $run->source_system;
@@ -188,16 +201,22 @@ class resume_command extends Command
 					if (!empty($res['completed']))
 					{
 						$io->success("All migration stages completed successfully! You may finalize the migration in ACP.");
+						break;
+					}
+					else if ($auto_approve && !empty($res['next_stage']))
+					{
+						$this->engine->approve_stage_continuation($run_id, $res['next_stage']);
+						$cur_stage_name = ucfirst(str_replace('_', ' ', $res['next_stage']));
+						$io->section("Starting stage: " . $cur_stage_name);
+						continue;
 					}
 					else
 					{
 						$next_stage = !empty($res['next_stage']) ? ucfirst(str_replace('_', ' ', $res['next_stage'])) : 'Next Stage';
 						$io->writeln("Migration paused at the stage checkpoint.");
 						$io->writeln("Return to ACP and approve the next stage: {$next_stage}.");
+						break;
 					}
-
-					$io->writeln("Exit code: 0");
-					break;
 				}
 
 				if (!empty($res['completed']))

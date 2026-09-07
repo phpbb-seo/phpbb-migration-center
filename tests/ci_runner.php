@@ -91,12 +91,19 @@ $standalone_tests = [
     'VbMessageConverterTest'     => \phpbbseo\migrationcenter\tests\unit\source\vbulletin\VbMessageConverterTest::class,
     'VbCredentialPrecedenceRegressionTest' => \phpbbseo\migrationcenter\tests\unit\source\vbulletin\VbCredentialPrecedenceRegressionTest::class,
     'VbProviderSeparationTest'   => \phpbbseo\migrationcenter\tests\unit\source\vbulletin\VbProviderSeparationTest::class,
+    'Vb6MigrationTest'           => \phpbbseo\migrationcenter\tests\unit\source\vbulletin\Vb6MigrationTest::class,
     'VbConfigDetectorTest'       => \phpbbseo\migrationcenter\tests\unit\source\vbulletin\vb_config_detector_test::class,
     'MybbPasswordDriverTest'     => \phpbbseo\migrationcenter\tests\unit\source\mybb\MybbPasswordDriverTest::class,
     'MybbMessageConverterTest'   => \phpbbseo\migrationcenter\tests\unit\source\mybb\MybbMessageConverterTest::class,
     'MybbGroupNormalizerTest'    => \phpbbseo\migrationcenter\tests\unit\source\mybb\MybbGroupNormalizerTest::class,
     'MybbUserNormalizerTest'     => \phpbbseo\migrationcenter\tests\unit\source\mybb\MybbUserNormalizerTest::class,
     'MybbConfigDetectorTest'     => \phpbbseo\migrationcenter\tests\unit\source\mybb\MybbConfigDetectorTest::class,
+    'SmfPasswordDriverTest'      => \phpbbseo\migrationcenter\tests\unit\source\smf\SmfPasswordDriverTest::class,
+    'SmfMessageConverterTest'    => \phpbbseo\migrationcenter\tests\unit\source\smf\SmfMessageConverterTest::class,
+    'SmfConfigDetectorTest'      => \phpbbseo\migrationcenter\tests\unit\source\smf\SmfConfigDetectorTest::class,
+    'SmfUserNormalizerTest'      => \phpbbseo\migrationcenter\tests\unit\source\smf\SmfUserNormalizerTest::class,
+    'SmfGroupNormalizerTest'     => \phpbbseo\migrationcenter\tests\unit\source\smf\SmfGroupNormalizerTest::class,
+    'CrossEngineAdminModeratorPermissionsTest' => \phpbbseo\migrationcenter\tests\unit\CrossEngineAdminModeratorPermissionsTest::class,
 ];
 
 $passed = 0;

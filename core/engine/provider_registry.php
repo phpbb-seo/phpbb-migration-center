@@ -49,17 +49,25 @@ class provider_registry
 		{
 			return $this->providers['vbulletin4'];
 		}
+		if (($system_name === 'vb6' || $system_name === 'vbulletin6') && isset($this->providers['vbulletin6']))
+		{
+			return $this->providers['vbulletin6'];
+		}
 		if ($system_name === 'vbulletin')
 		{
 			return $this->providers['vbulletin'] ?? $this->providers['vbulletin4'] ?? $this->providers['vbulletin3'] ?? null;
 		}
-		if (in_array($system_name, ['vb3', 'vb4', 'vbulletin3', 'vbulletin4'], true) && isset($this->providers['vbulletin']))
+		if (in_array($system_name, ['vb3', 'vb4', 'vb6', 'vbulletin3', 'vbulletin4', 'vbulletin6'], true) && isset($this->providers['vbulletin']))
 		{
 			return $this->providers['vbulletin'];
 		}
 		if (($system_name === 'mybb' || $system_name === 'mybb18') && isset($this->providers['mybb']))
 		{
 			return $this->providers['mybb'];
+		}
+		if (in_array($system_name, ['smf', 'smf2', 'smf20', 'smf21'], true) && isset($this->providers['smf']))
+		{
+			return $this->providers['smf'];
 		}
 		return null;
 	}
@@ -86,13 +94,17 @@ class provider_registry
 		{
 			return true;
 		}
-		if (in_array($system_name, ['vbulletin', 'vb3', 'vb4', 'vbulletin3', 'vbulletin4'], true))
+		if (in_array($system_name, ['vbulletin', 'vb3', 'vb4', 'vbulletin3', 'vbulletin4', 'vb6', 'vbulletin6'], true))
 		{
-			return isset($this->providers['vbulletin3']) || isset($this->providers['vbulletin4']) || isset($this->providers['vbulletin']);
+			return isset($this->providers['vbulletin3']) || isset($this->providers['vbulletin4']) || isset($this->providers['vbulletin6']) || isset($this->providers['vbulletin']);
 		}
 		if (in_array($system_name, ['mybb', 'mybb18'], true))
 		{
 			return isset($this->providers['mybb']);
+		}
+		if (in_array($system_name, ['smf', 'smf2', 'smf20', 'smf21'], true))
+		{
+			return isset($this->providers['smf']);
 		}
 		return false;
 	}
