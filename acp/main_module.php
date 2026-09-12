@@ -747,6 +747,16 @@ class main_module
 			]);
 		}
 
+		// Assign selected steps list for Step 5 confirmation & hidden inputs
+		foreach ($selected_steps as $k)
+		{
+			$template->assign_block_vars('selected_steps_list', [
+				'KEY'     => $k,
+				'LABEL'   => $step_labels[$k] ?? ucfirst(str_replace('_', ' ', $k)),
+				'COUNT'   => $counts_map[$k] ?? 0,
+			]);
+		}
+
 		// Step 5 Submit: Start Run
 		if ($step === 5 && $submit)
 		{
@@ -790,6 +800,8 @@ class main_module
 			'TARGET_POSTS'          => $target_posts,
 			'TARGET_NOT_EMPTY'      => $target_not_empty,
 			'SOURCE_SYSTEM'         => $source_system,
+			'SOURCE_SYSTEM_NAME'    => ($source_system === 'xenforo' ? 'XenForo 2.x' : ($source_system === 'vbulletin' ? 'vBulletin' : ($source_system === 'mybb' ? 'MyBB' : ($source_system === 'smf' ? 'SMF' : ucfirst($source_system))))),
+			'SELECTED_STEPS_COUNT'  => count($selected_steps),
 			'SOURCE_PATH'           => $source_path,
 			'DB_HOST'               => $db_host,
 			'DB_PORT'               => $db_port,

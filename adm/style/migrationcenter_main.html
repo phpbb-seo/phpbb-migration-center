@@ -1503,13 +1503,75 @@
 					<input type="hidden" name="lock_timeout" value="{LOCK_TIMEOUT}" />
 					<input type="hidden" name="preserve_ids" value="{PRESERVE_IDS}" />
 					<input type="hidden" name="dry_run" value="{DRY_RUN}" />
+					<!-- BEGIN selected_steps_list -->
+					<input type="hidden" name="steps[]" value="{selected_steps_list.KEY}" />
+					<!-- END selected_steps_list -->
+
+					<!-- IF START_ERROR -->
+						<div class="mc-alert mc-alert-danger" style="margin-bottom: 16px;">
+							<strong>{L_ERROR}:</strong> {START_ERROR}
+						</div>
+					<!-- ENDIF -->
+
 					<div class="mc-plan-card">
-						<h3 style="margin: 0 0 14px 0; font-size: 17px; font-weight: 700; color: var(--mc-text);">{L_WIZARD_STEP_5_TITLE}</h3>
+						<h3 style="margin: 0 0 6px 0; font-size: 17px; font-weight: 700; color: var(--mc-text);">{L_WIZARD_STEP_5_TITLE}</h3>
 						<p style="font-size: 13px; color: var(--mc-text-muted); margin-bottom: 20px;">{L_CONFIRMATION_EXPLAIN}</p>
+
+						<!-- Summary Cards Grid -->
+						<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 16px; margin-bottom: 20px;">
+							<!-- Card 1: Source & Database -->
+							<div class="mc-kpi-card" style="padding: 16px;">
+								<h4 style="margin: 0 0 12px 0; font-size: 14px; font-weight: 700; color: var(--mc-primary); border-bottom: 1px solid var(--mc-border-subtle); padding-bottom: 6px;">
+									{L_MIGRATION_SUMMARY_SOURCE}
+								</h4>
+								<div style="font-size: 13px; line-height: 1.9;">
+									<div><strong>{L_SOURCE_SYSTEM}:</strong> <span class="status-badge status-ready">{SOURCE_SYSTEM_NAME}</span></div>
+									<div><strong>{L_DB_NAME}:</strong> <code>{DB_NAME}</code></div>
+									<div><strong>{L_DB_HOST}:</strong> <code>{DB_HOST}:{DB_PORT}</code></div>
+									<div><strong>{L_DB_PREFIX}:</strong> <code>{DB_PREFIX}</code></div>
+									<!-- IF SOURCE_PATH -->
+										<div style="word-break: break-all;"><strong>{L_SOURCE_PATH}:</strong> <code style="font-size: 11px;">{SOURCE_PATH}</code></div>
+									<!-- ENDIF -->
+								</div>
+							</div>
+
+							<!-- Card 2: Execution Parameters -->
+							<div class="mc-kpi-card" style="padding: 16px;">
+								<h4 style="margin: 0 0 12px 0; font-size: 14px; font-weight: 700; color: var(--mc-primary); border-bottom: 1px solid var(--mc-border-subtle); padding-bottom: 6px;">
+									{L_MIGRATION_SUMMARY_CONFIG}
+								</h4>
+								<div style="font-size: 13px; line-height: 1.9;">
+									<div><strong>{L_DEFAULT_BATCH_SIZE}:</strong> <span class="status-badge status-ready">{BATCH_SIZE} {L_RECORDS}</span></div>
+									<div><strong>{L_WORKER_LOCK_TIMEOUT}:</strong> {LOCK_TIMEOUT}s</div>
+									<div><strong>{L_PRESERVE_IDS}:</strong> <!-- IF PRESERVE_IDS --><span class="status-badge status-completed">{L_YES}</span><!-- ELSE --><span class="status-badge status-neutral">{L_NO}</span><!-- ENDIF --></div>
+									<div><strong>{L_DRY_RUN}:</strong> <!-- IF DRY_RUN --><span class="status-badge status-warning">{L_YES}</span><!-- ELSE --><span class="status-badge status-completed">{L_NO}</span><!-- ENDIF --></div>
+								</div>
+							</div>
+
+							<!-- Card 3: Selected Stages Overview -->
+							<div class="mc-kpi-card" style="padding: 16px;">
+								<h4 style="margin: 0 0 12px 0; font-size: 14px; font-weight: 700; color: var(--mc-primary); border-bottom: 1px solid var(--mc-border-subtle); padding-bottom: 6px;">
+									{L_MIGRATION_SUMMARY_CONTENT} ({SELECTED_STEPS_COUNT})
+								</h4>
+								<div style="display: flex; flex-wrap: wrap; gap: 6px; max-height: 140px; overflow-y: auto; padding: 2px;">
+									<!-- BEGIN selected_steps_list -->
+										<span class="status-badge status-ready" style="font-size: 11px; padding: 3px 8px;">
+											{selected_steps_list.LABEL} <!-- IF selected_steps_list.COUNT > 0 -->({selected_steps_list.COUNT})<!-- ENDIF -->
+										</span>
+									<!-- END selected_steps_list -->
+								</div>
+							</div>
+						</div>
+
+						<!-- Safety Note Banner -->
+						<div class="mc-alert mc-alert-info" style="margin-bottom: 20px; display: flex; align-items: center; gap: 10px; background: rgba(59, 130, 246, 0.08); border-left: 4px solid var(--mc-primary); padding: 12px 16px; border-radius: 4px;">
+							<span style="font-size: 18px;">ℹ️</span>
+							<span style="font-size: 13px; color: var(--mc-text);">{L_MIGRATION_SAFE_NOTE}</span>
+						</div>
 
 						<div class="mc-unified-toolbar">
 							<a href="{U_WIZARD_ACTION}&amp;step=4" class="mc-btn mc-btn-secondary">{L_BACK}</a>
-							<button type="submit" name="submit" class="mc-btn mc-btn-success" style="font-size: 14px; padding: 10px 24px;">{L_CREATE_MIGRATION_PLAN} &raquo;</button>
+							<button type="submit" name="submit" class="mc-btn mc-btn-success" style="font-size: 14px; padding: 10px 24px; font-weight: 700;">{L_CREATE_MIGRATION_PLAN} &raquo;</button>
 						</div>
 					</div>
 				</form>
