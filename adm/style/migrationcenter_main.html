@@ -1074,7 +1074,54 @@
 						</div>
 					</div>
 				</div>
-			<!-- ELSE -->
+
+				<!-- IF SHOW_SEO_REDIRECT_BOX -->
+				<!-- SEO 301 Legacy Redirects Generator Card (Overview View) -->
+				<div class="mc-plan-card" style="margin-bottom: 24px; border-inline-start: 4px solid #2563eb; background: #ffffff;">
+					<div class="mc-checkpoint-header" style="flex-wrap: wrap; gap: 10px;">
+						<div>
+							<h3 class="mc-checkpoint-title" style="display: flex; align-items: center; gap: 8px;">
+								<span style="font-size: 18px;">🛡️</span> {L_SEO_301_REDIRECTS_TITLE}
+							</h3>
+						</div>
+						<div style="display: flex; gap: 8px; align-items: center;">
+							<span class="status-badge status-completed">{SEO_REDIRECT_SOURCE_LABEL}</span>
+							<button type="button" class="mc-btn mc-btn-secondary" id="mc-btn-copy-seo-ov" onclick="copySeoRedirectRules(this, 'ov');" style="font-size: 12px; padding: 6px 14px;">
+								📋 {L_SEO_301_COPY_BTN}
+							</button>
+						</div>
+					</div>
+
+					<p style="margin: 0 0 16px 0; font-size: 13px; color: var(--mc-text-muted); line-height: 1.6;">
+						{SEO_301_REDIRECTS_DESC_PARSED}
+					</p>
+
+					<!-- Server Switcher Tabs -->
+					<div style="display: flex; gap: 8px; margin-bottom: 12px;">
+						<button type="button" id="seo-tab-btn-htaccess-ov" class="mc-btn mc-btn-primary" style="font-size: 12px; padding: 6px 16px;" onclick="switchSeoRulesTab('htaccess', 'ov');">
+							{L_SEO_301_HTACCESS_TAB}
+						</button>
+						<button type="button" id="seo-tab-btn-nginx-ov" class="mc-btn mc-btn-secondary" style="font-size: 12px; padding: 6px 16px;" onclick="switchSeoRulesTab('nginx', 'ov');">
+							{L_SEO_301_NGINX_TAB}
+						</button>
+					</div>
+
+					<!-- Code Box: htaccess -->
+					<div id="seo-code-box-htaccess-ov">
+						<pre id="seo-code-htaccess-ov" style="background: #0f172a; color: #f8fafc; padding: 16px; border-radius: 8px; font-family: monospace; font-size: 12px; line-height: 1.5; overflow-x: auto; margin: 0; white-space: pre-wrap; word-break: break-all;">{SEO_HTACCESS_RULES}</pre>
+					</div>
+
+					<!-- Code Box: nginx -->
+					<div id="seo-code-box-nginx-ov" style="display: none;">
+						<pre id="seo-code-nginx-ov" style="background: #0f172a; color: #f8fafc; padding: 16px; border-radius: 8px; font-family: monospace; font-size: 12px; line-height: 1.5; overflow-x: auto; margin: 0; white-space: pre-wrap; word-break: break-all;">{SEO_NGINX_RULES}</pre>
+					</div>
+
+					<!-- Standalone Script Callout Notice -->
+					<div style="margin-top: 14px; padding: 12px 16px; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 6px; font-size: 12px; color: var(--mc-text-muted); line-height: 1.6;">
+						💡 {SEO_301_STANDALONE_PARSED}
+					</div>
+				</div>
+				<!-- ENDIF -->
 				<div class="mc-empty-state">
 					<div class="mc-empty-icon">&#9881;</div>
 					<h3 class="mc-empty-title">{L_MIGRATION_EMPTY_TITLE}</h3>

@@ -204,10 +204,16 @@ class main_module
 			'KPI_DISPLAY_STATUS_LABEL'    => $display_kpi_status_label,
 			'TOTAL_TERMINAL_RUNS'         => count($recent_runs),
 			'U_ACTIVE_RUN_VIEW'           => $active_run ? ($this->u_action . '&amp;mode=progress&amp;run_id=' . urlencode($active_run->run_id)) : '',
-			'CAN_START_NEW_MIGRATION'     => (!$is_in_progress),
 			'U_START_WIZARD'              => $this->u_action . '&amp;mode=wizard',
 			'U_HISTORY'                   => $this->u_action . '&amp;mode=history',
 			'U_OVERVIEW'                  => $this->u_action . '&amp;mode=overview',
+			'SEO_REDIRECT_SOURCE'        => $completed_run ? (string)($completed_run->source_system ?? 'xenforo') : '',
+			'SEO_REDIRECT_SOURCE_LABEL'  => $completed_run ? self::format_source_label((string)($completed_run->source_system ?? 'xenforo'), (string)($completed_run->source_version ?? '')) : '',
+			'SEO_HTACCESS_RULES'         => $completed_run ? \phpbbseo\migrationcenter\core\seo\redirect_generator::get_htaccess_rules((string)($completed_run->source_system ?? 'xenforo')) : '',
+			'SEO_NGINX_RULES'            => $completed_run ? \phpbbseo\migrationcenter\core\seo\redirect_generator::get_nginx_rules((string)($completed_run->source_system ?? 'xenforo')) : '',
+			'SEO_301_REDIRECTS_DESC_PARSED' => $completed_run ? sprintf(!empty($user->lang['SEO_301_REDIRECTS_DESC']) ? $user->lang['SEO_301_REDIRECTS_DESC'] : 'Legacy 301 redirects for %s', self::format_source_label((string)($completed_run->source_system ?? 'xenforo'), (string)($completed_run->source_version ?? ''))) : '',
+			'SEO_301_STANDALONE_PARSED'  => sprintf(!empty($user->lang['SEO_301_STANDALONE_NOTICE']) ? $user->lang['SEO_301_STANDALONE_NOTICE'] : 'Standalone script: %s', 'legacy_redirect.php'),
+			'SHOW_SEO_REDIRECT_BOX'      => ($completed_run !== null),
 		]);
 
 		foreach ($recent_runs as $run)
