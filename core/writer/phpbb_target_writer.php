@@ -2498,20 +2498,22 @@ class phpbb_target_writer implements target_writer_interface
 	{
 		if (empty($steps_run) || in_array('posts', $steps_run, true) || in_array('topics', $steps_run, true) || in_array('forums', $steps_run, true))
 		{
-			// 1. Finalize all topics that have posts
-			$sql = 'SELECT DISTINCT topic_id FROM ' . $this->table_prefix . 'posts WHERE topic_id > 0';
-			$res = $this->db->sql_query($sql);
-			$topic_ids = [];
-			while ($row = $this->db->sql_fetchrow($res))
-			{
-				$topic_ids[] = (int)$row['topic_id'];
-			}
-			$this->db->sql_freeresult($res);
-
-			if (!empty($topic_ids))
-			{
-				$this->finalize_topics($topic_ids);
-			}
+			// 1. Finalize topics in fast set-based update for any unfinalized topic pointers
+			$sql = 'UPDATE ' . $this->table_prefix . 'topics t
+					JOIN (
+						SELECT topic_id,
+							   MIN(post_id) as min_p,
+							   MAX(post_id) as max_p,
+							   COUNT(*) as total_posts
+						FROM ' . $this->table_prefix . 'posts
+						WHERE post_visibility = 1
+						GROUP BY topic_id
+					) p ON (t.topic_id = p.topic_id)
+					SET t.topic_first_post_id = p.min_p,
+						t.topic_last_post_id = p.max_p,
+						t.topic_posts_approved = GREATEST(0, p.total_posts - 1)
+					WHERE t.topic_first_post_id = 0 OR t.topic_last_post_id = 0';
+			$this->db->sql_query($sql);
 
 			// 2. Synchronize all forums that contain topics
 			$sql = 'SELECT DISTINCT forum_id FROM ' . $this->table_prefix . 'topics WHERE forum_id > 0';
@@ -2528,13 +2530,16 @@ class phpbb_target_writer implements target_writer_interface
 				$this->synchronize_forums($forum_ids);
 			}
 
-			// 3. Synchronize user post counts (excluding anonymous / bot)
+			// 3. Synchronize user post counts (fast set-based update)
 			$sql = 'UPDATE ' . $this->table_prefix . 'users u 
-					SET user_posts = (
-						SELECT COUNT(*) FROM ' . $this->table_prefix . 'posts p 
-						WHERE p.poster_id = u.user_id AND p.post_visibility = 1
-					) 
-					WHERE u.user_id > 1 AND u.user_type <> 2';
+					JOIN (
+						SELECT poster_id, COUNT(*) as cnt 
+						FROM ' . $this->table_prefix . 'posts 
+						WHERE post_visibility = 1 AND poster_id > 1 
+						GROUP BY poster_id
+					) p ON (u.user_id = p.poster_id) 
+					SET u.user_posts = p.cnt 
+					WHERE u.user_type <> 2';
 			$this->db->sql_query($sql);
 		}
 
