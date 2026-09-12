@@ -1060,6 +1060,7 @@ class main_module
 		}
 		else if ($action === 'run_finalization')
 		{
+			@set_time_limit(300);
 			$finalizer = $phpbb_container->get('phpbbseo.migrationcenter.finalizer');
 			$finalizer->finalize_all($run_id, array_keys($steps));
 			$stats = $run->stats;
@@ -1069,8 +1070,9 @@ class main_module
 		}
 		else if ($action === 'run_search_index')
 		{
+			@set_time_limit(300);
 			$indexer = $phpbb_container->get('phpbbseo.migrationcenter.search_indexer');
-			$idx_res = $indexer->index_range($run_id, 0, 50000);
+			$idx_res = $indexer->index_range($run_id, 0, 100);
 			$stats = $run->stats;
 			$stats['search_indexed_at'] = time();
 			$stats['search_indexed_count'] = $idx_res['indexed'] ?? 0;
@@ -1079,6 +1081,7 @@ class main_module
 		}
 		else if ($action === 'run_verify')
 		{
+			@set_time_limit(300);
 			$verifier = $phpbb_container->get('phpbbseo.migrationcenter.verifier');
 			$v_res = $verifier->verify_all($run_id);
 			$stats = $run->stats;
@@ -1091,14 +1094,15 @@ class main_module
 		}
 		else if ($action === 'run_all_final_steps')
 		{
+			@set_time_limit(300);
 			$finalizer = $phpbb_container->get('phpbbseo.migrationcenter.finalizer');
 			$indexer = $phpbb_container->get('phpbbseo.migrationcenter.search_indexer');
 			$verifier = $phpbb_container->get('phpbbseo.migrationcenter.verifier');
 
 			// 1. Finalization & Recounts
 			$finalizer->finalize_all($run_id, array_keys($steps));
-			// 2. Search Indexing
-			$idx_res = $indexer->index_range($run_id, 0, 50000);
+			// 2. Search Indexing (initial warm-up batch for web request)
+			$idx_res = $indexer->index_range($run_id, 0, 50);
 			// 3. Health Verifications
 			$v_res = $verifier->verify_all($run_id);
 

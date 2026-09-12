@@ -60,96 +60,31 @@ class phpbb_finalizer
 		$topics_finalized = 0;
 		$errors = [];
 
-		// Query all topics or topics mapped in this run
-		$sql = 'SELECT t.topic_id, t.forum_id, t.topic_posts_approved, t.topic_posts_unapproved, t.topic_posts_softdeleted, t.topic_first_post_id, t.topic_last_post_id 
-				FROM ' . $this->table_prefix . 'topics t';
-		$result = $this->db->sql_query($sql);
-
-		while ($t = $this->db->sql_fetchrow($result))
+		if (!$dry_run)
 		{
-			$topic_id = (int)$t['topic_id'];
-
-			// 1. Calculate first post (Earliest post_id/post_time in this topic)
-			$sql_first = 'SELECT post_id, poster_id, post_time, post_visibility 
-						  FROM ' . $this->table_prefix . 'posts 
-						  WHERE topic_id = ' . $topic_id . ' 
-						  ORDER BY post_time ASC, post_id ASC';
-			$res_first = $this->db->sql_query_limit($sql_first, 1);
-			$first_post = $this->db->sql_fetchrow($res_first);
-			$this->db->sql_freeresult($res_first);
-
-			// 2. Calculate last post (Latest post_id/post_time in this topic)
-			$sql_last = 'SELECT p.post_id, p.poster_id, p.post_time, p.post_subject, p.post_visibility, u.username, u.user_colour 
-						 FROM ' . $this->table_prefix . 'posts p 
-						 LEFT JOIN ' . $this->table_prefix . 'users u ON (p.poster_id = u.user_id) 
-						 WHERE p.topic_id = ' . $topic_id . ' 
-						 ORDER BY p.post_time DESC, p.post_id DESC';
-			$res_last = $this->db->sql_query_limit($sql_last, 1);
-			$last_post = $this->db->sql_fetchrow($res_last);
-			$this->db->sql_freeresult($res_last);
-
-			// 3. Count approved, unapproved, softdeleted posts
-			$sql_counts = 'SELECT post_visibility, COUNT(*) as cnt 
-						   FROM ' . $this->table_prefix . 'posts 
-						   WHERE topic_id = ' . $topic_id . ' 
-						   GROUP BY post_visibility';
-			$res_counts = $this->db->sql_query($sql_counts);
-			$cnt_approved = 0;
-			$cnt_unapproved = 0;
-			$cnt_softdeleted = 0;
-
-			while ($c = $this->db->sql_fetchrow($res_counts))
-			{
-				$vis = (int)$c['post_visibility'];
-				if ($vis === 1) { // ITEM_APPROVED
-					$cnt_approved = (int)$c['cnt'];
-				} else if ($vis === 0 || $vis === 2) { // ITEM_UNAPPROVED / REAPPROVE
-					$cnt_unapproved += (int)$c['cnt'];
-				} else if ($vis === 3) { // ITEM_DELETED
-					$cnt_softdeleted = (int)$c['cnt'];
-				}
-			}
-			$this->db->sql_freeresult($res_counts);
-
-			// Check attachments in this topic
-			$sql_att = 'SELECT COUNT(*) as cnt FROM ' . $this->table_prefix . 'attachments WHERE topic_id = ' . $topic_id . ' AND in_message = 0';
-			$res_att = $this->db->sql_query($sql_att);
-			$has_attachment = ((int)$this->db->sql_fetchfield('cnt') > 0) ? 1 : 0;
-			$this->db->sql_freeresult($res_att);
-
-			if ($first_post && $last_post)
-			{
-				// In phpBB, topic_posts_approved is replies count (approved posts - 1)
-				$replies_approved = max(0, $cnt_approved - 1);
-
-				$update_arr = [
-					'topic_first_post_id'      => (int)$first_post['post_id'],
-					'topic_last_post_id'       => (int)$last_post['post_id'],
-					'topic_last_post_time'     => (int)$last_post['post_time'],
-					'topic_last_poster_id'     => (int)$last_post['poster_id'],
-					'topic_last_poster_name'   => (string)($last_post['username'] ?: ''),
-					'topic_last_poster_colour' => (string)($last_post['user_colour'] ?: ''),
-					'topic_posts_approved'     => $replies_approved,
-					'topic_posts_unapproved'   => $cnt_unapproved,
-					'topic_posts_softdeleted'  => $cnt_softdeleted,
-					'topic_attachment'         => $has_attachment,
-					'topic_visibility'         => (int)$first_post['post_visibility'],
-				];
-
-				if (!$dry_run)
-				{
-					$sql_up = 'UPDATE ' . $this->table_prefix . 'topics SET ' . $this->db->sql_build_array('UPDATE', $update_arr) . ' WHERE topic_id = ' . $topic_id;
-					$this->db->sql_query($sql_up);
-				}
-				$topics_finalized++;
-			}
+			$sql = 'UPDATE ' . $this->table_prefix . 'topics t
+					JOIN (
+						SELECT topic_id,
+							   MIN(post_id) as min_p,
+							   MAX(post_id) as max_p,
+							   MAX(post_time) as last_time,
+							   COUNT(*) as total_posts
+						FROM ' . $this->table_prefix . 'posts
+						WHERE post_visibility = 1
+						GROUP BY topic_id
+					) p ON (t.topic_id = p.topic_id)
+					SET t.topic_first_post_id = p.min_p,
+						t.topic_last_post_id = p.max_p,
+						t.topic_last_post_time = p.last_time,
+						t.topic_posts_approved = GREATEST(0, p.total_posts - 1)';
+			$this->db->sql_query($sql);
+			$topics_finalized = $this->db->sql_affectedrows();
 		}
-		$this->db->sql_freeresult($result);
 
 		return [
-			'status' => 'success',
+			'status'           => 'success',
 			'topics_finalized' => $topics_finalized,
-			'errors' => $errors,
+			'errors'           => $errors,
 		];
 	}
 
@@ -294,46 +229,34 @@ class phpbb_finalizer
 		$dry_run = !empty($options['dry_run']);
 		$users_finalized = 0;
 
-		// 1. Recalculate user_posts for all non-anonymous users
-		$sql = 'SELECT u.user_id 
-				FROM ' . $this->table_prefix . 'users u 
-				WHERE u.user_id <> 1';
-		$res = $this->db->sql_query($sql);
-
-		while ($r = $this->db->sql_fetchrow($res))
+		if (!$dry_run)
 		{
-			$user_id = (int)$r['user_id'];
+			// 1. Recalculate user_posts for all non-anonymous users in set-based update
+			$sql = 'UPDATE ' . $this->table_prefix . 'users u 
+					JOIN (
+						SELECT poster_id, COUNT(*) as cnt 
+						FROM ' . $this->table_prefix . 'posts 
+						WHERE post_visibility = 1 AND poster_id > 1 
+						GROUP BY poster_id
+					) p ON (u.user_id = p.poster_id) 
+					SET u.user_posts = p.cnt 
+					WHERE u.user_type <> 2';
+			$this->db->sql_query($sql);
+			$users_finalized = $this->db->sql_affectedrows();
 
-			// Count approved posts in forums where post_postcount = 1
-			$sql_pc = 'SELECT COUNT(p.post_id) as cnt 
-					   FROM ' . $this->table_prefix . 'posts p 
-					   LEFT JOIN ' . $this->table_prefix . 'forums f ON (p.forum_id = f.forum_id) 
-					   WHERE p.poster_id = ' . $user_id . ' 
-					     AND p.post_visibility = 1 
-					     AND p.post_postcount = 1';
-			$res_pc = $this->db->sql_query($sql_pc);
-			$post_cnt = (int)$this->db->sql_fetchfield('cnt');
-			$this->db->sql_freeresult($res_pc);
-
-			// Count unread PMs
-			$sql_pm = 'SELECT COUNT(*) as cnt FROM ' . $this->table_prefix . 'privmsgs_to 
-					   WHERE user_id = ' . $user_id . ' AND pm_unread = 1 AND pm_deleted = 0 AND folder_id = 0';
-			$res_pm = $this->db->sql_query($sql_pm);
-			$pm_cnt = (int)$this->db->sql_fetchfield('cnt');
-			$this->db->sql_freeresult($res_pm);
-
-			if (!$dry_run)
-			{
-				$sql_up = 'UPDATE ' . $this->table_prefix . 'users SET 
-								user_posts = ' . $post_cnt . ',
-								user_unread_privmsg = ' . $pm_cnt . ',
-								user_new_privmsg = 0 
-						   WHERE user_id = ' . $user_id;
-				$this->db->sql_query($sql_up);
-			}
-			$users_finalized++;
+			// 2. Synchronize unread PM counts in set-based update
+			$sql = 'UPDATE ' . $this->table_prefix . 'users u
+					LEFT JOIN (
+						SELECT user_id, COUNT(*) as cnt
+						FROM ' . $this->table_prefix . 'privmsgs_to
+						WHERE pm_unread = 1 AND pm_deleted = 0 AND folder_id = 0
+						GROUP BY user_id
+					) pm ON (u.user_id = pm.user_id)
+					SET u.user_unread_privmsg = COALESCE(pm.cnt, 0),
+						u.user_new_privmsg = 0
+					WHERE u.user_id > 1';
+			$this->db->sql_query($sql);
 		}
-		$this->db->sql_freeresult($res);
 
 		return [
 			'status' => 'success',
