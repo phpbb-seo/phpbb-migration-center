@@ -178,7 +178,8 @@ class install_schema extends \phpbb\db\migration\migration
 				$this->table_prefix . 'migration_locks',
 				$this->table_prefix . 'migration_settings',
 				$this->table_prefix . 'migration_errors',
-				$this->table_prefix . 'migration_id_map',
+				// Note: migration_id_map is deliberately preserved to ensure permanent 301 redirects
+				// and SEO URL mapping continue working indefinitely even if the extension is disabled/purged.
 				$this->table_prefix . 'migration_steps',
 				$this->table_prefix . 'migration_runs',
 			),

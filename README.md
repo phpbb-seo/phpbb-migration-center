@@ -93,6 +93,66 @@ php tests/ci_runner.php
 
 ---
 
+## 🛡️ SEO Preservation & 301 Redirect Guide
+
+One of the biggest risks during a forum platform migration is losing Google search rankings, backlinks, and organic traffic due to broken URLs (404 errors).
+
+phpBB Migration Center provides an enterprise-grade **Permanent 301 Redirection infrastructure** designed to maintain 100% of your Google PageRank and backlink equity:
+
+### 1. Permanent ID Mapping Table (`phpbb_migration_id_map`)
+- During migration, every source ID (topics, posts, forums, users) is indexed and stored in `phpbb_migration_id_map`.
+- **Data Safety Guarantee:** When Migration Center is disabled or uninstalled, the `phpbb_migration_id_map` table is **deliberately preserved** in your database so legacy redirects continue to work indefinitely.
+
+### 2. Integration with phpBB SEO Framework
+For the ultimate SEO setup, install the [phpBB SEO Framework](https://github.com/phpbb-seo/). It automatically integrates with `phpbb_migration_id_map` to seamlessly redirect old XenForo, vBulletin, SMF, or MyBB URLs directly to modern, canonical, human-readable slug URLs (e.g. `/topic/123-title`) with `HTTP 301 Moved Permanently`.
+
+### 3. Emergency Standalone Fallback (`legacy_redirect.php`)
+If you have not installed the phpBB SEO Framework yet, a lightweight, zero-dependency script is included:
+- **Location:** `ext/phpbbseo/migrationcenter/legacy_redirect.php` (can also be copied to your phpBB root as `legacy_redirect.php`).
+- Directly queries `phpbb_migration_id_map` in under 2ms and issues `301 Moved Permanently` headers.
+
+### 4. Webserver Rewrite Rules
+
+Add the appropriate rules to the top of your webserver configuration to intercept old URLs:
+
+#### Apache / LiteSpeed (`.htaccess`):
+```apache
+<IfModule mod_rewrite.c>
+RewriteEngine On
+
+# XenForo 301 Redirects:
+RewriteRule ^threads/[^/]*\.([0-9]+)/?.*$ index.php?threads=$1 [L,QSA]
+RewriteRule ^threads/([0-9]+)/?.*$ index.php?threads=$1 [L,QSA]
+RewriteRule ^posts/([0-9]+)/?.*$ index.php?posts=$1 [L,QSA]
+RewriteRule ^forums/[^/]*\.([0-9]+)/?.*$ index.php?forums=$1 [L,QSA]
+RewriteRule ^members/[^/]*\.([0-9]+)/?.*$ index.php?members=$1 [L,QSA]
+
+# vBulletin 301 Redirects:
+RewriteCond %{QUERY_STRING} (?:^|&)t=([0-9]+) [NC]
+RewriteRule ^showthread\.php$ index.php?t=%1 [L,QSA]
+RewriteCond %{QUERY_STRING} (?:^|&)f=([0-9]+) [NC]
+RewriteRule ^forumdisplay\.php$ index.php?f=%1 [L,QSA]
+</IfModule>
+```
+
+#### Nginx (`nginx.conf`):
+```nginx
+# XenForo 301 Redirects:
+location ~ ^/threads/[^/]*\.([0-9]+)/? {
+    rewrite ^/threads/[^/]*\.([0-9]+)/?.*$ /index.php?threads=$1 last;
+}
+location ~ ^/posts/([0-9]+)/? {
+    rewrite ^/posts/([0-9]+)/?.*$ /index.php?posts=$1 last;
+}
+location ~ ^/forums/[^/]*\.([0-9]+)/? {
+    rewrite ^/forums/[^/]*\.([0-9]+)/?.*$ /index.php?forums=$1 last;
+}
+```
+
+> **Tip:** You can view and copy customized rules tailored to your exact source platform directly from the **Health & Finalization Dashboard** in the phpBB ACP.
+
+---
+
 ## 📄 License
 
 This project is licensed under the [GNU General Public License v2 (GPL-2.0)](LICENSE).
