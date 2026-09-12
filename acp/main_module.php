@@ -274,7 +274,7 @@ class main_module
 		$db_port       = (int)$request->variable('db_port', 3306);
 		$db_name       = $request->variable('db_name', '');
 		$db_user       = $request->variable('db_user', '');
-		$db_pass       = $request->variable('db_pass', $request->variable('db_password', ''));
+		$db_pass       = (string)$request->untrimmed_variable('db_pass', (string)$request->untrimmed_variable('db_password', '', true), true);
 		$is_vb = in_array($source_system, ['vbulletin', 'vbulletin3', 'vbulletin4', 'vbulletin6', 'vb3', 'vb4', 'vb6'], true);
 		$is_mybb = in_array($source_system, ['mybb', 'mybb18'], true);
 		$is_smf = in_array($source_system, ['smf', 'smf2', 'smf20', 'smf21'], true);

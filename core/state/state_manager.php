@@ -114,8 +114,7 @@ class state_manager
 	 */
 	public function create_run(string $run_id, string $source_system, string $source_version, migration_config_dto $config): run_state_dto
 	{
-		$now = time();
-		$options = $config->to_array(false); // safe, no passwords
+		$options = $config->to_array(true); // Must include database credentials so batch workers can connect
 
 		$data = [
 			'run_id'         => $run_id,

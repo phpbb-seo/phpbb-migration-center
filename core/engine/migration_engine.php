@@ -266,6 +266,31 @@ class migration_engine
 		}
 
 		$config = migration_config_dto::from_array($run->options);
+		if (empty($config->db_password) && !empty($config->source_path))
+		{
+			$detected_cfg = null;
+			if ($run->source_system === 'xenforo')
+			{
+				$detected_cfg = \phpbbseo\migrationcenter\source\xenforo\config\xf_config_detector::detect_from_path($config->source_path);
+			}
+			else if (strpos($run->source_system, 'vb') !== false || strpos($run->source_system, 'vbulletin') !== false)
+			{
+				$detected_cfg = \phpbbseo\migrationcenter\source\vbulletin\config\vb_config_detector::detect_from_path($config->source_path);
+			}
+			else if ($run->source_system === 'mybb')
+			{
+				$detected_cfg = \phpbbseo\migrationcenter\source\mybb\config\mybb_config_detector::detect_from_path($config->source_path);
+			}
+			else if ($run->source_system === 'smf')
+			{
+				$detected_cfg = \phpbbseo\migrationcenter\source\smf\config\smf_config_detector::detect_from_path($config->source_path);
+			}
+
+			if ($detected_cfg && !empty($detected_cfg->db_password))
+			{
+				$config->db_password = $detected_cfg->db_password;
+			}
+		}
 		$steps = $this->state_manager->get_steps($run_id);
 
 		// Find current incomplete step (in canonical sequence)
