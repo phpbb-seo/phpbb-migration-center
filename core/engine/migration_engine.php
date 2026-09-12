@@ -119,33 +119,41 @@ class migration_engine
 			throw new \RuntimeException("Another migration is already running for source: {$source_system}");
 		}
 
-		$run_state = $this->state_manager->create_run($run_id, $source_system, $source_version, $config);
-
-		// Resolve ordered steps
-		$requested_steps = !empty($config->selected_steps) ? $config->selected_steps : $provider->get_supported_steps();
-		$ordered_steps = $this->step_registry->resolve_order($requested_steps, $source_system);
-
-		$steps_init = [];
-		foreach ($ordered_steps as $order => $step_name)
+		try
 		{
-			$total = $provider->get_total_records($step_name, $config);
-			$max_id = $provider->get_max_source_id($step_name, $config);
-			$steps_init[] = [
-				'step_name'     => $step_name,
-				'step_order'    => $order + 1,
-				'total_records' => $total,
-				'max_source_id' => $max_id,
-			];
+			$run_state = $this->state_manager->create_run($run_id, $source_system, $source_version, $config);
+
+			// Resolve ordered steps
+			$requested_steps = !empty($config->selected_steps) ? $config->selected_steps : $provider->get_supported_steps();
+			$ordered_steps = $this->step_registry->resolve_order($requested_steps, $source_system);
+
+			$steps_init = [];
+			foreach ($ordered_steps as $order => $step_name)
+			{
+				$total = $provider->get_total_records($step_name, $config);
+				$max_id = $provider->get_max_source_id($step_name, $config);
+				$steps_init[] = [
+					'step_name'     => $step_name,
+					'step_order'    => $order + 1,
+					'total_records' => $total,
+					'max_source_id' => $max_id,
+				];
+			}
+
+			$this->state_manager->init_steps($run_id, $steps_init);
+			$this->state_manager->update_run_status($run_id, 'ready', $ordered_steps[0] ?? '');
+
+			// Release initial creation lock so it is not held idly before batches start
+			$this->lock_manager->release($lock_name, $run_id);
+
+			$run_state = $this->state_manager->get_run($run_id);
+			return $run_state;
 		}
-
-		$this->state_manager->init_steps($run_id, $steps_init);
-		$this->state_manager->update_run_status($run_id, 'ready', $ordered_steps[0] ?? '');
-
-		// Release initial creation lock so it is not held idly before batches start
-		$this->lock_manager->release($lock_name, $run_id);
-
-		$run_state = $this->state_manager->get_run($run_id);
-		return $run_state;
+		catch (\Throwable $e)
+		{
+			$this->lock_manager->release($lock_name, $run_id);
+			throw $e;
+		}
 	}
 
 	/**

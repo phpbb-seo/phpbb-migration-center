@@ -85,17 +85,23 @@ class lock_manager
 
 		// Check if previous run is completed or failed
 		$prev_run_status = '';
+		$run_exists = false;
 		if (!empty($existing_lock['run_id']))
 		{
 			$runs_table = str_replace('migration_locks', 'migration_runs', $this->table_name);
 			$sql = 'SELECT status FROM ' . $runs_table . ' WHERE run_id = ' . "'" . $this->db->sql_escape($existing_lock['run_id']) . "'";
 			$r_res = $this->db->sql_query($sql);
-			$prev_run_status = (string)$this->db->sql_fetchfield('status');
+			$row = $this->db->sql_fetchrow($r_res);
+			if ($row)
+			{
+				$run_exists = true;
+				$prev_run_status = (string)$row['status'];
+			}
 			$this->db->sql_freeresult($r_res);
 		}
 
 		$is_stale = ((int)$existing_lock['heartbeat_at'] < $stale_threshold);
-		$is_finished = in_array($prev_run_status, ['completed', 'finalized', 'rolled_back', 'abandoned', 'failed'], true);
+		$is_finished = (!$run_exists && !empty($existing_lock['run_id'])) || in_array($prev_run_status, ['completed', 'finalized', 'rolled_back', 'abandoned', 'failed'], true);
 
 		// If the lock is held by the EXACT same full worker_id, refresh heartbeat
 		if ($existing_lock['worker_id'] === $full_worker_id && $existing_lock['run_id'] === $run_id)
